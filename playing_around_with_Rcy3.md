@@ -2,6 +2,12 @@
 Julia Gustavsen  
 May 24, 2016  
 
+# Purpose
+
+Testing out some ways to develop functions that could be used in R with RCy3 to access Cytoscape plugins
+
+# Sandbox
+
 
 ```r
 library(RCy3)
@@ -10,6 +16,13 @@ library(RCy3)
 ```
 ## Loading required package: graph
 ```
+
+```r
+library(RJSONIO)
+library(httr)
+```
+
+## Connection to Cytoscape 
 
 
 ```r
@@ -32,7 +45,7 @@ CytoscapeWindow("test", overwriteWindow = TRUE) # creates empty window in Cytosc
 ## [1] "test"
 ## 
 ## Slot "window.id":
-## [1] "248"
+## [1] "192"
 ## 
 ## Slot "graph":
 ## A graphNEL graph with directed edges
@@ -73,7 +86,7 @@ existing.CytoscapeWindow("test") # The constructor for the CytoscapeWindowClass,
 ## [1] "test"
 ## 
 ## Slot "window.id":
-## [1] "248"
+## [1] "192"
 ## 
 ## Slot "graph":
 ## A graphNEL graph with directed edges
@@ -102,64 +115,11 @@ existing.CytoscapeWindow("test") # The constructor for the CytoscapeWindowClass,
 #check.cytoscape.plugin.version() ## doesn't work with loading the regular library. or in dev. Seems to work a bit more if loaded separately
 ```
 
-So how do I get the api version and see what is available?
-
-
-```r
-library(igraph)
-```
-
-```
-## 
-## Attaching package: 'igraph'
-```
-
-```
-## The following objects are masked from 'package:graph':
-## 
-##     degree, edges, intersection, union
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     decompose, spectrum
-```
-
-```
-## The following object is masked from 'package:base':
-## 
-##     union
-```
-
-```r
-library(RJSONIO)
-library(httr)
-```
-
-
-
-```r
-resetCytoscapeSession <-
-  function(port.number=1234)
-  {
-    base.url = paste("http://localhost:", toString(port.number), "/v1", sep="")
-    reset.url <- paste(base.url,"session",sep="/")
-    if (requireNamespace("httr",quietly=TRUE)) {res<-httr::DELETE(reset.url)}
-    else {stop("httr package must be installed to use this function")}
-  }
-```
-
-
-
+## Visualizing REST urls
 
 
 ```r
 port.number = 1234
-
-resetCytoscapeSession(port.number) # just to make sure you are using a clean Cytoscape
-## removes all previous networks that were loaded in that session.
-
 base.url = paste("http://localhost:",
                  toString(port.number),
                  "/v1", sep="")
@@ -170,13 +130,15 @@ base.url
 ## [1] "http://localhost:1234/v1"
 ```
 
+## Basic cytoscape info
+
+
 ```r
 version.url = paste(base.url,
                     "version",
                     sep="/")
 
 cytoscape.version = GET(version.url)
-
 cy.version = fromJSON(rawToChar(cytoscape.version$content))
 cy.version
 ```
@@ -202,110 +164,54 @@ basic_info
 ## 
 ## $memoryStatus
 ##  usedMemory  freeMemory totalMemory   maxMemory 
-##         645        2432        3078       13305
+##         430        2699        3129       13305
 ```
 
-The idea is how do I find more info on the api and what it shows? For example...how do I access enrichment map.
+
+## List of networks currently available
 
 
 ```r
-  network.url = paste(base.url, "networks", sep="/")
 ## lists networks 
-
-  # res <- POST(url=network.url, body=cygraph, encode="json")
-  # 
-  # # Extract SUID of the new network
-  # network.suid = unname(fromJSON(rawToChar(res$content)))
-  # network.suid
-  # 
-  # 
-  # #http://localhost:1234/v1/apply/styles
-  # ## what else apply?
-  # #http://localhost:1234/v1/apply/layouts
-  # ## and then give to specific network
-  # #and can send the parameters via jsonlite::
-  # 
-  # # Apply style
-  # apply.style.url = paste(base.url, "apply/styles", style.name , toString(network.suid), sep="/")
-  # GET(apply.style.url)
-  # 
-  # # Apply force-directed layout --need this first
-  #   # Tweak Layout parameters
-  #   layout.params = list(
-  #    name="unweighted",
-  #    value=TRUE
-  #    )
-  # 
-  #   layout.params.url = paste(base.url, "apply/layouts/kamada-kawai/parameters", sep="/")
-  #   PUT(layout.params.url, body=toJSON(list(layout.params)), encode = "json")
-  # 
-  #   apply.layout.url = paste(base.url, "apply/layouts/kamada-kawai", toString(network.suid), sep="/")
+network.url = paste(base.url, "networks", sep="/")
+network.url
 ```
 
-
-How do I find out what is available at the for the REST APIs?
-
-from manual - not sure I understand the difference
-" Cytoscape offers two flavors of REST-style control: REST Commands and cyREST. REST Commands uses a REST interface to issue script commands. cyREST uses a REST interface to access the Cytoscape data model as a document via a formal API"
-
-Trying with clustermaker
-
-```r
-  ## what else apply?
-#  http://localhost:1234/v1/apply/layouts
-  ## and then give to specific network
-  #and can send the parameters via jsonlite::
-  
-
-##cluster maker stuff idea?
-#   apply.clustering.url = paste(base.url,"apply/cluster",cluster.command, toString(network.suid), sep="/")
-# GET(apply.clustering.url)
-# 
-# try cluster network?
-  
-  # Apply force-directed layout --need this first
-    # Tweak Layout parameters
-    # layout.params = list(
-    #  name="unweighted",
-    #  value=TRUE
-    #  )
-    # 
-    # layout.params.url = paste(base.url, "apply/layouts/kamada-kawai/parameters", sep="/")
-    # PUT(layout.params.url, body=toJSON(list(layout.params)), encode = "json")
-    # 
-    # apply.layout.url = paste(base.url, "apply/layouts/kamada-kawai", toString(network.suid), sep="/")
+```
+## [1] "http://localhost:1234/v1/networks"
 ```
 
+## Code from RCy3 on getLayoutNames
 
-can I use this to query other types of things? 
-
+Help to figure out how to access the commands for manipulating networks n Cytoscape via plugins. 
 
 
 ```r
-## so get layoutNames looks like this.
+## lifted from RCy3 code
 
-
-setMethod('getLayoutNames', 'CytoscapeConnectionClass', 
-	function(obj) {
-request.uri <- paste(obj@uri, pluginVersion(obj), "apply/layouts", sep="/")
-        request.res <- GET(url=request.uri)
-        
-        available.layouts <- unname(fromJSON(rawToChar(request.res$content)))
-                return(available.layouts)
-})
+setMethod('getLayoutNames',
+          'CytoscapeConnectionClass', 
+          function(obj) {
+            request.uri <- paste(obj@uri,
+                                 pluginVersion(obj),
+                                 "apply/layouts",
+                                 sep="/")
+            request.res <- GET(url=request.uri)
+            
+            available.layouts <- unname(fromJSON(rawToChar(request.res$content)))
+            return(available.layouts)
+          })
 ```
 
 ```
 ## [1] "getLayoutNames"
 ```
 
-so to look at the current parameters of one type of attribute: 
+To look at the current parameters of one type of attribute: 
 
 http://localhost:1234/v1/apply/layouts/attribute-circle/parameters
 
-
-
-so we see they are pasting url/v1/apply/layouts/ to find available layouts
+Will come back later to find the function that RCy3 uses to apply parameters
 
 
 ```r
@@ -335,103 +241,104 @@ getLayoutNames (cy)
 ## [19] "isom"
 ```
 
-
-Ok maybe we are getting somewhere. 
-
-
-```r
-# paste(obj@uri, version, "networks", net.SUID, "tables/defaultnode/rows", as.character(node.SUIDs[i]), attribute.name, sep="/")
-```
+## URLs used to test out API calls
 
 http://localhost:1234/v1/networks - gives list of networks
 
 http://localhost:1234/v1/networks/13633 - gives json formatted view of network
+
 http://localhost:1234/v1/networks/13633/tables - shows all networks?
+
 http://localhost:1234/v1/networks/13633/tables/defaultnode
+
 http://localhost:1234/v1/networks/13633/tables/defaultnode/rows
 
 http://localhost:1234/v1/networks/13633/tables/defaultedge
+
 http://localhost:1234/v1/networks/13633/tables/defaultedge/rows
 
-
-what about how to list what can be applied???
-
-http://localhost:1234/v1/apply/enrichmentmap/
-
-
-```r
-#paste(obj@uri, version, "apply/styles", "default", net.SUID, sep = "/")
-## fit.content
-#resource.uri <- paste(obj@uri, pluginVersion(obj), "apply/fit", net.SUID, sep="/")
-## get style names
-#paste(obj@uri, pluginVersion(obj), "apply/styles", sep="/")
-```
-
 http://localhost:1234/v1/apply/styles
+
+http://localhost:1234/v1/networks.names/ - returns json list
+
+http://localhost:1234/v1/tables/count/
+
+## Reference for the API
 
 found this page which is helpful for the api:
 
 http://idekerlab.github.io/cyREST/#1637304040
-http://localhost:1234/v1/networks.names/ - returns json list
-http://localhost:1234/v1/tables/count/
 
+## Finding command names available in Cytoscape using R
 
-Ok hhallelya!! http://localhost:1234/v1/commands !!!
+Finally found: 
+
+http://localhost:1234/v1/commands
+
+Which gives the same as when you type `help` in the Command Line Dialog in cytoscape
 
 
 ```r
-# setMethod('getCommandNames', 'CytoscapeConnectionClass', 
-# 	
-#           function(obj) {
-# request.uri <- paste(obj@uri, pluginVersion(obj), "commands", sep="/")
-#         request.res <- GET(url=request.uri)
-#         
-#         available.commands <- unname(fromJSON(rawToChar(request.res$content)))
-#                 return(available.commands)
-# })
-
-## playing around
-
-commands.uri <- paste(base.url, "commands", sep="/")
-request.res <- GET(url=commands.uri)
-request.res
+## create function to get command names from Cytoscape
+setGeneric ('getCommandNames', 
+            signature='obj',
+            function(obj) standardGeneric ('getCommandNames'))
 ```
 
 ```
-## Response [http://localhost:1234/v1/commands]
-##   Date: 2016-05-31 15:12
-##   Status: 200
-##   Content-Type: text/plain
-##   Size: 146 B
+## [1] "getCommandNames"
+```
+
+```r
+setMethod('getCommandNames',
+          'CytoscapeConnectionClass',
+          function(obj) { 
+            request.uri <- paste(obj@uri,
+                                 pluginVersion(obj),
+                                 "commands",
+                                 sep="/")
+            request.res <- GET(url=request.uri)
+            
+            available.commands <- unlist(strsplit(rawToChar(request.res$content),
+                                                  split="\n\\s*"))
+            ## how to remove "Available namespaces"?
+            ## will remove the first value,
+            ## but feels a bit hacky
+            ## not happy with this
+            available.commands <- available.commands[-1]
+            return(available.commands) })
 ```
 
 ```
-## No encoding supplied: defaulting to UTF-8.
+## [1] "getCommandNames"
+```
+
+Test out the function to see the available commands in Cytoscape
+
+```r
+cy <- CytoscapeConnection ()
+getCommandNames(cy)
 ```
 
 ```
-## Available namespaces:
-##   cluster
-##   clusterviz
-##   command
-##   edge
-##   enrichmentmap
-##   group
-##   layout
-##   network
-##   node
-## ...
+##  [1] "cluster"       "clusterviz"    "command"       "edge"         
+##  [5] "enrichmentmap" "group"         "layout"        "network"      
+##  [9] "node"          "session"       "table"         "view"         
+## [13] "vizmap"
 ```
+
+### Can I easily access the commands within Enrichment map?
+
 
 ```r
 commands_enrichment_map.uri <- paste(base.url, "commands/enrichmentmap", sep="/")
-request.res <- GET(url=commands_enrichment_map.uri )
+request.res <- GET(url = commands_enrichment_map.uri )
 request.res
 ```
 
 ```
 ## Response [http://localhost:1234/v1/commands/enrichmentmap]
-##   Date: 2016-05-31 15:12
+##   Date: 2016-06-01 14:13
 ##   Status: 200
 ##   Content-Type: text/plain
 ##   Size: 60 B
@@ -447,3 +354,168 @@ request.res
 ##   gseabuild
 ```
 
+Now try to extend this to find commands from a specific plugin?
+Does it make sense to make a specifc class for S4 for these things? I need to keep learning about this.
+
+
+```r
+## make function to get commands from Enrichment map
+setGeneric ('getCommandNamesEnrichmentMap', 
+            signature = 'obj', function(obj) standardGeneric ('getCommandNamesEnrichmentMap'))
+```
+
+```
+## [1] "getCommandNamesEnrichmentMap"
+```
+
+```r
+setMethod('getCommandNamesEnrichmentMap',
+          'CytoscapeConnectionClass',
+          function(obj) { 
+            request.uri <- paste(obj@uri,
+                                 pluginVersion(obj),
+                                 "commands/enrichmentmap",
+                                 sep = "/")
+            request.res <- GET(url = request.uri)
+            
+            available.commands <- unlist(strsplit(rawToChar(request.res$content),
+                                                  split = "\n\\s*"))
+            ## how to remove "Available commands ..."?
+            ## not happy with this
+            available.commands <- available.commands[-1]
+            return(available.commands) })
+```
+
+```
+## [1] "getCommandNamesEnrichmentMap"
+```
+
+```r
+cy <- CytoscapeConnection ()
+str(getCommandNamesEnrichmentMap(cy))
+```
+
+```
+##  chr [1:2] "build" "gseabuild"
+```
+
+Could try to find names within a specific namespace...make a function to do that?
+
+
+
+```r
+## make function to get commands from Enrichment map
+setGeneric ('getCommandsWithinNamespace', 
+            signature = 'obj',
+            function(obj,
+                     namespace) standardGeneric ('getCommandsWithinNamespace'))
+```
+
+```
+## [1] "getCommandsWithinNamespace"
+```
+
+```r
+setMethod('getCommandsWithinNamespace',
+          'CytoscapeConnectionClass',
+          function(obj,
+                   namespace) { 
+            request.uri <- paste(obj@uri,
+                                 pluginVersion(obj),
+                                 "commands",
+                                 namespace,
+                                 sep = "/")
+            request.res <- GET(url = request.uri)
+            
+            available.commands <- unlist(strsplit(rawToChar(request.res$content),
+                                                  split = "\n\\s*"))
+            ## how to remove "Available commands ..."?
+            ## not happy with this
+            available.commands <- available.commands[-1]
+            return(available.commands) })
+```
+
+```
+## [1] "getCommandsWithinNamespace"
+```
+
+Test out using different namespaces
+
+```r
+cy <- CytoscapeConnection ()
+str(getCommandsWithinNamespace(cy, "enrichmentmap"))
+```
+
+```
+##  chr [1:2] "build" "gseabuild"
+```
+
+```r
+getCommandsWithinNamespace(cy, "layout")
+```
+
+```
+##  [1] "allegro-edge-repulsive-fruchterman-reingold"
+##  [2] "allegro-edge-repulsive-spring-electric"     
+##  [3] "allegro-edge-repulsive-strong-clustering"   
+##  [4] "allegro-edge-repulsive-weak-clustering"     
+##  [5] "allegro-fruchterman-reingold"               
+##  [6] "allegro-spring-electric"                    
+##  [7] "allegro-strong-clustering"                  
+##  [8] "allegro-weak-clustering"                    
+##  [9] "apply preferred"                            
+## [10] "attribute-circle"                           
+## [11] "attributes-layout"                          
+## [12] "circular"                                   
+## [13] "degree-circle"                              
+## [14] "force-directed"                             
+## [15] "fruchterman-rheingold"                      
+## [16] "get preferred"                              
+## [17] "grid"                                       
+## [18] "hierarchical"                               
+## [19] "isom"                                       
+## [20] "kamada-kawai"                               
+## [21] "set preferred"                              
+## [22] "stacked-node-layout"
+```
+
+```r
+getCommandsWithinNamespace(cy, "cluster")
+```
+
+```
+##  [1] "ap"                  "attribute"           "autosome_heatmap"   
+##  [4] "autosome_network"    "bestneighbor"        "cheng&church"       
+##  [7] "connectedcomponents" "cuttingedge"         "dbscan"             
+## [10] "density"             "fcml"                "featurevector"      
+## [13] "fft"                 "filter"              "fuzzifier"          
+## [16] "getcluster"          "getnetworkcluster"   "glay"               
+## [19] "haircut"             "hascluster"          "hierarchical"       
+## [22] "hopach"              "kmeans"              "kmedoid"            
+## [25] "mcl"                 "mcode"               "network"            
+## [28] "pam"                 "scps"                "transclust"
+```
+
+```r
+getCommandsWithinNamespace(cy, "network")
+```
+
+```
+##  [1] "add"              "add edge"         "add node"        
+##  [4] "clone"            "create"           "create attribute"
+##  [7] "create empty"     "delete"           "deselect"        
+## [10] "destroy"          "export"           "get"             
+## [13] "get attribute"    "get properties"   "hide"            
+## [16] "import file"      "import url"       "list"            
+## [19] "list attributes"  "list properties"  "load file"       
+## [22] "load url"         "rename"           "select"          
+## [25] "set attribute"    "set current"      "set properties"  
+## [28] "show"
+```
+
+## Next steps
+
+- Examine RCy3 to see what functions I can use to send info (POST) to the commands in Cytoscape. 
+- Verify that I have made these functions correctly for use in S4 framework
+- Start working through Enrichment map tutorial (or other data?) using these R functions.
+- Is it wrong to have variable `available.commands`? Does this mess with S4 stuff? 
