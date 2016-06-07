@@ -78,6 +78,7 @@ network.url
 
 Help to figure out how to access the commands for manipulating networks n Cytoscape via plugins. 
 
+standardGeneric() is like the S3 UseMethod()
 ```{r}
 ## lifted from RCy3 code
 
@@ -248,9 +249,270 @@ getCommandsWithinNamespace(cy, "cluster")
 getCommandsWithinNamespace(cy, "network")
 ```
 
+
+## Enrichment map stuff
+
+### help enrichmentmap build
+enrichmentmap build arguments:
+analysisType=<ListSingleSelection GSEA|generic|DAVID/BiNGO/Great)>: Analysis Type
+classDataset1=<File>: Classes
+classDataset2=<File>: Classes
+coeffecients=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: Similarity Coeffecient
+enrichments2Dataset1=<File>: Enrichments 2
+enrichments2Dataset2=<File>: Enrichments 2
+enrichmentsDataset1=<File>: Enrichments
+enrichmentsDataset2=<File>: Enrichments
+expressionDataset1=<File>: Expression
+expressionDataset2=<File>: Expression
+gmtFile=<File>: GMT
+phenotype1Dataset1=<String>: Phenotype1
+phenotype1Dataset2=<String>: Phenotype1
+phenotype2Dataset1=<String>: Phenotype2
+phenotype2Dataset2=<String>: Phenotype2
+pvalue=<Double>: P-value Cutoff
+qvalue=<Double>: FDR Q-value Cutoff
+ranksDataset1=<File>: Ranks
+ranksDataset2=<File>: Ranks
+similaritycutoff=<Double>: Similarity Cutoff
+
+### help enrichmentmap gseabuild
+enrichmentmap gseabuild arguments:
+combinedconstant=<Double>: combinedconstant
+edbdir=<String>: edbdir
+edbdir2=<String>: edbdir2
+expressionfile=<String>: expressionfile
+expressionfile2=<String>: expressionfile2
+overlap=<Double>: overlap
+pvalue=<Double>: P-value Cutoff
+qvalue=<Double>: FDR Q-value Cutoff
+similaritymetric=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: similaritymetric
+
+```{r}
+
+setGeneric ('getEnrichmentMapCommands', 
+	signature='obj', function(obj) standardGeneric ('getEnrichmentMapCommands'))
+setGeneric ('getEnrichmentMapNameMapping',	
+	signature='obj', function(obj) standardGeneric ('getEnrichmentMapNameMapping'))
+setGeneric ('getEnrichmentMapCommandsNames',	
+	signature='obj', function(obj, layout.name) standardGeneric ('getEnrichmentMapCommandsNames'))
+
+getCommandNamesEnrichmentMap(cy)
+
+layout.names <- getCommandNamesEnrichmentMap(cy)
+layout.full.names <- c()
+
+
+# get the English/full name of a layout
+for (layout.name in layout.names){
+  request.uri <- paste(cy@uri,
+                       pluginVersion(cy),
+                       "commands/enrichmentmap",
+                       as.character(layout.name),
+                       sep="/")
+  request.res <- GET(url=request.uri)
+
+   layout.property.names <- unlist(strsplit(rawToChar(request.res$content),
+                                                  split = "\n\\s*"))
+            ## how to remove "Available commands ..."?
+            ## not happy with this
+            layout.property.names <- layout.property.names[-1]
+
+return(layout.property.names)
+}
+```
+
+```{r}
+## need to specify which one would be most useful here? build or gseabuild or just make stuff for both?
+setMethod('getEnrichmentMapNameMapping', 'CytoscapeConnectionClass', 
+    function(obj) {
+        layout.names <- getCommandNamesEnrichmentMap(obj)
+        layout.full.names <- c()
+        
+        # get the English/full name of a layout
+        for (layout.name in layout.names){
+            request.uri <- paste(obj@uri,
+                                 pluginVersion(obj),
+                                 "commands/enrichmentmap",
+                                 as.character(layout.name),
+                                 sep="/")
+            request.res <- GET(url=request.uri)
+            
+   layout.property.names <- unlist(strsplit(rawToChar(request.res$content),
+                                                  split = "\n\\s*"))
+            ## how to remove "Available commands ..."?
+            ## not happy with this
+            layout.property.names <- layout.property.names[-1]
+        }
+
+return(layout.property.names)
+})
+## END getLayoutNameMapping
+
+getEnrichmentMapNameMapping(cy)            
+            
+#http://localhost:1234/v1/commands/enrichmentmap/build/
+
+setMethod('getEnrichmentMapCommandsNames',
+          'CytoscapeConnectionClass', 
+          function(obj,
+                   layout.name) {
+            request.uri <- paste(obj@uri,
+                                 pluginVersion(obj),
+                                 "commands/enrichmentmap",
+                                 as.character(layout.name),
+                                 sep="/")
+            request.res <- GET(url=request.uri)
+            
+            layout.property.names <-unlist(strsplit(rawToChar(request.res$content),
+                                                    split = "\n\\s*"))
+            ## how to remove "Available commands ..."?
+            ## not happy with this
+            layout.property.names <- layout.property.names[-1]
+            
+            return(layout.property.names)
+            
+          })## END getEnrichmentMapCommandsNames
+
+getEnrichmentMapCommandsNames(cy, "build")
+getEnrichmentMapCommandsNames(cy, "gseabuild")
+```
+
+Trying to figure out how to send data to the cytoscape network
+
+
+```{r}
+
+request.uri <- paste(cy@uri,
+                     pluginVersion(cy),
+                     "commands/enrichmentmap",
+                     as.character(layout.name),
+                     sep = "/")
+
+## with this one you need to use a GET request and it should be in the form of a query, not a json list. 
+request.res <- PUT(url = request.uri,
+                   body = new.property.value.list.JSON,
+                   encode = "json")
+request.res    
+## gives 405 response...which means not allowed. 
+```
+
+
+```{r}
+getEnrichmentMapCommandsNames(cy,"build")
+```
+
+```{r}
+enrichmentmap.url <- paste(base.url,
+                           "commands",
+                           "enrichmentmap",
+                           "build",
+                           sep="/") 
+
+## something to deal with is that you cannot use relative paths in this, it needs to be absolute path
+path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+
+enr_file = paste(path_to_file,
+                 "gprofiler_results_mesenonly_ordered_computedinR.txt",
+                 sep="")
+
+#' Runs Enrichment Map with a list of parameters.
+#'
+#' @param object Cytoscape network where Enrichment Map is run via RCy3 
+#' @param 
+#' @return An enrichmentMap 
+#'
+#' @concept RCy3
+#' @export
+#' 
+#' @importFrom methods setGeneric
+
+setGeneric('setEnrichmentMapProperties', 
+            signature='obj',
+            function(obj,
+                     layout.name,
+                     properties.list) standardGeneric('setEnrichmentMapProperties')
+           )
+
+setMethod('setEnrichmentMapProperties',
+          'CytoscapeWindowClass', 
+          
+          function(obj,
+                   layout.name,
+                   properties.list) {
+            all.possible.props <- getEnrichmentMapCommandsNames(obj,
+                                                         layout.name)
+              if (all(names(properties.list) %in% all.possible.props) == FALSE) {
+                print('You have included a name which is not in the commands')
+                      stderr ()
+              } else {
+                request.uri <- paste(obj@uri,
+                     pluginVersion(obj),
+                     "commands/enrichmentmap",
+                     as.character(layout.name),
+                     sep = "/")
+
+                request.res <- GET(url = request.uri,
+                                   query = properties.list)
+                if (request.res$status == 200){
+                  print("Successfully buitl the EnrichmentMap.")
+                        stdout ()
+                } else {
+                  print("Something went wrong. Unable to build EnrichmentMap")
+                        stderr ()
+                }
+                invisible(request.res)
+              }
+          }) 
+
+em_params <- list(analysisType = "generic",
+                  enrichmentsDataset1 = enr_file,
+                  pvalue = "1.0",
+                  qvalue = "0.00001",
+                  #expressionDataset1 = exp_file, 
+                  similaritycutoff = "0.25",
+                  coeffecients = "JACCARD")
+
+setEnrichmentMapProperties(cy, "build", em_params)
+displayGraph(cy)
+## does not work because the class is not right
+## see line 404 in RCy3.R
+saveImage(cy,"test_EM", "pdf", scale=1.0)
+saveImage(c2,"test_EM", "png", scale=0.3)
+
+```
+
+
+
+```{r}
+
+enrichmentmap.url <- paste(base.url,
+                           "commands",
+                           "enrichmentmap",
+                           "build",
+                           sep="/") 
+
+path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+
+enr_file = paste(path_to_file,"gprofiler_results_mesenonly_ordered_computedinR.txt",sep="")
+
+em_params <- list(analysisType = "generic",
+                  enrichmentsDataset1 =enr_file,
+                  pvalue="1.0",
+                  qvalue="0.00001",
+                  #expressionDataset1 = exp_file, 
+                  similaritycutoff="0.25",
+                  coeffecients="JACCARD")
+
+response <- GET(url=enrichmentmap.url,
+                query=em_params)
+response$url
+
+```
+
 ## Next steps
 
 - Examine RCy3 to see what functions I can use to send info (POST) to the commands in Cytoscape. 
 - Verify that I have made these functions correctly for use in S4 framework
 - Start working through Enrichment map tutorial (or other data?) using these R functions.
 - Is it wrong to have variable `available.commands`? Does this mess with S4 stuff? 
+- timecourse ideas??
