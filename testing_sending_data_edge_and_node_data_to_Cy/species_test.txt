@@ -1,0 +1,13 @@
+V1	V2	weight
+Species1	Species2	2
+Species1	Species3	3
+Species4	Species5	5
+Species4	Species1	2
+Species3	Species5	2
+Species2	Species4	1
+Species5	Species6	1
+Species6	Species7	1
+Species6	Species8	2
+Species5	Species7	3
+Species4	Species7	9
+Species6	Species2	21
