@@ -16,12 +16,14 @@
 
 - Continue to work on EnrichmentMap functions and then vignette:
     - convert EnrichmentMap functions to work properly in the S4 framework
+    - work through examples from Ruth Isserlin's github repo on EnrichmentMap analysis.
     
 - Continue to work on species co-occurrence network example:
     - add in taxonomic data for networks
     - further analysis and layouts to look at ecology of microbes
     - consider comparing to surface water network
 - Write post on the first progress in these examples
+- If time permits start working with cytoscape plugins: clusterMaker, cyanimator, chemviz. 
 
 ### Problems or things that I am stuck on:
 
@@ -30,3 +32,5 @@
 ### Questions for mentor:
 
 - Once I get functions working for Enrichment map, how should I continue the analysis?
+    - response from mentor: work through the examples from Bader lab tutorial and make appropriate S4 functions. 
+    - generate appropriate figures from these analyses and we can go from there.
