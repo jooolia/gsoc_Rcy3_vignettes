@@ -82,3 +82,45 @@ Cheers,
 
 Gipsi
 
+## 10 June 2016
+
+Emailed Dr. Matt Sullivan (corresponding author on Brum et al 2015 paper: [Patterns and ecological drivers of ocean viral communities. Science. 348. doi:10.1126/science.1261498.] (http://www.sciencemag.org/content/348/6237/1261498.full))
+
+My email: 
+
+Hi Dr. Sullivan,
+
+I hope that you are well and perhaps I will see you this summer at either VOM or ISME in Montreal. 
+
+I'm working on a small project this summer that is funded by Google summer of code with the National Resource on Network Biology and we're looking to facilitate the reproducible analysis of biological networks (project here and working github repo here ). I thought it would be great to use some of the Tara oceans data for one of the examples that we are developing. 
+
+I want to use the deep chlorophyll max virus and bacteria,archaea abundance tables and I have discussed a bit with the Raes lab and they have been very helpful for figuring out some things, but I have one question for your group. 
+1) Are the annotations for the viral clusters available? I mean those that look like ph_9996. I have looked in the http://mirrors.iplantcollaborative.org/browse/iplant/home/shared/iVirus/TOV_43_viromes folder, but perhaps I overlooked something. I realize it is not a big deal to redo this analysis, but thought it would be more straightforward to use the annotations from the papers.
+
+Thanks for any help! 
+
+Cheers, Julia
+
+### Response: 
+
+Hi Julia,
+
+Thank you for your email, great to hear about this project to try to reproduce the networks. I’m assuming you want the annotations for the protein clusters (the viral clusters are something different) or else for the viral populations. Cesar or Simon can help you with this for the protein clusters or viral populations, respectively. Both are CC’d to this email.
+
+Best,
+Matt
+
+### Response: 
+Hi Julia,
+
+Enclosed is a spreadsheet that should help (to some extent.. ). Fist tab has the co-presence of phage and host (i.e. the co-occurrence network results), with the correspondence between network ids (ph_XXXX) and the contig ID (that you have in the files at http://mirrors.iplantcollaborative.org/browse/iplant/home/shared/iVirus/TOV_43_viromes). Second tab has all the BLAST-based affiliations we have for these contigs: note that most of the contigs are "unclassified" (meaning that they have inconsistent hits to multiple phages, or no hits at all), and not all contigs are in this affiliation table (we only tried to affiliated large contigs, as we did not believe that contigs with 2-3 genes could give us a reliable affiliation). The lack of affiliation is also due to the fact that we used very stringent cutoffs (we really looked for contigs near-identical to isolated phages). The good side of this is that when we provide an affiliation, usually we are relatively confident that the contigs come from a virus with a similar host as the isolate (at least most of the time). 
+
+Anyway, let me know if you have any question on these data, or if anything looks inconsistent !
+
+Best,
+
+Simon
+
+attached: Tara_Phage_host_copresence.xls
+
+
