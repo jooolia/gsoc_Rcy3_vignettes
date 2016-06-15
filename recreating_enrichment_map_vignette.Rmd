@@ -234,10 +234,7 @@ getEnrichmentMapCommandsNames(cy, "gseabuild")
 
 ## Send data to the cytoscape network
 
-```{r}
-getEnrichmentMapCommandsNames(cy,"build")
-```
-
+Use data from the Bader lab tutorial
 ```{r}
 ## Note: You cannot use relative paths in this,
 ## it needs to be the absolute path
@@ -343,81 +340,61 @@ em_params <- list(analysisType = "generic",
                   coeffecients = "JACCARD")
 
 ## no graph is returned, just the connection to the graph
-new <- setEnrichmentMapProperties(cy,
+EM_1 <- setEnrichmentMapProperties(cy,
                                   "build",
                                   em_params)
 ```
 
+Is there a situation where using the last made window for this enrichment map will fail? What other option could I find?
+
 ```{r}
-saveImage(new,
-          "test_EM_new",
+saveImage(EM_1,
+          "EM_1",
           "png",
           scale=4)
 ```
 
-![](./test_EM_new.png)
+![](./EM_1.png)
 
 ```{r}
-print(noa.names(getGraph(new)))
+head(noa.names(getGraph(EM_1)))
 
 ## test setting layout from R
-layoutNetwork(new,
+layoutNetwork(EM_1,
                   'grid')
 
-saveImage(new,
-          "test_EM_new",
+saveImage(EM_1,
+          "EM_1_gridded",
           "png",
           scale=4)
 ```
-![](./test_EM_new.png)
+![](./EM_1_gridded.png)
 
-```{r}
-saveNetwork(new, "test_EM")    
-new@graph
+```{r, cache = TRUE}
+saveNetwork(EM_1, "EM_1")    
+EM_1@graph
 
 ## if we want the graph data to be returned
 ## this part is slooooow!
-new2 <- setEnrichmentMapProperties(cy,
+EM_1_2 <- setEnrichmentMapProperties(cy,
                                    "build",
                                    em_params,
                                    copy.graph.to.R = TRUE)
-print(noa.names(getGraph(new2)))
-nodeData(new2@graph)
+print(noa.names(getGraph(EM_1_2)))
+head(nodeData(EM_1_2@graph))
 
-saveImage(new2,
-          "test_EM_new2",
+saveImage(EM_1_2,
+          "EM_1_2",
           "png",
           scale=4)
 
 ```
 
-![](./test_EM_new2.png)
+![](./EM_1_2.png)
 
-```{r}
+## EM with two inputs
 
-enrichmentmap.url <- paste(base.url,
-                           "commands",
-                           "enrichmentmap",
-                           "build",
-                           sep="/") 
-
-path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
-
-enr_file = paste(path_to_file,"gprofiler_results_mesenonly_ordered_computedinR.txt",sep="")
-
-em_params <- list(analysisType = "generic",
-                  enrichmentsDataset1 =enr_file,
-                  pvalue="1.0",
-                  qvalue="0.00001",
-                  #expressionDataset1 = exp_file, 
-                  similaritycutoff="0.25",
-                  coeffecients="JACCARD")
-
-response <- GET(url=enrichmentmap.url,
-                query=em_params)
-response$url
-
-```
+to come!
 
 ## Next steps
 
