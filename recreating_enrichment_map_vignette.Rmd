@@ -194,65 +194,37 @@ similaritymetric=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: similaritymet
 
 
 ```{r}
-setGeneric ('getEnrichmentMapCommands', 
-	signature='obj', function(obj) standardGeneric ('getEnrichmentMapCommands'))
-setGeneric ('getEnrichmentMapNameMapping',	
-	signature='obj', function(obj) standardGeneric ('getEnrichmentMapNameMapping'))
+# setGeneric ('getEnrichmentMapCommands', 
+# 	signature='obj', function(obj) standardGeneric ('getEnrichmentMapCommands'))
 setGeneric ('getEnrichmentMapCommandsNames',	
-	signature='obj', function(obj, layout.name) standardGeneric ('getEnrichmentMapCommandsNames'))
+	signature='obj', function(obj, command.name) standardGeneric ('getEnrichmentMapCommandsNames'))
 
 getCommandNamesEnrichmentMap(cy)
 ```
 
 ```{r}
 ## need to specify which one would be most useful here? build or gseabuild or just make stuff for both?
-setMethod('getEnrichmentMapNameMapping',
-          'CytoscapeConnectionClass', 
-    function(obj) {
-        layout.names <- getCommandNamesEnrichmentMap(obj)
-        layout.full.names <- c()
-        
-        # get the English/full name of a layout
-        for (layout.name in layout.names){
-            request.uri <- paste(obj@uri,
-                                 pluginVersion(obj),
-                                 "commands/enrichmentmap",
-                                 as.character(layout.name),
-                                 sep="/")
-            request.res <- GET(url = request.uri)
-            
-   layout.property.names <- unlist(strsplit(rawToChar(request.res$content),
-                                                  split = "\n\\s*"))
-            ## how to remove "Available commands ..."?
-            ## not happy with this
-            layout.property.names <- layout.property.names[-1]
-        }
-return(layout.property.names)
-})
-## END getLayoutNameMapping
-
-getEnrichmentMapNameMapping(cy)            
             
 #http://localhost:1234/v1/commands/enrichmentmap/build/
 
 setMethod('getEnrichmentMapCommandsNames',
           'CytoscapeConnectionClass', 
           function(obj,
-                   layout.name) {
+                   command.name) {
             request.uri <- paste(obj@uri,
                                  pluginVersion(obj),
                                  "commands/enrichmentmap",
-                                 as.character(layout.name),
+                                 as.character(command.name),
                                  sep="/")
             request.res <- GET(url=request.uri)
             
-            layout.property.names <-unlist(strsplit(rawToChar(request.res$content),
+            command.property.names <-unlist(strsplit(rawToChar(request.res$content),
                                                     split = "\n\\s*"))
             ## how to remove "Available commands ..."?
             ## not happy with this
-            layout.property.names <- layout.property.names[-1]
+            command.property.names <- command.property.names[-1]
             
-            return(layout.property.names)
+            return(command.property.names)
             
           })## END getEnrichmentMapCommandsNames
 
@@ -260,38 +232,15 @@ getEnrichmentMapCommandsNames(cy, "build")
 getEnrichmentMapCommandsNames(cy, "gseabuild")
 ```
 
-Trying to figure out how to send data to the cytoscape network
-
-
-```{r}
-
-request.uri <- paste(cy@uri,
-                     pluginVersion(cy),
-                     "commands/enrichmentmap",
-                     as.character(layout.name),
-                     sep = "/")
-
-## with this one you need to use a GET request and it should be in the form of a query, not a json list. 
-# request.res <- PUT(url = request.uri,
-#                    body = new.property.value.list.JSON,
-#                    encode = "json")
-# request.res    
-## gives 405 response...which means not allowed. 
-```
-
+## Send data to the cytoscape network
 
 ```{r}
 getEnrichmentMapCommandsNames(cy,"build")
 ```
 
 ```{r}
-enrichmentmap.url <- paste(base.url,
-                           "commands",
-                           "enrichmentmap",
-                           "build",
-                           sep="/") 
-
-## something to deal with is that you cannot use relative paths in this, it needs to be absolute path
+## Note: You cannot use relative paths in this,
+## it needs to be the absolute path
 path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
 
 enr_file = paste(path_to_file,
@@ -314,7 +263,7 @@ enr_file = paste(path_to_file,
 setGeneric('setEnrichmentMapProperties', 
             signature='obj',
             function(obj,
-                     layout.name,
+                     command.name,
                      properties.list, 
                      copy.graph.to.R = FALSE) standardGeneric('setEnrichmentMapProperties')
            )
@@ -322,11 +271,11 @@ setGeneric('setEnrichmentMapProperties',
 setMethod('setEnrichmentMapProperties',
           'CytoscapeConnectionClass', 
           function(obj,
-                   layout.name,
+                   command.name,
                    properties.list, 
                    copy.graph.to.R = FALSE) {
             all.possible.props <- getEnrichmentMapCommandsNames(obj,
-                                                                layout.name)
+                                                                command.name)
             if (all(names(properties.list) %in% all.possible.props) == FALSE) {
               print('You have included a name which is not in the commands')
               stderr ()
@@ -334,7 +283,7 @@ setMethod('setEnrichmentMapProperties',
               request.uri <- paste(obj@uri,
                                    pluginVersion(obj),
                                    "commands/enrichmentmap",
-                                   as.character(layout.name),
+                                   as.character(command.name),
                                    sep = "/")
               
               request.res <- GET(url = request.uri,
@@ -345,7 +294,7 @@ setMethod('setEnrichmentMapProperties',
                 resource.uri <- paste(cy@uri,
                                       pluginVersion(cy),
                                       "networks",
-                                      sep="/")
+                                      sep = "/")
                 request.res <- GET(resource.uri)
                 # SUIDs list of the existing Cytoscape networks	
                 cy.networks.SUIDs <- fromJSON(rawToChar(request.res$content))
@@ -356,26 +305,26 @@ setMethod('setEnrichmentMapProperties',
                                       pluginVersion(cy),
                                       "networks",
                                       as.character(cy.networks.SUIDs.last),
-                                      sep="/")
+                                      sep = "/")
                 result <- GET(res.uri.last)
                 net.name <- fromJSON(rawToChar(result$content))$data$name
-              
+                
                 if (copy.graph.to.R){
-                  connect_EM_to_R_session <- existing.CytoscapeWindow (net.name,
-                                                  copy.graph.from.cytoscape.to.R=TRUE)
-                                 print(paste0("Cytoscape window",
-                            net.name,
-                            " successfully connected to R session and graph copied to R."))
+                  connect_EM_to_R_session <- existing.CytoscapeWindow(net.name,
+                                                                       copy.graph.from.cytoscape.to.R = TRUE)
+                  print(paste0("Cytoscape window",
+                               net.name,
+                               " successfully connected to R session and graph copied to R."))
                 } 
-                else{
-               connect_EM_to_R_session <- existing.CytoscapeWindow (net.name,
-                                                  copy.graph.from.cytoscape.to.R=FALSE) 
-               print(paste0("Cytoscape window",
-                            net.name,
-                            " successfully connected to R session."))
+                else {
+                  connect_EM_to_R_session <- existing.CytoscapeWindow(net.name,
+                                                                       copy.graph.from.cytoscape.to.R = FALSE) 
+                  print(paste0("Cytoscape window ",
+                               net.name,
+                               " successfully connected to R session."))
                 }
-               
-               
+                
+                
               } else {
                 print("Something went wrong. Unable to build EnrichmentMap")
                 stderr ()
@@ -392,24 +341,42 @@ em_params <- list(analysisType = "generic",
                   #expressionDataset1 = exp_file, 
                   similaritycutoff = "0.25",
                   coeffecients = "JACCARD")
-## so no graph is returned, just the connection to the graph
-new <- setEnrichmentMapProperties(cy, "build", em_params)
+
+## no graph is returned, just the connection to the graph
+new <- setEnrichmentMapProperties(cy,
+                                  "build",
+                                  em_params)
+```
+
+```{r}
+saveImage(new,
+          "test_EM_new",
+          "png",
+          scale=4)
+```
+
+![](./test_EM_new.png)
+
+```{r}
+print(noa.names(getGraph(new)))
+
+## test setting layout from R
+layoutNetwork(new,
+                  'grid')
 
 saveImage(new,
           "test_EM_new",
           "png",
           scale=4)
-print(noa.names(getGraph(new)))
- layoutNetwork(new,
-                  'grid')
+```
+![](./test_EM_new.png)
+
+```{r}
 saveNetwork(new, "test_EM")    
 new@graph
 
-## so almost here like you need to get the window returned here. 
-## need a function to determine the suid of the network made. 
-## how to get the name of the graph made??
-## how can I then manipulate it?
-
+## if we want the graph data to be returned
+## this part is slooooow!
 new2 <- setEnrichmentMapProperties(cy,
                                    "build",
                                    em_params,
@@ -417,47 +384,14 @@ new2 <- setEnrichmentMapProperties(cy,
 print(noa.names(getGraph(new2)))
 nodeData(new2@graph)
 
-list_of_windows <- getWindowList(cy)
-list_of_windows
-## last created and then use that to connect to that window
-## hard because suids are just given however?
-		resource.uri <- paste(cy@uri,
-		                      pluginVersion(cy),
-		                      "networks",
-		                      sep="/")
-		request.res <- GET(resource.uri)
-		# SUIDs list of the existing Cytoscape networks	
-		cy.networks.SUIDs <- fromJSON(rawToChar(request.res$content))
-		# most recently made enrichment map will have the highest SUID
-		cy.networks.SUIDs.last <- max(cy.networks.SUIDs)
-		
-		res.uri.last <- paste(cy@uri,
-		                      pluginVersion(cy),
-		                      "networks",
-		                      as.character(cy.networks.SUIDs.last),
-		                      sep="/")
-			result <- GET(res.uri.last)
-			net.name <- fromJSON(rawToChar(result$content))$data$name
-
-## here!!		
-## so the suids seem to increase in number as they are made. ## so it is a matter of extracting them and then getting hte name and linking up to an existing window!
-
-getWindowList(cy)
-## how do I connect to that window??
-getWindowID(cy,net.name)
-
-## object needs to be a CytoscapeWindowClass object
-## connect to existing window....
-test_existing_window <- existing.CytoscapeWindow (net.name,
-                                                  copy.graph.from.cytoscape.to.R=FALSE)
-
-saveImage(test_existing_window,
-          "test_EM_new",
+saveImage(new2,
+          "test_EM_new2",
           "png",
           scale=4)
+
 ```
 
-![](./test_EM_new.png)
+![](./test_EM_new2.png)
 
 ```{r}
 
@@ -490,3 +424,4 @@ response$url
 - Verify that I have made these functions correctly for use in S4 framework
 - Clean up the use of the functions
 - EM with two inputs.- see tutorial for ideas
+- command to print list of setable properties?
