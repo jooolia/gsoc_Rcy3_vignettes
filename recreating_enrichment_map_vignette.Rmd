@@ -16,12 +16,10 @@ output:
 * Recreating tutorials from Bader lab (link) using Rcy3 and cytoscape.
 * creating functions using RCy3 that make it easy to use Enrichment Map
 
-
-```{r}
+```{r, message = FALSE}
 library(RCy3)
 library(httr)
 library(RJSONIO)
-
 ```
 
 * Make sure cytoscape is open!
@@ -357,7 +355,7 @@ saveImage(EM_1,
 ![](./EM_1.png)
 
 ```{r}
-head(noa.names(getGraph(EM_1)))
+print(noa.names(getGraph(EM_1)))
 
 ## test setting layout from R
 layoutNetwork(EM_1,
@@ -381,7 +379,6 @@ EM_1_2 <- setEnrichmentMapProperties(cy,
                                    em_params,
                                    copy.graph.to.R = TRUE)
 print(noa.names(getGraph(EM_1_2)))
-head(nodeData(EM_1_2@graph))
 
 saveImage(EM_1_2,
           "EM_1_2",
@@ -392,13 +389,133 @@ saveImage(EM_1_2,
 
 ![](./EM_1_2.png)
 
-## EM with two inputs
+## Following :
+[Protocol 4 - Summarize Enrichment Results with Enrichment] Maps(https://github.com/BaderLab/EM-tutorials-docker/blob/master/notebooks/Protocol%204%20-%20Summarize%20Enrichment%20Results%20with%20Enrichment%20Maps.ipynb)
 
-to come!
+### Option 1: Load enrichment results from g:Profiler
+```{r}
+path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+
+enr_file = paste0(path_to_file,
+                 "gprofiler_results_mesenonly_ordered.txt")
+
+expression_RNA_seq <- paste0(path_to_file,
+                               "MesenchymalvsImmunoreactive_RNSseq_expression.txt")
+
+ranks_file <- paste0(path_to_file,
+                      "MesenchymalvsImmunoreactive_RNA_seq_ranks.rnk")
+classes_file <- paste0(path_to_file,
+                      "MesenchymalvsImmunoreactive_RNAseq_classes.cls")
+
+# Phenotype - In the text boxes replace "UP" with "Mesenchymal" and "DOWN" with Immunoreactive. Mesenchymal will be associated with red nodes because it corresponds to the positive phenotype in the gprofiler_results_mesenonly_ordered.
+
+em_params <- list(analysisType = "generic",
+                  enrichmentsDataset1 = enr_file,
+                  pvalue = "1.0",
+                  qvalue = "0.0001",
+                  #expressionDataset1 = expression_RNA_seq, 
+                  #ranksDataset1 = ranks_file,
+                  classDataset1 = classes_file,
+                  phenotype1Dataset1 ="Mesenchymal",
+                  phenotype2Dataset1 ="Immunoreactive",
+                  similaritycutoff = "0.25",
+                  coeffecients = "JACCARD")
+
+EM_ex_4 <- setEnrichmentMapProperties(cy,
+                                  "build",
+                                  em_params)
+
+```
+
+
+
+```{r}
+saveImage(EM_ex_4,
+          "EM_ex_4",
+          "png",
+          scale=4)
+```
+![](./EM_ex_4.png)
+
+
+### Option 2: Load enrichment results from GSEA
+
+```{r}
+
+path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+
+gmt_file = paste0(path_to_file,
+                 "Human_GOBP_AllPathways_no_GO_iea_December_24_2015_symbol.gmt")
+expression_file <- paste0(path_to_file,
+                          "MesenchymalvsImmunoreactive_RNSseq_expression.txt")
+## come back here! was running
+# enrichments_1 <- paste0(path_to_file,
+#                         )
+# 
+# Enrichments 1- gsea_home/output/[data]/ Mesen_vs_Immuno_edgeR.GseaPreranked.1453221178549 / gsea_report_for_na_pos_1453221178549.xls (example file name. Number is automatically generated and will be different for results run by user.
+# Enrichments 2 – gsea_home/output/[data]/ Mesen_vs_Immuno_edgeR.GseaPreranked.1453221178549 /gsea_report_for_na_neg_1453221178549.xls (example file name. Number is automatically generated and will be different for results run by user.
+# Classes - MesenchymalvsImmunoreactive_RNAseq_classes.cls
+
+
+```
+
+
+
+## Recreate tutorial on lab website: http://www.baderlab.org/Software/EnrichmentMap/Tutorial
+
+```{r}
+
+gsea_tut_path="/home/julia_g/windows_school/gsoc/gsoc_Rcy3_vignettes/GSEATutorial/"
+
+gmt_file <- paste0(gsea_tut_path,
+                   "Human_GO_AllPathways_no_GO_iea_April_15_2013_symbol.gmt")
+
+data_1_ex_1 <- paste0(gsea_tut_path,
+                     "MCF7_ExprMx_v2_names.gct")
+
+gsea_tut_path="/home/julia_g/gsea_home/output/may23/estrogen_treatment_12hr_gsea_enrichment_results.Gsea.1464036337021/"
+
+data_1_en_1_es <- paste0(gsea_tut_path,
+                      "gsea_report_for_ES12_1464036337021.xls")
+data_1_en_2_nt <- paste0(gsea_tut_path,
+                         "gsea_report_for_NT12_1464036337021.xls")
+
+rank_file <- paste0(gsea_tut_path,
+                    "edb/MCF7_ExprMx_v2_names_ExprMx_v2_names.ES_NT.cls_ES12_versus_NT12.rnk")
+
+
+#Dataset 1 / Phenotypes 1: ES12 VS NT12 (OPTIONAL)
+
+em_params <- list(analysisType = "GSEA",
+                  gmtFile = gmt_file,
+                  expressionDataset1 = data_1_ex_1,
+                  enrichmentsDataset1 = data_1_en_1_es,
+                  enrichments2Dataset1 = data_1_en_2_nt,
+                  pvalue = "0.001",
+                  qvalue = "0.05",
+                  ranksDataset1 = rank_file,
+                  phenotype1Dataset1 ="ES12",
+                  phenotype2Dataset1 ="NT12",
+                  similaritycutoff = "0.25",
+                  coeffecients = "JACCARD")
+
+EM_ex_6 <- setEnrichmentMapProperties(cy,
+                                  "build",
+                                  em_params)
+```
+
+
+Successfully built!
+```{r}
+saveImage(EM_ex_6,
+          "EM_ex_6",
+          "png",
+          scale=4)
+```
+![](./EM_ex_6.png)
 
 ## Next steps
 
 - Verify that I have made these functions correctly for use in S4 framework
 - Clean up the use of the functions
-- EM with two inputs.- see tutorial for ideas
 - command to print list of setable properties?

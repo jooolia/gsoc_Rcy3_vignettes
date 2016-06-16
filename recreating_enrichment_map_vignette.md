@@ -8,16 +8,8 @@ May 24, 2016
 * creating functions using RCy3 that make it easy to use Enrichment Map
 
 
-
 ```r
 library(RCy3)
-```
-
-```
-## Loading required package: graph
-```
-
-```r
 library(httr)
 library(RJSONIO)
 ```
@@ -114,17 +106,10 @@ request.res
 
 ```
 ## Response [http://localhost:1234/v1/commands/enrichmentmap]
-##   Date: 2016-06-15 14:25
+##   Date: 2016-06-16 12:57
 ##   Status: 200
 ##   Content-Type: text/plain
 ##   Size: 60 B
-```
-
-```
-## No encoding supplied: defaulting to UTF-8.
-```
-
-```
 ## Available commands for 'enrichmentmap':
 ##   build
 ##   gseabuild
@@ -533,7 +518,7 @@ EM_1 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM3_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM15_Enrichment Map successfully connected to R session."
 ```
 
 Is there a situation where using the last made window for this enrichment map will fail? What other option could I find?
@@ -550,7 +535,7 @@ saveImage(EM_1,
 
 
 ```r
-head(noa.names(getGraph(EM_1)))
+print(noa.names(getGraph(EM_1)))
 ```
 
 ```
@@ -592,7 +577,7 @@ EM_1_2 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape windowEM4_Enrichment Map successfully connected to R session and graph copied to R."
+## [1] "Cytoscape windowEM12_Enrichment Map successfully connected to R session and graph copied to R."
 ```
 
 ```r
@@ -600,208 +585,11 @@ print(noa.names(getGraph(EM_1_2)))
 ```
 
 ```
-##  [1] "name"                    "EM4_GS_DESCR"           
-##  [3] "EM4_Formatted_name"      "EM4_Name"               
-##  [5] "EM4_GS_Source"           "EM4_GS_Type"            
-##  [7] "EM4_pvalue_dataset1"     "EM4_Colouring_dataset1" 
-##  [9] "EM4_fdr_qvalue_dataset1" "EM4_gs_size_dataset1"
-```
-
-```r
-head(nodeData(EM_1_2@graph))
-```
-
-```
-## $`REAC:5173214`
-## $`REAC:5173214`$name
-## [1] "REAC:5173214"
-## 
-## $`REAC:5173214`$EM4_GS_DESCR
-## [1] "O-GLYCOSYLATION OF TSR DOMAIN-CONTAINING PROTEINS"
-## 
-## $`REAC:5173214`$EM4_Formatted_name
-## [1] "REAC:5173214\n"
-## 
-## $`REAC:5173214`$EM4_Name
-## [1] "REAC:5173214"
-## 
-## $`REAC:5173214`$EM4_GS_Source
-## [1] "none"
-## 
-## $`REAC:5173214`$EM4_GS_Type
-## [1] "ENR"
-## 
-## $`REAC:5173214`$EM4_pvalue_dataset1
-## [1] 2.21e-12
-## 
-## $`REAC:5173214`$EM4_Colouring_dataset1
-## [1] 1
-## 
-## $`REAC:5173214`$EM4_fdr_qvalue_dataset1
-## [1] 2.21e-12
-## 
-## $`REAC:5173214`$EM4_gs_size_dataset1
-## [1] 17
-## 
-## 
-## $`GO:0010720`
-## $`GO:0010720`$name
-## [1] "GO:0010720"
-## 
-## $`GO:0010720`$EM4_GS_DESCR
-## [1] "POSITIVE REGULATION OF CELL DEVELOPMENT"
-## 
-## $`GO:0010720`$EM4_Formatted_name
-## [1] "GO:0010720\n"
-## 
-## $`GO:0010720`$EM4_Name
-## [1] "GO:0010720"
-## 
-## $`GO:0010720`$EM4_GS_Source
-## [1] "none"
-## 
-## $`GO:0010720`$EM4_GS_Type
-## [1] "ENR"
-## 
-## $`GO:0010720`$EM4_pvalue_dataset1
-## [1] 3.52e-07
-## 
-## $`GO:0010720`$EM4_Colouring_dataset1
-## [1] 0.9999996
-## 
-## $`GO:0010720`$EM4_fdr_qvalue_dataset1
-## [1] 3.52e-07
-## 
-## $`GO:0010720`$EM4_gs_size_dataset1
-## [1] 34
-## 
-## 
-## $`GO:0010721`
-## $`GO:0010721`$name
-## [1] "GO:0010721"
-## 
-## $`GO:0010721`$EM4_GS_DESCR
-## [1] "NEGATIVE REGULATION OF CELL DEVELOPMENT"
-## 
-## $`GO:0010721`$EM4_Formatted_name
-## [1] "GO:0010721\n"
-## 
-## $`GO:0010721`$EM4_Name
-## [1] "GO:0010721"
-## 
-## $`GO:0010721`$EM4_GS_Source
-## [1] "none"
-## 
-## $`GO:0010721`$EM4_GS_Type
-## [1] "ENR"
-## 
-## $`GO:0010721`$EM4_pvalue_dataset1
-## [1] 2.38e-06
-## 
-## $`GO:0010721`$EM4_Colouring_dataset1
-## [1] 0.9999976
-## 
-## $`GO:0010721`$EM4_fdr_qvalue_dataset1
-## [1] 2.38e-06
-## 
-## $`GO:0010721`$EM4_gs_size_dataset1
-## [1] 16
-## 
-## 
-## $`GO:0044273`
-## $`GO:0044273`$name
-## [1] "GO:0044273"
-## 
-## $`GO:0044273`$EM4_GS_DESCR
-## [1] "SULFUR COMPOUND CATABOLIC PROCESS"
-## 
-## $`GO:0044273`$EM4_Formatted_name
-## [1] "GO:0044273\n"
-## 
-## $`GO:0044273`$EM4_Name
-## [1] "GO:0044273"
-## 
-## $`GO:0044273`$EM4_GS_Source
-## [1] "none"
-## 
-## $`GO:0044273`$EM4_GS_Type
-## [1] "ENR"
-## 
-## $`GO:0044273`$EM4_pvalue_dataset1
-## [1] 2.64e-06
-## 
-## $`GO:0044273`$EM4_Colouring_dataset1
-## [1] 0.9999974
-## 
-## $`GO:0044273`$EM4_fdr_qvalue_dataset1
-## [1] 2.64e-06
-## 
-## $`GO:0044273`$EM4_gs_size_dataset1
-## [1] 8
-## 
-## 
-## $`GO:0043062`
-## $`GO:0043062`$name
-## [1] "GO:0043062"
-## 
-## $`GO:0043062`$EM4_GS_DESCR
-## [1] "EXTRACELLULAR STRUCTURE ORGANIZATION"
-## 
-## $`GO:0043062`$EM4_Formatted_name
-## [1] "GO:0043062\n"
-## 
-## $`GO:0043062`$EM4_Name
-## [1] "GO:0043062"
-## 
-## $`GO:0043062`$EM4_GS_Source
-## [1] "none"
-## 
-## $`GO:0043062`$EM4_GS_Type
-## [1] "ENR"
-## 
-## $`GO:0043062`$EM4_pvalue_dataset1
-## [1] 9.28e-63
-## 
-## $`GO:0043062`$EM4_Colouring_dataset1
-## [1] 1
-## 
-## $`GO:0043062`$EM4_fdr_qvalue_dataset1
-## [1] 9.28e-63
-## 
-## $`GO:0043062`$EM4_gs_size_dataset1
-## [1] 100
-## 
-## 
-## $`GO:0048864`
-## $`GO:0048864`$name
-## [1] "GO:0048864"
-## 
-## $`GO:0048864`$EM4_GS_DESCR
-## [1] "STEM CELL DEVELOPMENT"
-## 
-## $`GO:0048864`$EM4_Formatted_name
-## [1] "GO:0048864\n"
-## 
-## $`GO:0048864`$EM4_Name
-## [1] "GO:0048864"
-## 
-## $`GO:0048864`$EM4_GS_Source
-## [1] "none"
-## 
-## $`GO:0048864`$EM4_GS_Type
-## [1] "ENR"
-## 
-## $`GO:0048864`$EM4_pvalue_dataset1
-## [1] 6.74e-13
-## 
-## $`GO:0048864`$EM4_Colouring_dataset1
-## [1] 1
-## 
-## $`GO:0048864`$EM4_fdr_qvalue_dataset1
-## [1] 6.74e-13
-## 
-## $`GO:0048864`$EM4_gs_size_dataset1
-## [1] 32
+##  [1] "name"                     "EM12_GS_DESCR"           
+##  [3] "EM12_Formatted_name"      "EM12_Name"               
+##  [5] "EM12_GS_Source"           "EM12_GS_Type"            
+##  [7] "EM12_pvalue_dataset1"     "EM12_Colouring_dataset1" 
+##  [9] "EM12_fdr_qvalue_dataset1" "EM12_gs_size_dataset1"
 ```
 
 ```r
@@ -813,13 +601,143 @@ saveImage(EM_1_2,
 
 ![](./EM_1_2.png)
 
-## EM with two inputs
+## Following :
+[Protocol 4 - Summarize Enrichment Results with Enrichment] Maps(https://github.com/BaderLab/EM-tutorials-docker/blob/master/notebooks/Protocol%204%20-%20Summarize%20Enrichment%20Results%20with%20Enrichment%20Maps.ipynb)
 
-to come!
+### Option 1: Load enrichment results from g:Profiler
+
+```r
+path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+
+enr_file = paste0(path_to_file,
+                 "gprofiler_results_mesenonly_ordered.txt")
+
+expression_RNA_seq <- paste0(path_to_file,
+                               "MesenchymalvsImmunoreactive_RNSseq_expression.txt")
+
+ranks_file <- paste0(path_to_file,
+                      "MesenchymalvsImmunoreactive_RNA_seq_ranks.rnk")
+classes_file <- paste0(path_to_file,
+                      "MesenchymalvsImmunoreactive_RNAseq_classes.cls")
+
+# Phenotype - In the text boxes replace "UP" with "Mesenchymal" and "DOWN" with Immunoreactive. Mesenchymal will be associated with red nodes because it corresponds to the positive phenotype in the gprofiler_results_mesenonly_ordered.
+
+em_params <- list(analysisType = "generic",
+                  enrichmentsDataset1 = enr_file,
+                  pvalue = "1.0",
+                  qvalue = "0.0001",
+                  #expressionDataset1 = expression_RNA_seq, 
+                  #ranksDataset1 = ranks_file,
+                  classDataset1 = classes_file,
+                  phenotype1Dataset1 ="Mesenchymal",
+                  phenotype2Dataset1 ="Immunoreactive",
+                  similaritycutoff = "0.25",
+                  coeffecients = "JACCARD")
+
+EM_ex_4 <- setEnrichmentMapProperties(cy,
+                                  "build",
+                                  em_params)
+```
+
+```
+## [1] "Successfully built the EnrichmentMap."
+## [1] "Cytoscape window EM16_Enrichment Map successfully connected to R session."
+```
+
+
+
+
+```r
+saveImage(EM_ex_4,
+          "EM_ex_4",
+          "png",
+          scale=4)
+```
+![](./EM_ex_4.png)
+
+
+### Option 2: Load enrichment results from GSEA
+
+
+```r
+path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+
+gmt_file = paste0(path_to_file,
+                 "Human_GOBP_AllPathways_no_GO_iea_December_24_2015_symbol.gmt")
+expression_file <- paste0(path_to_file,
+                          "MesenchymalvsImmunoreactive_RNSseq_expression.txt")
+## come back here! was running
+# enrichments_1 <- paste0(path_to_file,
+#                         )
+# 
+# Enrichments 1- gsea_home/output/[data]/ Mesen_vs_Immuno_edgeR.GseaPreranked.1453221178549 / gsea_report_for_na_pos_1453221178549.xls (example file name. Number is automatically generated and will be different for results run by user.
+# Enrichments 2 – gsea_home/output/[data]/ Mesen_vs_Immuno_edgeR.GseaPreranked.1453221178549 /gsea_report_for_na_neg_1453221178549.xls (example file name. Number is automatically generated and will be different for results run by user.
+# Classes - MesenchymalvsImmunoreactive_RNAseq_classes.cls
+```
+
+
+
+## Recreate tutorial on lab website: http://www.baderlab.org/Software/EnrichmentMap/Tutorial
+
+
+```r
+gsea_tut_path="/home/julia_g/windows_school/gsoc/gsoc_Rcy3_vignettes/GSEATutorial/"
+
+gmt_file <- paste0(gsea_tut_path,
+                   "Human_GO_AllPathways_no_GO_iea_April_15_2013_symbol.gmt")
+
+data_1_ex_1 <- paste0(gsea_tut_path,
+                     "MCF7_ExprMx_v2_names.gct")
+
+gsea_tut_path="/home/julia_g/gsea_home/output/may23/estrogen_treatment_12hr_gsea_enrichment_results.Gsea.1464036337021/"
+
+data_1_en_1_es <- paste0(gsea_tut_path,
+                      "gsea_report_for_ES12_1464036337021.xls")
+data_1_en_2_nt <- paste0(gsea_tut_path,
+                         "gsea_report_for_NT12_1464036337021.xls")
+
+rank_file <- paste0(gsea_tut_path,
+                    "edb/MCF7_ExprMx_v2_names_ExprMx_v2_names.ES_NT.cls_ES12_versus_NT12.rnk")
+
+
+#Dataset 1 / Phenotypes 1: ES12 VS NT12 (OPTIONAL)
+
+em_params <- list(analysisType = "GSEA",
+                  gmtFile = gmt_file,
+                  expressionDataset1 = data_1_ex_1,
+                  enrichmentsDataset1 = data_1_en_1_es,
+                  enrichments2Dataset1 = data_1_en_2_nt,
+                  pvalue = "0.001",
+                  qvalue = "0.05",
+                  ranksDataset1 = rank_file,
+                  phenotype1Dataset1 ="ES12",
+                  phenotype2Dataset1 ="NT12",
+                  similaritycutoff = "0.25",
+                  coeffecients = "JACCARD")
+
+EM_ex_6 <- setEnrichmentMapProperties(cy,
+                                  "build",
+                                  em_params)
+```
+
+```
+## [1] "Successfully built the EnrichmentMap."
+## [1] "Cytoscape window EM17_Enrichment Map successfully connected to R session."
+```
+
+
+Successfully built!
+
+```r
+saveImage(EM_ex_6,
+          "EM_ex_6",
+          "png",
+          scale=4)
+```
+![](./EM_ex_6.png)
 
 ## Next steps
 
 - Verify that I have made these functions correctly for use in S4 framework
 - Clean up the use of the functions
-- EM with two inputs.- see tutorial for ideas
 - command to print list of setable properties?
