@@ -6,9 +6,11 @@ library(rentrez)
 library(stringr)
 phage_ids <- "./Tara_Phage_host_copresence.xls"
 
-first_sheet <- read_excel(phage_ids, sheet = 1)
+first_sheet <- read_excel(phage_ids,
+                          sheet = 1)
 
-second_sheet <- read_excel(phage_ids, sheet = 2)
+second_sheet <- read_excel(phage_ids,
+                           sheet = 2)
 
 sum(second_sheet$Phage_id %in% first_sheet$Phage_id) # only 73!
 
@@ -45,10 +47,7 @@ get_tax_lineage_fr_NCBI <- function(phage_from_affiliation ) {
   return(split_lineage)
 }
 
-test <- get_tax_lineage_fr_NCBI(all_phage_affiliations[7])
-
 list_of_affiliations <- sapply(all_phage_affiliations[-19], get_tax_lineage_fr_NCBI)
-
 
 ## because these are not all the same length
 indx <- lengths(list_of_affiliations) 

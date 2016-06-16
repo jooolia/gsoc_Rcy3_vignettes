@@ -82,6 +82,15 @@ Cheers,
 
 Gipsi
 
+##JAG note:
+From Sunagawa: taxonomically annotated 16S reference
+sequences from the SILVA database (release
+115: SSU Ref NR 99) 
+
+To get this info I downloaded https://www.arb-silva.de/fileadmin/silva_databases/release_115/Exports/SSURef_NR99_115_tax_silva.fasta.tgz
+
+then I ran ```grep "^>" SSURef_NR99_115_tax_silva.fasta > ~/windows_school/gsoc/gsoc_RCy3_vignettes/inst/data-raw/SSURef_NR99_115_tax_silva_headers.txt
+
 ## 10 June 2016
 
 Emailed Dr. Matt Sullivan (corresponding author on Brum et al 2015 paper: [Patterns and ecological drivers of ocean viral communities. Science. 348. doi:10.1126/science.1261498.] (http://www.sciencemag.org/content/348/6237/1261498.full))
