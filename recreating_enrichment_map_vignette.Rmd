@@ -1,5 +1,5 @@
 ---
-title: "recreating_enrichment_map_tut_with_RCy3"
+title: "Recreating EnrichmentMap tutorials with RCy3"
 author: "Julia Gustavsen"
 date: "May 24, 2016"
 output: 
@@ -14,7 +14,25 @@ output:
 # Purpose: 
 
 * Recreating tutorials from Bader lab (link) using Rcy3 and cytoscape.
-* creating functions using RCy3 that make it easy to use Enrichment Map
+* creating functions using RCy3 that make it easy to use 
+
+
+## Draft writing:Free writing that has not bee edited. Hidden from output for today.
+```{r, echo=FALSE}
+# Free writing that has not bee edited. 
+### Enrichment Map
+#So many people use data from experiments to determine which biological pathways are enriched in certain diseases or conditions. They can use RNAseq data taken from different treatments, process the sequence data to visualize which pathways are present based on the genes that are found and then which ones are more enriched compared to the baseline. This can thus tell them the genes that are important for regulating what is happening in the disease, what is causing the disease or the reaction of the body to the state. Then based on the determination of which genes are enriched we can see which pathways are present in this action/reaction/etc. These pathways are determined via databases that are curated from data coming from many different experiments where the expression data have been measured (is this true? where do the data from SEED come from). These pathways are therefore important for looking a new experiments and can also be used in enviromental samples to examine a community (see X vignette for this use. where I can use this pathway method applied to a metagenomic data set....see the curtis huttenhower lab for ideas and examples). So once we have the pathways that are enriched and that are present in the data we can make a network from them. 
+
+## Reproducible Enrichment Map 
+#So this is where we come in the RCy3, Cytoscape and EnrichmentMap. The basic workflow is the you can use R scripts to build EnrichmentMaps in Cytoscape. The benefit of using R scripts is that it is easier to reproduce your analyse or even to repeat it with different data. 
+
+#To proceed please follow instructions in Install.Rmd if you do not have RCy3 and Cytoscape installed. 
+
+#So once you have installed all of these things then you are ready to get groovin' with RCy3 and Cytoscape. RCy3 (R to Cytoscape 3, there is also a RCy that was used with Cytoscape 2). Additional info about RCy3: this R package (kindly develloped by Tanja, Paul and XX) uses the CyREST protocol that now comes with all installations of Cytoscape. It uses the API (definition) from cytoscape to send and receive information via R. This means that you can send data from R and also receive information about the graphs that you have made in Cytoscape in R. This is useful for reproducibility, but also if you are analysing networks in ways that are not yet supported by plugins in Cytoscape (or what else?). 
+
+#So what we will do today is to use data already processed in GSEA...? (this is a program that does X, Y, Z). (IS there also a way to do all of this in R) (you can follow the tutorials here to see what is happening). So this data is what?? So what we will do is use this processed data to make an enrichment map in Cytoscape and then manipulate the network stylistically to our preferences. 
+```
+
 
 ```{r, message = FALSE}
 library(RCy3)
@@ -38,35 +56,7 @@ http://localhost:1234/v1/commands
 
 Which gives the same as when you type `help` in the Command Line Dialog in cytoscape
 
-```{r}
-## create function to get command names for available plugins from Cytoscape
-setGeneric ('getCommandNames', 
-            signature='obj',
-            function(obj) standardGeneric ('getCommandNames'))
 
-setMethod('getCommandNames',
-          'CytoscapeConnectionClass',
-          function(obj) { 
-            request.uri <- paste(obj@uri,
-                                 pluginVersion(obj),
-                                 "commands",
-                                 sep="/")
-            request.res <- GET(url=request.uri)
-            
-            available.commands <- unlist(strsplit(rawToChar(request.res$content),
-                                                  split="\n\\s*"))
-            ## to remove "Available namespaces" title
-            ## remove the first value
-            available.commands <- available.commands[-1]
-            return(available.commands) 
-          })
-```
-
-Test out the function to see what commands are available in Cytoscape
-```{r}
-cy <- CytoscapeConnection ()
-getCommandNames(cy)
-```
 
 ### Accessing the commands within Enrichment map?
 
@@ -86,71 +76,6 @@ request.res
 ```
 
 Now try to extend the function to be able to find commands from a specific plugin?
-
-```{r}
-## make function to get commands from Enrichment map
-setGeneric ('getCommandNamesEnrichmentMap', 
-            signature = 'obj',
-            function(obj) standardGeneric ('getCommandNamesEnrichmentMap'))
-
-setMethod('getCommandNamesEnrichmentMap',
-          'CytoscapeConnectionClass',
-          function(obj) { 
-            request.uri <- paste(obj@uri,
-                                 pluginVersion(obj),
-                                 "commands/enrichmentmap",
-                                 sep = "/")
-            request.res <- GET(url = request.uri)
-            
-            available.commands <- unlist(strsplit(rawToChar(request.res$content),
-                                                  split = "\n\\s*"))
-            ## remove "Available commands" title
-            available.commands <- available.commands[-1]
-            return(available.commands) })
-
-cy <- CytoscapeConnection ()
-str(getCommandNamesEnrichmentMap(cy))
-
-```
-
-
-### Make a function to look for commands within different plugins.
-
-
-```{r}
-## make function to get commands from Enrichment map
-setGeneric ('getCommandsWithinNamespace', 
-            signature = 'obj',
-            function(obj,
-                     namespace) standardGeneric ('getCommandsWithinNamespace'))
-
-setMethod('getCommandsWithinNamespace',
-          'CytoscapeConnectionClass',
-          function(obj,
-                   namespace) { 
-            request.uri <- paste(obj@uri,
-                                 pluginVersion(obj),
-                                 "commands",
-                                 namespace,
-                                 sep = "/")
-            request.res <- GET(url = request.uri)
-            
-            available.commands <- unlist(strsplit(rawToChar(request.res$content),
-                                                  split = "\n\\s*"))
-            ## remove "Available commands" title
-            available.commands <- available.commands[-1]
-            return(available.commands) })
-```
-
-Test out using different namespaces
-```{r}
-cy <- CytoscapeConnection ()
-str(getCommandsWithinNamespace(cy, "enrichmentmap"))
-getCommandsWithinNamespace(cy, "layout")
-getCommandsWithinNamespace(cy, "cluster")
-getCommandsWithinNamespace(cy, "network")
-```
-
 
 ## Enrichment map stuff
 
@@ -192,12 +117,9 @@ similaritymetric=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: similaritymet
 
 
 ```{r}
-# setGeneric ('getEnrichmentMapCommands', 
-# 	signature='obj', function(obj) standardGeneric ('getEnrichmentMapCommands'))
 setGeneric ('getEnrichmentMapCommandsNames',	
 	signature='obj', function(obj, command.name) standardGeneric ('getEnrichmentMapCommandsNames'))
 
-getCommandNamesEnrichmentMap(cy)
 ```
 
 ```{r}
@@ -225,10 +147,20 @@ setMethod('getEnrichmentMapCommandsNames',
             return(command.property.names)
             
           })## END getEnrichmentMapCommandsNames
+```
 
+```{r}
+cy <- CytoscapeConnection ()
 getEnrichmentMapCommandsNames(cy, "build")
 getEnrichmentMapCommandsNames(cy, "gseabuild")
 ```
+
+So first we read in the data.
+Then we use the function X (as part of package ....y) to read in the enrichment data and set the parameters. 
+
+If we wanted to see the full list of parameters we could run for this we could use X() and if we wanted to run functions for X types of analysis we could run X(, "other analysis"). 
+
+These parameters could also be set in cytoscape. The function that we run also attaches the window created in Cytoscape to our R session, so that we are able to manipulate the stylistic aspects of our network. 
 
 ## Send data to the cytoscape network
 

@@ -1,11 +1,16 @@
-# recreating_enrichment_map_tut_with_RCy3
+# Recreating EnrichmentMap tutorials with RCy3
 Julia Gustavsen  
 May 24, 2016  
 
 # Purpose: 
 
 * Recreating tutorials from Bader lab (link) using Rcy3 and cytoscape.
-* creating functions using RCy3 that make it easy to use Enrichment Map
+* creating functions using RCy3 that make it easy to use 
+
+
+## Draft writing:Free writing that has not bee edited. Hidden from output for today.
+
+
 
 
 ```r
@@ -31,53 +36,6 @@ http://localhost:1234/v1/commands
 Which gives the same as when you type `help` in the Command Line Dialog in cytoscape
 
 
-```r
-## create function to get command names for available plugins from Cytoscape
-setGeneric ('getCommandNames', 
-            signature='obj',
-            function(obj) standardGeneric ('getCommandNames'))
-```
-
-```
-## [1] "getCommandNames"
-```
-
-```r
-setMethod('getCommandNames',
-          'CytoscapeConnectionClass',
-          function(obj) { 
-            request.uri <- paste(obj@uri,
-                                 pluginVersion(obj),
-                                 "commands",
-                                 sep="/")
-            request.res <- GET(url=request.uri)
-            
-            available.commands <- unlist(strsplit(rawToChar(request.res$content),
-                                                  split="\n\\s*"))
-            ## to remove "Available namespaces" title
-            ## remove the first value
-            available.commands <- available.commands[-1]
-            return(available.commands) 
-          })
-```
-
-```
-## [1] "getCommandNames"
-```
-
-Test out the function to see what commands are available in Cytoscape
-
-```r
-cy <- CytoscapeConnection ()
-getCommandNames(cy)
-```
-
-```
-##  [1] "cluster"       "clusterviz"    "command"       "edge"         
-##  [5] "enrichmentmap" "group"         "layout"        "network"      
-##  [9] "node"          "session"       "table"         "view"         
-## [13] "vizmap"
-```
 
 ### Accessing the commands within Enrichment map?
 
@@ -106,7 +64,7 @@ request.res
 
 ```
 ## Response [http://localhost:1234/v1/commands/enrichmentmap]
-##   Date: 2016-06-16 12:57
+##   Date: 2016-06-17 12:53
 ##   Status: 200
 ##   Content-Type: text/plain
 ##   Size: 60 B
@@ -116,163 +74,6 @@ request.res
 ```
 
 Now try to extend the function to be able to find commands from a specific plugin?
-
-
-```r
-## make function to get commands from Enrichment map
-setGeneric ('getCommandNamesEnrichmentMap', 
-            signature = 'obj',
-            function(obj) standardGeneric ('getCommandNamesEnrichmentMap'))
-```
-
-```
-## [1] "getCommandNamesEnrichmentMap"
-```
-
-```r
-setMethod('getCommandNamesEnrichmentMap',
-          'CytoscapeConnectionClass',
-          function(obj) { 
-            request.uri <- paste(obj@uri,
-                                 pluginVersion(obj),
-                                 "commands/enrichmentmap",
-                                 sep = "/")
-            request.res <- GET(url = request.uri)
-            
-            available.commands <- unlist(strsplit(rawToChar(request.res$content),
-                                                  split = "\n\\s*"))
-            ## remove "Available commands" title
-            available.commands <- available.commands[-1]
-            return(available.commands) })
-```
-
-```
-## [1] "getCommandNamesEnrichmentMap"
-```
-
-```r
-cy <- CytoscapeConnection ()
-str(getCommandNamesEnrichmentMap(cy))
-```
-
-```
-##  chr [1:2] "build" "gseabuild"
-```
-
-
-### Make a function to look for commands within different plugins.
-
-
-
-```r
-## make function to get commands from Enrichment map
-setGeneric ('getCommandsWithinNamespace', 
-            signature = 'obj',
-            function(obj,
-                     namespace) standardGeneric ('getCommandsWithinNamespace'))
-```
-
-```
-## [1] "getCommandsWithinNamespace"
-```
-
-```r
-setMethod('getCommandsWithinNamespace',
-          'CytoscapeConnectionClass',
-          function(obj,
-                   namespace) { 
-            request.uri <- paste(obj@uri,
-                                 pluginVersion(obj),
-                                 "commands",
-                                 namespace,
-                                 sep = "/")
-            request.res <- GET(url = request.uri)
-            
-            available.commands <- unlist(strsplit(rawToChar(request.res$content),
-                                                  split = "\n\\s*"))
-            ## remove "Available commands" title
-            available.commands <- available.commands[-1]
-            return(available.commands) })
-```
-
-```
-## [1] "getCommandsWithinNamespace"
-```
-
-Test out using different namespaces
-
-```r
-cy <- CytoscapeConnection ()
-str(getCommandsWithinNamespace(cy, "enrichmentmap"))
-```
-
-```
-##  chr [1:2] "build" "gseabuild"
-```
-
-```r
-getCommandsWithinNamespace(cy, "layout")
-```
-
-```
-##  [1] "allegro-edge-repulsive-fruchterman-reingold"
-##  [2] "allegro-edge-repulsive-spring-electric"     
-##  [3] "allegro-edge-repulsive-strong-clustering"   
-##  [4] "allegro-edge-repulsive-weak-clustering"     
-##  [5] "allegro-fruchterman-reingold"               
-##  [6] "allegro-spring-electric"                    
-##  [7] "allegro-strong-clustering"                  
-##  [8] "allegro-weak-clustering"                    
-##  [9] "apply preferred"                            
-## [10] "attribute-circle"                           
-## [11] "attributes-layout"                          
-## [12] "circular"                                   
-## [13] "degree-circle"                              
-## [14] "force-directed"                             
-## [15] "fruchterman-rheingold"                      
-## [16] "get preferred"                              
-## [17] "grid"                                       
-## [18] "hierarchical"                               
-## [19] "isom"                                       
-## [20] "kamada-kawai"                               
-## [21] "set preferred"                              
-## [22] "stacked-node-layout"
-```
-
-```r
-getCommandsWithinNamespace(cy, "cluster")
-```
-
-```
-##  [1] "ap"                  "attribute"           "autosome_heatmap"   
-##  [4] "autosome_network"    "bestneighbor"        "cheng&church"       
-##  [7] "connectedcomponents" "cuttingedge"         "dbscan"             
-## [10] "density"             "fcml"                "featurevector"      
-## [13] "fft"                 "filter"              "fuzzifier"          
-## [16] "getcluster"          "getnetworkcluster"   "glay"               
-## [19] "haircut"             "hascluster"          "hierarchical"       
-## [22] "hopach"              "kmeans"              "kmedoid"            
-## [25] "mcl"                 "mcode"               "network"            
-## [28] "pam"                 "scps"                "transclust"
-```
-
-```r
-getCommandsWithinNamespace(cy, "network")
-```
-
-```
-##  [1] "add"              "add edge"         "add node"        
-##  [4] "clone"            "create"           "create attribute"
-##  [7] "create empty"     "delete"           "deselect"        
-## [10] "destroy"          "export"           "get"             
-## [13] "get attribute"    "get properties"   "hide"            
-## [16] "import file"      "import url"       "list"            
-## [19] "list attributes"  "list properties"  "load file"       
-## [22] "load url"         "rename"           "select"          
-## [25] "set attribute"    "set current"      "set properties"  
-## [28] "show"
-```
-
 
 ## Enrichment map stuff
 
@@ -315,22 +116,12 @@ similaritymetric=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: similaritymet
 
 
 ```r
-# setGeneric ('getEnrichmentMapCommands', 
-# 	signature='obj', function(obj) standardGeneric ('getEnrichmentMapCommands'))
 setGeneric ('getEnrichmentMapCommandsNames',	
 	signature='obj', function(obj, command.name) standardGeneric ('getEnrichmentMapCommandsNames'))
 ```
 
 ```
 ## [1] "getEnrichmentMapCommandsNames"
-```
-
-```r
-getCommandNamesEnrichmentMap(cy)
-```
-
-```
-## [1] "build"     "gseabuild"
 ```
 
 
@@ -365,7 +156,9 @@ setMethod('getEnrichmentMapCommandsNames',
 ## [1] "getEnrichmentMapCommandsNames"
 ```
 
+
 ```r
+cy <- CytoscapeConnection ()
 getEnrichmentMapCommandsNames(cy, "build")
 ```
 
@@ -388,6 +181,13 @@ getEnrichmentMapCommandsNames(cy, "gseabuild")
 ## [4] "expressionfile"   "expressionfile2"  "overlap"         
 ## [7] "pvalue"           "qvalue"           "similaritymetric"
 ```
+
+So first we read in the data.
+Then we use the function X (as part of package ....y) to read in the enrichment data and set the parameters. 
+
+If we wanted to see the full list of parameters we could run for this we could use X() and if we wanted to run functions for X types of analysis we could run X(, "other analysis"). 
+
+These parameters could also be set in cytoscape. The function that we run also attaches the window created in Cytoscape to our R session, so that we are able to manipulate the stylistic aspects of our network. 
 
 ## Send data to the cytoscape network
 
@@ -518,7 +318,7 @@ EM_1 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM15_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM1_Enrichment Map successfully connected to R session."
 ```
 
 Is there a situation where using the last made window for this enrichment map will fail? What other option could I find?
@@ -577,7 +377,7 @@ EM_1_2 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape windowEM12_Enrichment Map successfully connected to R session and graph copied to R."
+## [1] "Cytoscape windowEM2_Enrichment Map successfully connected to R session and graph copied to R."
 ```
 
 ```r
@@ -585,11 +385,11 @@ print(noa.names(getGraph(EM_1_2)))
 ```
 
 ```
-##  [1] "name"                     "EM12_GS_DESCR"           
-##  [3] "EM12_Formatted_name"      "EM12_Name"               
-##  [5] "EM12_GS_Source"           "EM12_GS_Type"            
-##  [7] "EM12_pvalue_dataset1"     "EM12_Colouring_dataset1" 
-##  [9] "EM12_fdr_qvalue_dataset1" "EM12_gs_size_dataset1"
+##  [1] "name"                    "EM2_GS_DESCR"           
+##  [3] "EM2_Formatted_name"      "EM2_Name"               
+##  [5] "EM2_GS_Source"           "EM2_GS_Type"            
+##  [7] "EM2_pvalue_dataset1"     "EM2_Colouring_dataset1" 
+##  [9] "EM2_fdr_qvalue_dataset1" "EM2_gs_size_dataset1"
 ```
 
 ```r
@@ -641,7 +441,7 @@ EM_ex_4 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM16_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM3_Enrichment Map successfully connected to R session."
 ```
 
 
@@ -722,7 +522,7 @@ EM_ex_6 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM17_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM4_Enrichment Map successfully connected to R session."
 ```
 
 
