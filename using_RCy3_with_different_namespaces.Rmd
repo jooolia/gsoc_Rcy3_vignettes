@@ -1,5 +1,5 @@
 ---
-title: "using_RCy3_with_different_namespaces"
+title: "Using RCy3 with different namespaces"
 author: "Julia Gustavsen"
 date: "June 17, 2016"
 output: html_document

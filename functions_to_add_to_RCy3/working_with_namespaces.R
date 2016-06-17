@@ -1,8 +1,21 @@
 library(RCy3)
 library(httr)
 
-## create function to get command names for available plugins from Cytoscape
-setGeneric ('getCommandNames', 
+## create functions to get command names for available plugins from Cytoscape
+
+
+#' Gets commands available from within cytoscape from 
+#' functions within cytoscape and from installed plugins.
+#'
+#' @param object Cytoscape network where commands are fetched via RCy3 
+#' @param 
+#' @return Vector of available commands from all namespaces (e.g. functions and plugins) 
+#'
+#' @concept RCy3
+#' @export
+#' 
+#' @importFrom methods setGeneric
+setGeneric('getCommandNames', 
             signature='obj',
             function(obj) standardGeneric ('getCommandNames'))
 
@@ -25,13 +38,22 @@ setMethod('getCommandNames',
 
 
 
-## make function to get commands from Enrichment map
-setGeneric ('getCommandsWithinNamespace', 
+#' Gets commands available from within a namespace in Cytoscape from 
+#' functions within cytoscape and from installed plugins.
+#'
+#' @param object Cytoscape network where commands are fetched via RCy3 
+#' @param namespace Cytoscape function (e.g. layout or network settings) or Cytoscape plugin function
+#' 
+#' @return Vector of available commands from a specific plugin or Cytoscape function (e.g. namespace)
+#'
+#' @concept RCy3
+#' @export
+#' 
+#' @importFrom methods setGeneric
+setGeneric('getCommandsWithinNamespace', 
             signature = 'obj',
             function(obj,
-                     namespace) standardGeneric ('getCommandsWithinNamespace'))
-
-
+                     namespace) standardGeneric('getCommandsWithinNamespace'))
 
 setMethod('getCommandsWithinNamespace',
           'CytoscapeConnectionClass',
