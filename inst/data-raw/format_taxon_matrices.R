@@ -59,5 +59,6 @@ filtered_row_by_row <- filter(melted_together,
 no_self_filtered_row_by_row <- filter(filtered_row_by_row,
                                       weight != 1)
 
-write.table(no_self_filtered_row_by_row,"../../data/virus_prok_cor.tsv",
+write.table(no_self_filtered_row_by_row,
+            "../../data/virus_prok_cor.tsv",
             sep="\t")

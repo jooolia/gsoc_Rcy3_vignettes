@@ -44,6 +44,8 @@ Found_In_Silva <- rownames(prok_matrix)[rownames(prok_matrix) %in% results$Acces
 ## filter the table to be just those found in the tara oceans
 
 taxa_in_tara_oc <- filter(results, Accession_ID %in% Found_In_Silva)
+## the other columns were all empty after removing the 
+## eukaryotes from the table
 taxa_in_tara_oc_trimmed <- select(taxa_in_tara_oc, Accession_ID, Kingdom
 ,Phylum,Class,Order,Family,Genus, Species)
 
