@@ -1,0 +1,38 @@
+---
+title: "using_RCy3_with_different_namespaces"
+author: "Julia Gustavsen"
+date: "June 17, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message = FALSE}
+library(RCy3)
+```
+
+
+```{r}
+source("./functions_to_add_to_RCy3/working_with_namespaces.R")
+```
+
+Test out the function to see what commands are available in Cytoscape
+
+```{r}
+cy <- CytoscapeConnection ()
+## now this is giving a weird return of including paragraph styles, etc
+getCommandNames(cy)
+str(getCommandNames(cy))
+```
+
+Test out using different namespaces available
+
+```{r}
+cy <- CytoscapeConnection ()
+str(getCommandsWithinNamespace(cy, "enrichmentmap"))
+getCommandsWithinNamespace(cy, "layout")
+getCommandsWithinNamespace(cy, "cluster")
+getCommandsWithinNamespace(cy, "network")
+```
