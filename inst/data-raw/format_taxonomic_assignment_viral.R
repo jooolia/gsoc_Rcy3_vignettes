@@ -107,4 +107,5 @@ for (row in 1:nrow(network_ids_with_affiliation)){
   }
 }
 
-write.csv(phage_ids_with_affiliation, "../../data/phage_ids_with_affiliation.csv")
+write.table(phage_ids_with_affiliation, "../../data/phage_ids_with_affiliation.tsv",
+            sep = "\t")
