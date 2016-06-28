@@ -30,13 +30,13 @@ prok_in_virus <- prok_matrix[rowSums(prok_matrix == 0) < eighty_percent_sites,]
 
 ## let's talk about abundance of each speices
 virus_matrix <- virus_matrix[rowSums(virus_matrix)/n_sites > 0.0001,]
-rownames(virus_matrix) <- gsub("$",
-                               "_vir",
-                               rownames(virus_matrix))
+# rownames(virus_matrix) <- gsub("$",
+#                                "_vir",
+#                                rownames(virus_matrix))
 prok_matrix <- prok_matrix[rowSums(prok_matrix)/n_sites > 0.0001,]
-rownames(prok_in_virus) <- gsub("$",
-                                "_prok",
-                                rownames(prok_in_virus))
+# rownames(prok_in_virus) <- gsub("$",
+#                                 "_prok",
+#                                 rownames(prok_in_virus))
 
 ## only want to look at comparisons between the two data frames...and not within each data frame...
 

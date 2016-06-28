@@ -14,7 +14,7 @@
 #' @importFrom methods setGeneric
 setGeneric ('getEnrichmentMapCommandsNames',	
             signature='obj', function(obj,
-                                      command.name) standardGeneric ('getEnrichmentMapCommandsNames'))
+                                      command.name) standardGeneric('getEnrichmentMapCommandsNames'))
 
 setMethod('getEnrichmentMapCommandsNames',
           'CytoscapeConnectionClass', 
