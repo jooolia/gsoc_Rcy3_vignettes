@@ -45,7 +45,7 @@ CytoscapeWindow("test", overwriteWindow = TRUE) # creates empty window in Cytosc
 ## [1] "test"
 ## 
 ## Slot "window.id":
-## [1] "192"
+## [1] "77660"
 ## 
 ## Slot "graph":
 ## A graphNEL graph with directed edges
@@ -86,7 +86,7 @@ existing.CytoscapeWindow("test") # The constructor for the CytoscapeWindowClass,
 ## [1] "test"
 ## 
 ## Slot "window.id":
-## [1] "192"
+## [1] "77660"
 ## 
 ## Slot "graph":
 ## A graphNEL graph with directed edges
@@ -164,7 +164,7 @@ basic_info
 ## 
 ## $memoryStatus
 ##  usedMemory  freeMemory totalMemory   maxMemory 
-##         430        2699        3129       13305
+##        1568        3255        4824       13305
 ```
 
 
@@ -185,6 +185,7 @@ network.url
 
 Help to figure out how to access the commands for manipulating networks n Cytoscape via plugins. 
 
+standardGeneric() is like the S3 UseMethod()
 
 ```r
 ## lifted from RCy3 code
@@ -338,7 +339,7 @@ request.res
 
 ```
 ## Response [http://localhost:1234/v1/commands/enrichmentmap]
-##   Date: 2016-06-01 14:13
+##   Date: 2016-06-13 13:05
 ##   Status: 200
 ##   Content-Type: text/plain
 ##   Size: 60 B
@@ -513,9 +514,455 @@ getCommandsWithinNamespace(cy, "network")
 ## [28] "show"
 ```
 
+
+## Enrichment map stuff
+
+### help enrichmentmap build
+enrichmentmap build arguments:
+analysisType=<ListSingleSelection GSEA|generic|DAVID/BiNGO/Great)>: Analysis Type
+classDataset1=<File>: Classes
+classDataset2=<File>: Classes
+coeffecients=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: Similarity Coeffecient
+enrichments2Dataset1=<File>: Enrichments 2
+enrichments2Dataset2=<File>: Enrichments 2
+enrichmentsDataset1=<File>: Enrichments
+enrichmentsDataset2=<File>: Enrichments
+expressionDataset1=<File>: Expression
+expressionDataset2=<File>: Expression
+gmtFile=<File>: GMT
+phenotype1Dataset1=<String>: Phenotype1
+phenotype1Dataset2=<String>: Phenotype1
+phenotype2Dataset1=<String>: Phenotype2
+phenotype2Dataset2=<String>: Phenotype2
+pvalue=<Double>: P-value Cutoff
+qvalue=<Double>: FDR Q-value Cutoff
+ranksDataset1=<File>: Ranks
+ranksDataset2=<File>: Ranks
+similaritycutoff=<Double>: Similarity Cutoff
+
+### help enrichmentmap gseabuild
+enrichmentmap gseabuild arguments:
+combinedconstant=<Double>: combinedconstant
+edbdir=<String>: edbdir
+edbdir2=<String>: edbdir2
+expressionfile=<String>: expressionfile
+expressionfile2=<String>: expressionfile2
+overlap=<Double>: overlap
+pvalue=<Double>: P-value Cutoff
+qvalue=<Double>: FDR Q-value Cutoff
+similaritymetric=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: similaritymetric
+
+
+```r
+setGeneric ('getEnrichmentMapCommands', 
+	signature='obj', function(obj) standardGeneric ('getEnrichmentMapCommands'))
+```
+
+```
+## [1] "getEnrichmentMapCommands"
+```
+
+```r
+setGeneric ('getEnrichmentMapNameMapping',	
+	signature='obj', function(obj) standardGeneric ('getEnrichmentMapNameMapping'))
+```
+
+```
+## [1] "getEnrichmentMapNameMapping"
+```
+
+```r
+setGeneric ('getEnrichmentMapCommandsNames',	
+	signature='obj', function(obj, layout.name) standardGeneric ('getEnrichmentMapCommandsNames'))
+```
+
+```
+## [1] "getEnrichmentMapCommandsNames"
+```
+
+```r
+getCommandNamesEnrichmentMap(cy)
+```
+
+```
+## [1] "build"     "gseabuild"
+```
+
+```r
+layout.names <- getCommandNamesEnrichmentMap(cy)
+layout.full.names <- c()
+
+
+# get the English/full name of a layout
+for (layout.name in layout.names){
+  request.uri <- paste(cy@uri,
+                       pluginVersion(cy),
+                       "commands/enrichmentmap",
+                       as.character(layout.name),
+                       sep="/")
+  request.res <- GET(url=request.uri)
+
+   layout.property.names <- unlist(strsplit(rawToChar(request.res$content),
+                                                  split = "\n\\s*"))
+            ## how to remove "Available commands ..."?
+            ## not happy with this
+            layout.property.names <- layout.property.names[-1]
+
+return(layout.property.names)
+}
+```
+
+```
+##  [1] "analysisType"         "classDataset1"        "classDataset2"       
+##  [4] "coeffecients"         "enrichments2Dataset1" "enrichments2Dataset2"
+##  [7] "enrichmentsDataset1"  "enrichmentsDataset2"  "expressionDataset1"  
+## [10] "expressionDataset2"   "gmtFile"              "phenotype1Dataset1"  
+## [13] "phenotype1Dataset2"   "phenotype2Dataset1"   "phenotype2Dataset2"  
+## [16] "pvalue"               "qvalue"               "ranksDataset1"       
+## [19] "ranksDataset2"        "similaritycutoff"
+```
+
+
+```r
+## need to specify which one would be most useful here? build or gseabuild or just make stuff for both?
+setMethod('getEnrichmentMapNameMapping', 'CytoscapeConnectionClass', 
+    function(obj) {
+        layout.names <- getCommandNamesEnrichmentMap(obj)
+        layout.full.names <- c()
+        
+        # get the English/full name of a layout
+        for (layout.name in layout.names){
+            request.uri <- paste(obj@uri,
+                                 pluginVersion(obj),
+                                 "commands/enrichmentmap",
+                                 as.character(layout.name),
+                                 sep="/")
+            request.res <- GET(url=request.uri)
+            
+   layout.property.names <- unlist(strsplit(rawToChar(request.res$content),
+                                                  split = "\n\\s*"))
+            ## how to remove "Available commands ..."?
+            ## not happy with this
+            layout.property.names <- layout.property.names[-1]
+        }
+
+return(layout.property.names)
+})
+```
+
+```
+## [1] "getEnrichmentMapNameMapping"
+```
+
+```r
+## END getLayoutNameMapping
+
+getEnrichmentMapNameMapping(cy)            
+```
+
+```
+## [1] "combinedconstant" "edbdir"           "edbdir2"         
+## [4] "expressionfile"   "expressionfile2"  "overlap"         
+## [7] "pvalue"           "qvalue"           "similaritymetric"
+```
+
+```r
+#http://localhost:1234/v1/commands/enrichmentmap/build/
+
+setMethod('getEnrichmentMapCommandsNames',
+          'CytoscapeConnectionClass', 
+          function(obj,
+                   layout.name) {
+            request.uri <- paste(obj@uri,
+                                 pluginVersion(obj),
+                                 "commands/enrichmentmap",
+                                 as.character(layout.name),
+                                 sep="/")
+            request.res <- GET(url=request.uri)
+            
+            layout.property.names <-unlist(strsplit(rawToChar(request.res$content),
+                                                    split = "\n\\s*"))
+            ## how to remove "Available commands ..."?
+            ## not happy with this
+            layout.property.names <- layout.property.names[-1]
+            
+            return(layout.property.names)
+            
+          })## END getEnrichmentMapCommandsNames
+```
+
+```
+## [1] "getEnrichmentMapCommandsNames"
+```
+
+```r
+getEnrichmentMapCommandsNames(cy, "build")
+```
+
+```
+##  [1] "analysisType"         "classDataset1"        "classDataset2"       
+##  [4] "coeffecients"         "enrichments2Dataset1" "enrichments2Dataset2"
+##  [7] "enrichmentsDataset1"  "enrichmentsDataset2"  "expressionDataset1"  
+## [10] "expressionDataset2"   "gmtFile"              "phenotype1Dataset1"  
+## [13] "phenotype1Dataset2"   "phenotype2Dataset1"   "phenotype2Dataset2"  
+## [16] "pvalue"               "qvalue"               "ranksDataset1"       
+## [19] "ranksDataset2"        "similaritycutoff"
+```
+
+```r
+getEnrichmentMapCommandsNames(cy, "gseabuild")
+```
+
+```
+## [1] "combinedconstant" "edbdir"           "edbdir2"         
+## [4] "expressionfile"   "expressionfile2"  "overlap"         
+## [7] "pvalue"           "qvalue"           "similaritymetric"
+```
+
+Trying to figure out how to send data to the cytoscape network
+
+
+
+```r
+request.uri <- paste(cy@uri,
+                     pluginVersion(cy),
+                     "commands/enrichmentmap",
+                     as.character(layout.name),
+                     sep = "/")
+
+## with this one you need to use a GET request and it should be in the form of a query, not a json list. 
+# request.res <- PUT(url = request.uri,
+#                    body = new.property.value.list.JSON,
+#                    encode = "json")
+# request.res    
+## gives 405 response...which means not allowed. 
+```
+
+
+
+```r
+getEnrichmentMapCommandsNames(cy,"build")
+```
+
+```
+##  [1] "analysisType"         "classDataset1"        "classDataset2"       
+##  [4] "coeffecients"         "enrichments2Dataset1" "enrichments2Dataset2"
+##  [7] "enrichmentsDataset1"  "enrichmentsDataset2"  "expressionDataset1"  
+## [10] "expressionDataset2"   "gmtFile"              "phenotype1Dataset1"  
+## [13] "phenotype1Dataset2"   "phenotype2Dataset1"   "phenotype2Dataset2"  
+## [16] "pvalue"               "qvalue"               "ranksDataset1"       
+## [19] "ranksDataset2"        "similaritycutoff"
+```
+
+
+```r
+enrichmentmap.url <- paste(base.url,
+                           "commands",
+                           "enrichmentmap",
+                           "build",
+                           sep="/") 
+
+## something to deal with is that you cannot use relative paths in this, it needs to be absolute path
+path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+
+enr_file = paste(path_to_file,
+                 "gprofiler_results_mesenonly_ordered_computedinR.txt",
+                 sep="")
+```
+
+
+```r
+#' Runs Enrichment Map with a list of parameters.
+#'
+#' @param object Cytoscape network where Enrichment Map is run via RCy3 
+#' @param 
+#' @return An enrichmentMap 
+#'
+#' @concept RCy3
+#' @export
+#' 
+#' @importFrom methods setGeneric
+
+setGeneric('setEnrichmentMapProperties', 
+            signature='obj',
+            function(obj,
+                     layout.name,
+                     properties.list) standardGeneric('setEnrichmentMapProperties')
+           )
+```
+
+```
+## [1] "setEnrichmentMapProperties"
+```
+
+```r
+setMethod('setEnrichmentMapProperties',
+          'CytoscapeConnectionClass', 
+          function(obj,
+                   layout.name,
+                   properties.list) {
+            all.possible.props <- getEnrichmentMapCommandsNames(obj,
+                                                                layout.name)
+              if (all(names(properties.list) %in% all.possible.props) == FALSE) {
+                print('You have included a name which is not in the commands')
+                      stderr ()
+              } else {
+                request.uri <- paste(obj@uri,
+                     pluginVersion(obj),
+                     "commands/enrichmentmap",
+                     as.character(layout.name),
+                     sep = "/")
+
+                request.res <- GET(url = request.uri,
+                                   query = properties.list)
+                if (request.res$status == 200){
+                  print("Successfully buitl the EnrichmentMap.")
+                        stdout ()
+                } else {
+                  print("Something went wrong. Unable to build EnrichmentMap")
+                        stderr ()
+                }
+                invisible(request.res)
+              }
+          }) 
+```
+
+```
+## [1] "setEnrichmentMapProperties"
+```
+
+```r
+em_params <- list(analysisType = "generic",
+                  enrichmentsDataset1 = enr_file,
+                  pvalue = "1.0",
+                  qvalue = "0.00001",
+                  #expressionDataset1 = exp_file, 
+                  similaritycutoff = "0.25",
+                  coeffecients = "JACCARD")
+
+new <- setEnrichmentMapProperties(cy, "build", em_params)
+```
+
+```
+## [1] "Successfully buitl the EnrichmentMap."
+```
+
+```r
+#displayGraph(new)
+## does not work because the class is not right
+## see line 404 in RCy3.R
+
+## does this print the enrichment map? no
+#saveImage(cy,"test_EM", "pdf", scale=1.0)
+#saveImage(cy,"test_EM", "png", scale=0.3)
+
+
+
+## what is I do 
+cw <- CytoscapeWindow('co-occurrence',
+                      overwriteWindow = TRUE)
+displayGraph(cw)
+```
+
+```
+## NULL
+```
+
+```r
+setEnrichmentMapProperties(cw, "build", em_params)
+```
+
+```
+## [1] "Successfully buitl the EnrichmentMap."
+```
+
+```r
+## how to get the name of the graph made??
+## how can I then manipulate it?
+existing.CytoscapeWindow("julia")
+```
+
+```
+## [1] NA
+```
+
+```r
+getWindowList(cy)
+```
+
+```
+##  [1] "EM9_Enrichment Map"  "EM1_Enrichment Map"  "EM6_Enrichment Map" 
+##  [4] "EM13_Enrichment Map" "EM19_Enrichment Map" "EM11_Enrichment Map"
+##  [7] "EM17_Enrichment Map" "EM3_Enrichment Map"  "EM8_Enrichment Map" 
+## [10] "EM15_Enrichment Map" "EM21_Enrichment Map" "EM12_Enrichment Map"
+## [13] "co-occurrence"       "EM4_Enrichment Map"  "EM10_Enrichment Map"
+## [16] "EM16_Enrichment Map" "EM2_Enrichment Map"  "EM7_Enrichment Map" 
+## [19] "EM14_Enrichment Map" "EM20_Enrichment Map" "EM5_Enrichment Map" 
+## [22] "EM18_Enrichment Map" "test"
+```
+
+```r
+## how do I connect to that window??
+getWindowID(cy, "EM18_Enrichment Map")
+```
+
+```
+## [1] "69532"
+```
+
+```r
+#http://localhost:1234/v1/networks
+## need to create a CytoscapeWindowClassObject in R for this. 
+## ok this saves the graph as graphnel. 
+## and is very slow
+#test_cw <- getGraphFromCyWindow(cy, "EM18_Enrichment Map")
+## need to print specific window...
+
+## object needs to be a CytoscapeWindowClass object
+## connect to existing window....
+test_existing_window <- existing.CytoscapeWindow ("EM18_Enrichment Map",
+                                                  host='localhost',
+                                                  port=1234,
+                                                  copy.graph.from.cytoscape.to.R=FALSE)
+
+saveImage(test_existing_window,"test_EM_new", "png", scale=0.3)
+```
+
+![](./test_EM_new.png)
+
+
+```r
+enrichmentmap.url <- paste(base.url,
+                           "commands",
+                           "enrichmentmap",
+                           "build",
+                           sep="/") 
+
+path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+
+enr_file = paste(path_to_file,"gprofiler_results_mesenonly_ordered_computedinR.txt",sep="")
+
+em_params <- list(analysisType = "generic",
+                  enrichmentsDataset1 =enr_file,
+                  pvalue="1.0",
+                  qvalue="0.00001",
+                  #expressionDataset1 = exp_file, 
+                  similaritycutoff="0.25",
+                  coeffecients="JACCARD")
+
+response <- GET(url=enrichmentmap.url,
+                query=em_params)
+response$url
+```
+
+```
+## [1] "http://localhost:1234/v1/commands/enrichmentmap/build?analysisType=generic&enrichmentsDataset1=%2Fhome%2Fjulia_g%2Fwindows_school%2Fgsoc%2FEM-tutorials-docker%2Fnotebooks%2Fdata%2Fgprofiler_results_mesenonly_ordered_computedinR.txt&pvalue=1.0&qvalue=0.00001&similaritycutoff=0.25&coeffecients=JACCARD"
+```
+
 ## Next steps
 
 - Examine RCy3 to see what functions I can use to send info (POST) to the commands in Cytoscape. 
 - Verify that I have made these functions correctly for use in S4 framework
 - Start working through Enrichment map tutorial (or other data?) using these R functions.
 - Is it wrong to have variable `available.commands`? Does this mess with S4 stuff? 
+- timecourse ideas??

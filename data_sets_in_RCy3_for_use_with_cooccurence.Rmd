@@ -2,556 +2,225 @@
 title: "data_sets_in_RCy3"
 author: "Julia Gustavsen"
 date: "May 24, 2016"
-output: html_document
+output: 
+    html_document:
+      keep_md: true
+      number_sections: yes
+      theme: cerulean
+      toc: yes
+      toc_depth: 6 
 ---
 
-Can I just use some of the virus data?
-
-TARA ocean data: http://www.raeslab.org/companion/ocean_interactome/taxonMatrices.zip
+```{r, message=FALSE}
+library(RCy3)
+library(igraph)
+library(RJSONIO)
+library(reshape2)
+library(dplyr)
+library(RColorBrewer)
+```
 
 What about a small subset of the human gut data? what about the Faust lab?
 
 http://onlinelibrary.wiley.com/doi/10.15252/msb.20156272/pdf
 
-library(igraph)
-library(igraphdata)
-data(package="igraphdata")
-data(foodwebs)
-plot(foodwebs$mangwet)
-data(yeast)
-
 Ok finally the idea is that I can have one with made up data and then I can use the Tara Oceans data to look at another vignette. 
 
 Let's just make it up so it doesn't depend on anything for now...
-
-```{r}
-library(RCy3)
-library(igraph)
-library(RJSONIO)
-species_data <- read.table(header=T, row.names=1, text=
-"    Species1 Species2 Species3 Species4
- 1   1   1   0  2
- 2   1   0   1  3
- 3   1   2   1  4
- 4   0   3   1  2
- 5   2   0   0  0
- 6   2   1   1  1
-")
-
-spe_cor <- cor(as.matrix(species_data),
-                  method="spearman") 
-
-spe_cor[upper.tri(spe_cor)] <- NA
-library(reshape2)
-melted_cor <- melt(spe_cor)
-melted_cor <- na.omit(melted_cor)
-
-library(dplyr)
-filtered_data <- filter(melted_cor, abs(value) > 0.6)
-
-graph_spe <- graph.data.frame(filtered_data,
-                          directed=FALSE)
-
-plot(graph_spe)
-```
- 
-Williams et al did a good job here:
-
-http://co-occurrence.readthedocs.io/en/latest/
-
- 
-Previously used
-```{r}
-library(vegan)
-data(dune)
-dune
-```
-
-Let's try to send the first one to Cytoscape
-
-Oh RCy3 doesn't work with igraph!
-
-Can that be fixed? Or should it be?
-
-Can I try to use graph instead?
-
-
-```{r}
-## ok can quickly do this:
-
-graphNEL_spe <- igraph.to.graphNEL(graph_spe)
-plot(graphNEL_spe)
-graphNEL_spe <- initEdgeAttribute (graphNEL_spe, "weight", "integer", 3)
-graphNEL_spe <- initEdgeAttribute (graphNEL_spe, "value", "numeric", 1.0)
-## so this just changes these things to these values.
-## doesn't use the underlying data. A bit hard to work with.
-
-# plot(graphNEL_spe)
-# g <- new ('graphNEL', edgemode='directed')
-# g <- graph::addNode ('A', g)
-# g <- graph::addNode ('B', g)
-# g <- graph::addNode ('C', g)
-
-## can figure out later how to do with graph package
-## g <- new ('graphNEL', edgemode='directed')
-cw <- CytoscapeWindow('co-occurrence',
-                      graph=graphNEL_spe,
-                      overwrite=TRUE)
-displayGraph(cw)
-```
-
-
-next in their vignette
-
-the layout
-
-```{r}
-layoutNetwork (cw, layout.name='grid')
-```
-
-# Add node attributes
-
-```{r}
-    g <- cw@graph   # created above, in the section  'A minimal example'
-    g <- initNodeAttribute (graph=g,
-                            attribute.name='Family',
-                            attribute.type='char',
-                            default.value='undefined')
-    nodeData (g, 'Species1', 'Family') <- 'Family1'
-    nodeData (g, 'Species2', 'Family') <- 'Family2'
-    nodeData (g, 'Species3', 'Family') <- 'Family1'
-    nodeData (g, 'Species4', 'Family') <- 'Family1'
-g <- initNodeAttribute (graph=g,  'lfc', 'numeric', 0.0)
-    nodeData (g, 'Species1', 'lfc') <- -1.2
-    nodeData (g, 'Species2', 'lfc') <- 1.8
-    nodeData (g, 'Species3', 'lfc') <- 3.2
-    nodeData (g, 'Species4', 'lfc') <- 0.0    
-## setGraph?? maybe the documentation is a bit hard to understand if you do not know S4?
-    ## so other things can be assigned in the other slots?
-    cw <- setGraph(cw, g)
-    str(cw)
-    displayGraph(cw)    # cw's graph is sent to Cytoscape
-
-```
-
-Ok now see these attributes show up in Cytoscape
-
-# Set up the default colours in cytoscape
-```{r}
-    setDefaultNodeShape(cw, 'OCTAGON')
-    setDefaultNodeColor(cw, '#AAFF88')
-    setDefaultNodeSize(cw, 80)
-    setDefaultNodeFontSize(cw, 40)
-```
-
-
-## Map attributes
-
-So first we look at ways of getting the info from cytoscape so that we can work with it. Interactive a bit. 
-
-```{r}
-getNodeShapes(cw)   # diamond, ellipse, trapezoid, triangle, etc.
-## noa.names --make title more informatic Names of node attributes
-print(noa.names(getGraph(cw)))  # what data attributes are defined?
-print(noa(getGraph(cw),
-          'moleculeType'))
-print(noa(getGraph(cw),
-          'Family'))   
-
-attribute.values <- c('Family1',
-                      'Family2')
-node.shapes      <- c('DIAMOND',
-                      'TRIANGLE')
-    
-## this applies the rule
-setNodeShapeRule(cw,
-                 node.attribute.name='Family',
-                 attribute.values,
-                 node.shapes)
-```
-
-
-## Interpolation rules
-
-used for values that can vary of are between certain levels
-```{r}
-setNodeColorRule(cw,
-                 'lfc',
-                 c(-3.0,
-                   0.0,
-                   3.0),
-                 c('#00AA00',
-                   '#00FF00',
-                   '#FFFFFF',
-                   '#FF0000',
-                   '#AA0000'),
-                 mode='interpolate')
-```
-
-Note that there \emph{five} colors, but only three control.points. The two additional colors tell the interpolated mapper which colors to use if the stated data attribute (lfc) has a value less than the smallest control point (paint it a darkish green, \#00AA00) or larger than the largets control point (paint it a darkish red, \#AA0000).  These extreme (or out-of-bounds) colors may be omitted:
-
-
-## Interpolating node size
-
-```{r}
-control.points = c (-1.2,
-                    2.0,
-                    4.0)
-node.sizes     = c (10,
-                    20,
-                    50,
-                    200,
-                    205)
-setNodeSizeRule (cw,
-                 'lfc',
-                 control.points,
-                 node.sizes,
-                 mode='interpolate')
-```
-
-# Edge attributes
-
-```{r}
-g <- cw@graph
-g <- initEdgeAttribute(graph=g,
-                       attribute.name='edgeType',
-                       attribute.type='char',
-                       default.value='unspecified')
-edgeData(g, 'Species1', 'Species2', 'edgeType') <- 'phosphorylates'
-edgeData(g, 'Species1', 'Species4', 'edgeType') <- 'promotes'
-## so this added edges
-
-    
-cw@graph <- g
-displayGraph (cw)
-    
-line.styles = c ('DOT', 'SOLID')
-edgeType.values = c ('phosphorylates', 'promotes')
-setEdgeLineStyleRule (cw,
-                      'edgeType',
-                      edgeType.values,
-                      line.styles)
-    
-arrow.styles = c('Arrow', 'Delta')
-setEdgeTargetArrowRule(cw,
-                       'edgeType',
-                       edgeType.values,
-                       arrow.styles)
-```
-
-# Manipulating the cytoscape window
-
-could be very useful for the use with a monitor
-
-```{r}
-hidePanel (cw, 'Data Panel')
-floatPanel (cw, 'D')
-dockPanel (cw, 'd')
-hidePanel (cw, 'Control Panel')
-floatPanel (cw, 'control')
-dockPanel (cw, 'c')
-```
-
-
-Selecting specific nodes
-```{r}
-selectNodes(cw, 'Family1') # gives error
-selectNodes(cw, 'Species1')
-```
-
-
-Here could get a list of those selected
-
-```{r}
-getSelectedNodes(cw)
-selectFirstNeighborsOfSelectedNodes(cw)
-selected_nodes <- getSelectedNodes(cw)
-```
-
-
-
-layout  that is data driven.
-what is makeSimpleGraph()?? 3 nodes good for demos...
-
-```{r}
-help("makeSimpleGraph")
-cwe <- CytoscapeWindow('vignette.setNodePosition',
-                            graph=RCy3::makeSimpleGraph(),
-                       overwrite=TRUE)
-displayGraph(cwe)
-    layoutNetwork(cwe,
-                  'grid')
-    
-center.x <- 200
-center.y <- 200
-radius <- 200
-
-# sweep through full revolution 3 times, 5 degrees at a time
-angles <- seq (0, 360, 90)
-for (angle in angles) {
-  angle.in.radians <- angle * pi / 180
-  x <- center.x + (radius * cos (angle.in.radians))
-  y <- center.y + (radius * sin (angle.in.radians))
-  setNodePosition (cwe, 'A', x, y)
-}
-
-```
-
-What about printing window to a pdf or png??
-
-```{r}
-saveImage(cw,"test", "pdf", scale=1.0)
-saveImage(cw,"test", "png", scale=0.3)
-## shouldn't saveImage have in the See Also section something about saving session?
-saveNetwork(cw, "test") ## makes test.cys, which is not a session file and I am not sure what to do with it...
-## what about a saveSession idea??
-```
-
-
-# Send network to Cytoscape
-
-```{r}
-## can I somehow port this function to RCy3?
-toCytoscape <- function (igraphobj) {
-  # Extract graph attributes
-  graph_attr = graph.attributes(igraphobj)
-  # Extract nodes
-  node_count = length(V(igraphobj))
-  if('name' %in% list.vertex.attributes(igraphobj)) {
-    V(igraphobj)$id <- V(igraphobj)$name
-  } else {
-    V(igraphobj)$id <- as.character(c(1:node_count))
-  }
-  
-  nodes <- V(igraphobj)
-  v_attr = vertex.attributes(igraphobj)
-  v_names = list.vertex.attributes(igraphobj)
-  
-  nds <- array(0, dim=c(node_count))
-  for(i in 1:node_count) {
-    if(i %% 1000 == 0) {
-      print(i)
-    }
-    nds[[i]] = list(data = mapAttributes(v_names, v_attr, i))
-  }
-  
-  edges <- get.edgelist(igraphobj)
-  edge_count = ecount(igraphobj)
-  e_attr <- edge.attributes(igraphobj)
-  e_names = list.edge.attributes(igraphobj)
-  
-  attr_exists = FALSE
-  e_names_len = 0
-  if(identical(e_names, character(0)) == FALSE) {
-    attr_exists = TRUE
-    e_names_len = length(e_names)
-  }
-  e_names_len <- length(e_names)
-  
-  eds <- array(0, dim=c(edge_count))
-  for(i in 1:edge_count) {
-    st = list(source=toString(edges[i,1]), target=toString(edges[i,2]))
-    
-    # Extract attributes
-    if(attr_exists) {
-      eds[[i]] = list(data=c(st, mapAttributes(e_names, e_attr, i)))
-    } else {
-      eds[[i]] = list(data=st)
-    }
-
-    if(i %% 1000 == 0) {
-      print(i)
-    }
-  }
-  
-  el = list(nodes=nds, edges=eds)
-  
-  x <- list(data = graph_attr, elements = el)
-  print("Done.  To json Start...")
-  return (toJSON(x))
-}
-
-mapAttributes <- function(attr.names, all.attr, i) {
-  attr = list()
-  cur.attr.names = attr.names
-  attr.names.length = length(attr.names)
-  
-  for(j in 1:attr.names.length) {
-    if(is.na(all.attr[[j]][i]) == FALSE) {
-      #       attr[j] = all.attr[[j]][i]
-      attr <- c(attr, all.attr[[j]][i])
-    } else {
-      cur.attr.names <- cur.attr.names[cur.attr.names != attr.names[j]]
-    }
-  }
-  names(attr) = cur.attr.names
-  return (attr)
-}
-
-
-
-
-
-```
-
 
 
 ```{r}
 cy <- CytoscapeConnection ()
 deleteAllWindows(cy)
-phage_and_prok_dcm <- read.delim("./data/taxonMatrices/matrix_23.txt")
 
-## did work on them in "inst/data-raw/"
-
-## but don't know if virus or prok....could fix that.
-## this is too big!!!
-#library(httr)
+## processed in "inst/data-raw/"
 prok_vir_cor <- read.delim("./data/virus_prok_cor.tsv")
 
 graph_vir_prok <- simplify(graph.data.frame(prok_vir_cor,
                                directed=FALSE))
-
-# #plot(graph_dune)
-# port.number = 1234
-# 
-# base.url = paste("http://localhost:",
-#                  toString(port.number),
-#                  "/v1", sep="")
-# base.url
-# 
-# cygraph <- toCytoscape(graph_vir_prok) ## formats an igraph object to json for sending to Cytoscape
-# 
-# network.url <-  paste(base.url,
-#                       "networks",
-#                       sep="/")
-# 
-# res <- POST(url=network.url,
-#             body=cygraph,
-#             encode="json")
-
 ```
 
 need to find a way to send igraphs to cytoscape via Rcy3 too. 
 
+Ways to set the layout...
 ```{r}
-#something like CytoscapeWindow...
 
-# Check the attributes
-summary(graph_vir_prok)
-gD.cyt <- igraph.to.graphNEL(graph_vir_prok)
-# g <- gD.cyt@
-#     g <- cw@graph 
-#     g <- initNodeAttribute (graph=g,  attribute.name='moleculeType',
-#                             attribute.type='char',
-#                             default.value='undefined')
-summary(gD.cyt)
-nodeData(gD.cyt)
-edgeData(gD.cyt)
-edgeNames(gD.cyt)
-properlyInitializedNodeAttribute(gD.cyt, "name")
-eda.names(gD.cyt) ## properly initialized
-
-## where does is.classic.graph(graph) come from??
-getEdgeAttributeNames(gD.cyt)
-gD.cyt <- initEdgeAttribute (graph=gD.cyt,
-                             "weight",
-                             'numeric',
-                             0.0)
-
-gDCW <- CytoscapeWindow("Les Miserables",
-                        graph = gD.cyt,
-                        overwriteWindow = TRUE)
-getEdgeAttributeNames(gDCW)
-cw <- setGraph (gDCW, gD.cyt)
-displayGraph (cw)
-
-# We can display graph, with defaults color/size scheme
-displayGraph(gDCW)
-
-
-gD.cyt <- igraph.to.graphNEL(gD)
-igraph.from.graphNEL(gD, name = TRUE, weight = TRUE, unlist.attrs = TRUE)
-# We have to create attributes for graphNEL
-# We'll keep the same name, so the values are passed from igraph
-
-gD.cyt <- initNodeAttribute(gD.cyt, 'degree', 'numeric', 0) 
-gD.cyt <- initNodeAttribute(gD.cyt, 'betweenness', 'numeric', 0) 
-gD.cyt <- initEdgeAttribute (gD.cyt, "weight", 'integer', 0)
-gD.cyt <- initEdgeAttribute (gD.cyt, "similarity", 'numeric', 0)
-
-# Now we can create a new graph window in cytoscape
-# Be sure that CytoscapeRPC plugin is activated
-gDCW <- CytoscapeWindow("Les Miserables",
-                        graph = gD.cyt,
-                        overwriteWindow = TRUE)
-
-# We can display graph, with defaults color/size scheme
-displayGraph(gDCW)
-
-# If you also want to choose a layout from R, a list  of available layouts can be accessed as follows:
 cy <- CytoscapeConnection()
 hlp <-getLayoutNames(cy)
-# We'll select the layour number 18 - "fruchterman-rheingold" layout 
-# See properties for the given layout
 # getLayoutPropertyNames(cy, hlp[18])
 # Apply values to some of the properties and plot the layout
-setLayoutProperties (gDCW,
-                     hlp[18],
-                     list (edge_attribute = 'similarity', iterations = 1000))
-layoutNetwork(gDCW, hlp[18])
-
-# Figure 1 made here
-
-# Now, we can define our own default color/size scheme
-setDefaultBackgroundColor(gDCW, '#FFFFFF')
-setDefaultEdgeColor(gDCW, '#CDC9C9')
-setDefaultEdgeLineWidth(gDCW, 4)
-setDefaultNodeBorderColor(gDCW, '#000000')
-setDefaultNodeBorderWidth(gDCW, 3)
-setDefaultNodeShape(gDCW, 'ellipse')
-setDefaultNodeColor(gDCW, '#87CEFA')
-setDefaultNodeSize(gDCW, 60)
-setDefaultNodeFontSize(gDCW, 20)
-setDefaultNodeLabelColor(gDCW, '#000000')
-
-# And we can replot it 
-redraw(gDCW)    
-```
-
-
-
-
-```{r}
-ug <- ftM2graphNEL(as.matrix(prok_vir_cor[1:2]),
-                   edgemode = "directed",
-                   W = as.matrix(prok_vir_cor[3]))
-edgeWeights(ug)
-
-#ug <- ftM2graphNEL(as.matrix(prok_vir_cor[1:2]))
-
-# ug <- initEdgeAttribute (ug, "weight", "numeric",prok_vir_cor[3] )
-
-#ug <- initEdgeAttribute (ug, "weight", "numeric",0 )
-
-cw <- CytoscapeWindow('co-occurrence',
-                      graph=ug,
-                      overwrite=TRUE)
-
-displayGraph(cw)
-```
-
-
-
-```{r}
-
-# ## need to get it to work with igrpah....this graph bioconductor sucks...
-# port.number=1234
+# setLayoutProperties (gDCW,
+#                      hlp[18],
+#                      list (edge_attribute = 'similarity', iterations = 1000))
+# layoutNetwork(gDCW, hlp[18])
 # 
-# base.url = paste("http://localhost:", toString(port.number), "/v1", sep="")
-# cygraph <- toCytoscape(graph_vir_prok) 
-# library(httr)
-# network.url = paste(base.url, "networks", sep="/")
-# res <- POST(url=network.url, body=cygraph, encode="json")
+# # Now, we can define our own default color/size scheme
+# setDefaultBackgroundColor(gDCW, '#FFFFFF')
+# setDefaultEdgeColor(gDCW, '#CDC9C9')
+# setDefaultEdgeLineWidth(gDCW, 4)
+# setDefaultNodeBorderColor(gDCW, '#000000')
+# setDefaultNodeBorderWidth(gDCW, 3)
+# setDefaultNodeShape(gDCW, 'ellipse')
+# setDefaultNodeColor(gDCW, '#87CEFA')
+# setDefaultNodeSize(gDCW, 60)
+# setDefaultNodeFontSize(gDCW, 20)
+# setDefaultNodeLabelColor(gDCW, '#000000')
+# 
+# # And we can replot it 
+# redraw(gDCW)    
+```
+
+
+## read in data from the taxnomic stuff
+
+```{r}
+phage_id_affiliation <-read.delim("./data/phage_ids_with_affiliation.tsv")
+
+bac_id_affi <- read.delim("./data/prok_tax_from_silva.tsv")
+## then need to add to the node data frames...
+```
+
+### Get the network in a mode to send to Cytoscape
+
+```{r}
+genenet.nodes <- as.data.frame(vertex.attributes(graph_vir_prok))
+
+## ids do not match for the phage ids 
+phage_id_affiliation$first_sheet.Phage_id_network <- gsub("-",
+                                                          "_",
+                                                          phage_id_affiliation$first_sheet.Phage_id_network)
+
+## not all have classification, so create empty columns
+## before had NA but was worried it was messing up the setting of attributes.
+genenet.nodes$phage_aff <- rep("test", nrow(genenet.nodes))
+genenet.nodes$Tax_order <- rep("test", nrow(genenet.nodes))
+genenet.nodes$Tax_subfamily <- rep("test", nrow(genenet.nodes))
+str(genenet.nodes)
+for (row in seq_along(1:nrow(genenet.nodes))){
+  if (genenet.nodes$name[row] %in% phage_id_affiliation$first_sheet.Phage_id_network){
+    aff_to_add <- unique(subset(phage_id_affiliation,
+              first_sheet.Phage_id_network == genenet.nodes$name[row],
+              select = c(phage_affiliation,
+                         Tax_order,
+                         Tax_subfamily)))
+    
+    genenet.nodes$phage_aff[row] <- as.character(aff_to_add$phage_affiliation)
+    genenet.nodes$Tax_order[row] <- as.character(aff_to_add$Tax_order)
+    genenet.nodes$Tax_subfamily[row] <- as.character(aff_to_add$Tax_subfamily)
+  }
+}
+
+str(genenet.nodes)
+
+## do the same for proks
+
+genenet.nodes$prok_king <- rep("test", nrow(genenet.nodes))
+genenet.nodes$prok_tax_phylum <- rep("test", nrow(genenet.nodes))
+genenet.nodes$prok_tax_class <- rep("test", nrow(genenet.nodes))
+
+for (row in seq_along(1:nrow(genenet.nodes))){
+  if (genenet.nodes$name[row] %in% bac_id_affi$Accession_ID){
+     aff_to_add <- unique(subset(bac_id_affi,
+              Accession_ID == as.character(genenet.nodes$name[row]),
+              select = c(Kingdom,
+                         Phylum,
+                         Class)))
+    
+    genenet.nodes$prok_king[row] <- as.character(aff_to_add$Kingdom)
+    genenet.nodes$prok_tax_phylum[row] <- as.character(aff_to_add$Phylum)
+    genenet.nodes$prok_tax_class[row] <- as.character(aff_to_add$Class)
+  }
+}
+
+genenet.edges <- data.frame(as_edgelist(graph_vir_prok))
+names(genenet.edges) <- c("name.1",
+                          "name.2")
+genenet.edges$Weight <- edge_attr(graph_vir_prok)[[1]]
+str(genenet.edges)
+str(genenet.nodes)
+
+genenet.edges$name.1 <- as.character(genenet.edges$name.1)
+genenet.edges$name.2 <- as.character(genenet.edges$name.2)
+genenet.nodes$name <- as.character(genenet.nodes$name)
+
+## works if I load the source from the cyplot Branch of Rcy3
+ug <- cyPlot(genenet.nodes,genenet.edges)
+
+.rcyEdgeNames = function(g) 
+{
+   nodes.list = graph::edges(g)
+   result = c()
+   for(source.node in names(nodes.list)) {
+      target.nodes = nodes.list[[source.node]]
+    
+   if(length(target.nodes) == 0) {
+      next;
+   }
+   for(target.node in target.nodes) {
+      tilde.edge.name = sprintf('%s~%s', source.node, target.node) 
+      result = c(result, tilde.edge.name)
+      } # for target.node
+   } # for source.node
+   
+   return(result)
+}
+## ok this was hacked together a bit. Not sending the edges to cytoscape yet
+
 
 ```
 
+### Send network to Cytoscape
+
+```{r}
+cw <- CytoscapeWindow("Tara oceans",
+                      graph=ug,
+                      overwriteWindow = TRUE)
+displayGraph(cw)
+redraw(cw)
+layoutNetwork(cw)
+
+selectNodes(cw,
+            'ph_500') # selects specific nodes
+selectNodes(cw,
+            'EF571982')
+getSelectedNodes(cw)
+families_to_colour <- c(" Podoviridae",
+                        " Siphoviridae",
+                        " Myoviridae")
+node.colour = c('#00AA00',
+                '#00FF00',
+                '#AAAAAA')
+setNodeColorRule(cw,
+                 'Tax_subfamily',
+                 families_to_colour,
+                 node.colour,
+                 "lookup",
+                 default.color='#AA0000')
+
+families_to_colour <- unique(genenet.nodes$prok_tax_phylum)
+## remove "test"
+families_to_colour <- families_to_colour[!families_to_colour %in% "test"]
+node.colour <- brewer.pal(length(families_to_colour),
+                          "Set3")
+
+setNodeColorRule(cw,
+                 'prok_tax_phylum',
+                 families_to_colour,
+                 node.colour,
+                 "lookup",
+                 default.color='#ffffff')
+## works!
+
+## set shape to be virus or prok
+shapes_for_nodes <- c('DIAMOND')
+
+## so want to grep for ph
+phage_names <- grep("ph_", genenet.nodes$name, value=TRUE)
+## here I want to search for something...
+noa.names (cw@graph)
+setNodeShapeRule(cw,
+                 "label",
+                 phage_names,
+                 shapes_for_nodes)
+## cool that worked!!
+```
