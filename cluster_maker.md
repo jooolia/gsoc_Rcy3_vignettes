@@ -1,17 +1,9 @@
----
-title: "cluster_maker"
-author: "Julia Gustavsen"
-date: "June 23, 2016"
-output: 
-    html_document:
-      keep_md: true
-      number_sections: yes
-      theme: cerulean
-      toc: yes
-      toc_depth: 6 
----
+# cluster_maker
+Julia Gustavsen  
+June 23, 2016  
 
-```{r, message = FALSE}
+
+```r
 library(RCy3)
 library(httr)
 library(RJSONIO)
@@ -20,9 +12,23 @@ source("./functions_to_add_to_RCy3/working_with_namespaces.R")
 
 Trying out cluster maker with R 
 
-```{r}
+
+```r
 cy <- CytoscapeConnection ()
 getCommandsWithinNamespace(cy, "cluster")
+```
+
+```
+##  [1] "ap"                  "attribute"           "autosome_heatmap"   
+##  [4] "autosome_network"    "bestneighbor"        "cheng&church"       
+##  [7] "connectedcomponents" "cuttingedge"         "dbscan"             
+## [10] "density"             "fcml"                "featurevector"      
+## [13] "fft"                 "filter"              "fuzzifier"          
+## [16] "getcluster"          "getnetworkcluster"   "glay"               
+## [19] "haircut"             "hascluster"          "hierarchical"       
+## [22] "hopach"              "kmeans"              "kmedoid"            
+## [25] "mcl"                 "mcode"               "network"            
+## [28] "pam"                 "scps"                "transclust"
 ```
 
 
@@ -32,7 +38,8 @@ http://opentutorials.cgl.ucsf.edu/index.php/Tutorial:Cluster_Maker
 
 ## need to read in cys
 
-```{r}
+
+```r
 #help session
 
 command.name <- "open"
@@ -53,8 +60,13 @@ request.res <- GET(url = request.uri,
 #get
 
 getWindowList(cy)
+```
 
+```
+## [1] "galFiltered.sif"
+```
 
+```r
 ## HERE!!!! 
 ## but how to apply to a specific networks
 connect_EM_to_R_session <- existing.CytoscapeWindow("galFiltered.sif",                                                                      copy.graph.from.cytoscape.to.R = FALSE)
@@ -62,9 +74,19 @@ connect_EM_to_R_session <- existing.CytoscapeWindow("galFiltered.sif",          
 
 Graph from session is loaded into Cytoscape
 
-```{r}
-getCommandsWithinNamespace(cy, "cluster/hierarchical")
 
+```r
+getCommandsWithinNamespace(cy, "cluster/hierarchical")
+```
+
+```
+##  [1] "adjustDiagonals"   "clusterAttributes" "createGroups"     
+##  [4] "edgeAttributeList" "ignoreMissing"     "linkage"          
+##  [7] "metric"            "network"           "nodeAttributeList"
+## [10] "selectedOnly"      "showUI"            "zeroMissing"
+```
+
+```r
 properties.list <- list(nodeAttributeList = c("node.gal1RGexp",
                                            "node.gal4RGexp",
                                            "node.gal80Rexp"),
@@ -86,7 +108,5 @@ request.uri <- paste(cy@uri,pluginVersion(cy),
 
 request.res <- GET(url = request.uri,
                    query = properties.list)
-
-
 ```
 
