@@ -4,27 +4,47 @@ May 24, 2016
 
 # Purpose: 
 
-* Recreating tutorials from Bader lab (link) using Rcy3 and cytoscape.
-* creating functions using RCy3 that make it easy to use 
+* Recreating tutorials from [Bader lab] (http://www.baderlab.org/Software/EnrichmentMap/Tutorial) using Rcy3 and cytoscape.
+* Create functions using RCy3 that make Enrichment Map easy to use in R. 
 
 
-## Draft writing:Free writing that has not bee edited. Hidden from output for today.
+## Draft writing: Free writing that has not bee edited. Hidden from output for today.
+### Enrichment Map
+### Functional enrichment analysis
+Many scientists use perform experiments to determine which biological pathways are enriched in certain diseases or conditions. Processed sequence data from RNAseq(ref) experiments from different treatments can be used  to visualize which pathways are present based on which genes ones are more enriched compared to the baseline. This informs which genes are important for regulating what is happening in the disease, what is causing the disease or the reaction of the organism to the disease state. Based on the  which genes are enriched, it can be determined which pathways are present in the specific state or treatment. 
+These pathways are retrieved from databases that are curated from data  from many different experiments where the expression data have been measured **(is this true? where do the data from SEED come from). **
+These pathways are important for looking at new experiments and can also be used in enviromental samples to examine the functional components of a community (see [Tara oceans vignette](Tara_oceans_vignette_here.html) for this use). 
+Where I can use this pathway method applied to a metagenomic data set....see the curtis huttenhower lab for ideas and examples). 
 
+The functional enrichment analysis is done outside of this vignette. Here we will use already processed data and we will use them to make a network in Cytoscape using the package RCy3.
 
+## Reproducible Functional enrichment analysis
+So twhere we come in is with [RCy3](https://github.com/tmuetze/Bioconductor_RCy3_the_new_RCytoscape), [Cytoscape](http://www.cytoscape.org/) and [EnrichmentMap](http://www.baderlab.org/Software/EnrichmentMap). The basic workflow is that you can use R scripts to build EnrichmentMaps that can be visualized and analysed in Cytoscape. The benefit of using R scripts is that it is easier to reproduce your analysis or even to repeat it with different data. 
 
+## Install done?
+-  To proceed please follow instructions in [installation vignette](Install_vignette.html) if you do not already have RCy3 and Cytoscape installed. 
+
+RCy3 (stands for R to Cytoscape 3, there is also a RCy that was used with Cytoscape 2 see [here](https://www.bioconductor.org/packages/release/bioc/html/RCytoscape.html). The RCy3 package (actively developped by Tanja Muetze, Georgi Kolishovski, Paul Shannon) uses the [CyREST api](https://github.com/idekerlab/cyREST/wiki) to allow communication between R and Cytoscape. CyREST now comes with all installations of Cytoscape. It uses the API (application programming interface) from Cytoscape to send and receive information via R. This means that you can send data from R to Cytoscape and also receive information about the graphs that you have made in Cytoscape in R. This is useful for reproducibility, but also if you are analysing networks in ways that are not yet supported by plugins in Cytoscape. 
+
+# GSEA processed data
+So what we will do today is to use data already processed in Gene Set Enrichment Analysis (GSEA  which "determines whether an a priori defined set of genes shows statistically  significant, concordant differences between two biological states " ). 
+ So this data is what?? 
+
+We will do is use this processed data to make an Enrichment Map in Cytoscape and then manipulate the network stylistically to our preferences. 
+
+### Load the appropriate libraries
 
 ```r
 library(RCy3)
 library(httr)
 library(RJSONIO)
 ```
-
+## Important note:
 * Make sure cytoscape is open!
 
 ## Reference for the API
 
 found this page which is helpful for the api:
-
 http://idekerlab.github.io/cyREST/#1637304040
 
 ## Finding command names available in Cytoscape using R
@@ -35,45 +55,8 @@ http://localhost:1234/v1/commands
 
 Which gives the same as when you type `help` in the Command Line Dialog in cytoscape
 
-
-
 ### Accessing the commands within Enrichment map?
 
-
-```r
-port.number = 1234
-base.url = paste("http://localhost:",
-                 toString(port.number),
-                 "/v1",
-                 sep="")
-base.url
-```
-
-```
-## [1] "http://localhost:1234/v1"
-```
-
-```r
-commands_enrichment_map.uri <- paste(base.url,
-                                     "commands/enrichmentmap",
-                                     sep="/")
-
-request.res <- GET(url = commands_enrichment_map.uri )
-request.res
-```
-
-```
-## Response [http://localhost:1234/v1/commands/enrichmentmap]
-##   Date: 2016-06-17 13:21
-##   Status: 200
-##   Content-Type: text/plain
-##   Size: 60 B
-## Available commands for 'enrichmentmap':
-##   build
-##   gseabuild
-```
-
-Now try to extend the function to be able to find commands from a specific plugin?
 
 ## Enrichment map stuff
 
@@ -113,7 +96,8 @@ pvalue=<Double>: P-value Cutoff
 qvalue=<Double>: FDR Q-value Cutoff
 similaritymetric=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: similaritymetric
 
-Load functions for creating Enrichment map
+## Load functions for creating Enrichment map
+
 
 ```r
 source("./functions_to_add_to_RCy3/working_with_EM.R")
@@ -189,7 +173,7 @@ EM_1 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM5_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM1_Enrichment Map successfully connected to R session."
 ```
 
 Is there a situation where using the last made window for this enrichment map will fail? What other option could I find?
@@ -248,7 +232,7 @@ EM_1_2 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape windowEM6_Enrichment Map successfully connected to R session and graph copied to R."
+## [1] "Cytoscape windowEM2_Enrichment Map successfully connected to R session and graph copied to R."
 ```
 
 ```r
@@ -256,11 +240,11 @@ print(noa.names(getGraph(EM_1_2)))
 ```
 
 ```
-##  [1] "name"                    "EM6_GS_DESCR"           
-##  [3] "EM6_Formatted_name"      "EM6_Name"               
-##  [5] "EM6_GS_Source"           "EM6_GS_Type"            
-##  [7] "EM6_pvalue_dataset1"     "EM6_Colouring_dataset1" 
-##  [9] "EM6_fdr_qvalue_dataset1" "EM6_gs_size_dataset1"
+##  [1] "name"                    "EM2_GS_DESCR"           
+##  [3] "EM2_Formatted_name"      "EM2_Name"               
+##  [5] "EM2_GS_Source"           "EM2_GS_Type"            
+##  [7] "EM2_pvalue_dataset1"     "EM2_Colouring_dataset1" 
+##  [9] "EM2_fdr_qvalue_dataset1" "EM2_gs_size_dataset1"
 ```
 
 ```r
@@ -312,7 +296,7 @@ EM_ex_4 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM7_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM3_Enrichment Map successfully connected to R session."
 ```
 
 
@@ -393,7 +377,7 @@ EM_ex_6 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM8_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM4_Enrichment Map successfully connected to R session."
 ```
 
 
