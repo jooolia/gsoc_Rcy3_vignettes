@@ -44,7 +44,8 @@ http://opentutorials.cgl.ucsf.edu/index.php/Tutorial:Cluster_Maker
 
 command.name <- "open"
 
-request.uri <- paste(cy@uri,pluginVersion(cy),
+request.uri <- paste(cy@uri,
+                     pluginVersion(cy),
                      "commands/session",
                      as.character(command.name),
                      sep = "/")
@@ -67,8 +68,6 @@ getWindowList(cy)
 ```
 
 ```r
-## HERE!!!! 
-## but how to apply to a specific networks
 connect_EM_to_R_session <- existing.CytoscapeWindow("galFiltered.sif",                                                                      copy.graph.from.cytoscape.to.R = FALSE)
 ```
 
@@ -92,11 +91,13 @@ properties.list <- list(nodeAttributeList = c("node.gal1RGexp",
                                            "node.gal80Rexp"),
                      selectedOnly = FALSE)
 
-## need to figure out how to send more than one things as a value.
 
-properties.list <- list(nodeAttributeList = "node.gal1RGexp",
-                                        #   "node.gal4RGexp",
-                                        #   "node.gal80Rexp",
+## I think this works to send an array to via json...
+node_list <- c('[ "node.gal1RGexp",
+                                          "node.gal4RGexp",
+                                          "node.gal80Rexp"]')
+
+properties.list <- list(nodeAttributeList = node_list,
                      selectedOnly = FALSE)
 
 command.name <- "hierarchical"
@@ -105,8 +106,9 @@ request.uri <- paste(cy@uri,pluginVersion(cy),
                      as.character(command.name),
                      sep = "/")
 ## file
-
 request.res <- GET(url = request.uri,
                    query = properties.list)
 ```
 
+Ok so how to get this to be more like a function? make specific things for the R funciton??
+- also connect to this network in R

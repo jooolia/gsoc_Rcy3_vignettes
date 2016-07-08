@@ -37,7 +37,8 @@ http://opentutorials.cgl.ucsf.edu/index.php/Tutorial:Cluster_Maker
 
 command.name <- "open"
 
-request.uri <- paste(cy@uri,pluginVersion(cy),
+request.uri <- paste(cy@uri,
+                     pluginVersion(cy),
                      "commands/session",
                      as.character(command.name),
                      sep = "/")
@@ -54,9 +55,6 @@ request.res <- GET(url = request.uri,
 
 getWindowList(cy)
 
-
-## HERE!!!! 
-## but how to apply to a specific networks
 connect_EM_to_R_session <- existing.CytoscapeWindow("galFiltered.sif",                                                                      copy.graph.from.cytoscape.to.R = FALSE)
 ```
 
@@ -70,23 +68,35 @@ properties.list <- list(nodeAttributeList = c("node.gal1RGexp",
                                            "node.gal80Rexp"),
                      selectedOnly = FALSE)
 
-## need to figure out how to send more than one things as a value.
+
+## I think this works to send an array to via json...
+node_list <- c('[ "node.gal1RGexp",
+                                          "node.gal4RGexp",
+                                          "node.gal80Rexp"]')
 
 properties.list <- list(nodeAttributeList = "node.gal1RGexp",
-                                        #   "node.gal4RGexp",
-                                        #   "node.gal80Rexp",
-                     selectedOnly = FALSE)
+                        selectedOnly = FALSE,
+                        clusterAttributes = FALSE,
+                        #ignoreMissing = FALSE,
+                        createGroups = TRUE,
+                        showUI = TRUE)
 
 command.name <- "hierarchical"
 request.uri <- paste(cy@uri,pluginVersion(cy),
                      "commands/cluster",
                      as.character(command.name),
                      sep = "/")
-## file
 
 request.res <- GET(url = request.uri,
                    query = properties.list)
-
-
+request.res$status_code
 ```
+
+# A bit stuck here. Cannot get this to work. 
+
+- Tried wiht the command line stuff too, but I can't add the nodes. how do I write the nodes? maybe check the xml page in the for how the nodes are listed and the columns of attributes. 
+
+Ok so how to get this to be more like a function? make specific things for the R funciton??
+- also connect to this network in R
+- look at the online tutorial again-----------<
 
