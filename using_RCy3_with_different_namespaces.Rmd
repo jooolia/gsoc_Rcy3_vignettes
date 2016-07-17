@@ -2,7 +2,13 @@
 title: "Using RCy3 with different namespaces"
 author: "Julia Gustavsen"
 date: "June 17, 2016"
-output: html_document
+output: 
+    html_document:
+      keep_md: true
+      number_sections: yes
+      theme: cerulean
+      toc: yes
+      toc_depth: 6 
 ---
 
 ```{r setup, include=FALSE}
