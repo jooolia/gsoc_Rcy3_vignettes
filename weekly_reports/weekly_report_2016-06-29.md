@@ -30,3 +30,15 @@
 
 - (from last report) When shall we publish the introductory blog post? -JAG could publish on my own github site if the other is not working well. 
 - should the functions related to EM be a separate package? or should I ask if it is something to be incorporated into RCy3? Should I be writing corresponding tests for use with these?
+
+#### Response from mentor:
+
+* Wait for the blog posts.
+* For the EM code we can refactor it out later into a separate package.
+* You can write tests, such as is the connection to Cytoscape
+available, but there needs to be a way disable them because they won't
+work in many situations. See the skip_on_bioc method here:
+
+https://github.com/BioPAX/paxtoolsr/blob/master/R/paxtoolsr.R
+
+I have some tests that needed to be skipped when Bioconductor runs tests.

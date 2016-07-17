@@ -23,4 +23,21 @@
 ### Questions for mentor:
 
 - draft of poster in progress, but are there any specific funding bodies that I should include?
-- also do you have any advice for making a poster about software? Currently trying to keep it as a very simple example of code and images for using taxonomic info to layout and colour a network.  
+- also do you have any advice for making a poster about software? Currently trying to keep it as a very simple example of code and images for using taxonomic info to layout and colour a network. 
+
+#### Answers from mentor:
+
+- for funding: some examples:
+ "We thank the PathVisio community, Thomas Kelder and Margot Sunshine for their useful feedback, and Alexander Pico for coordinating the Google Summer of Code project.
+
+Funding: Google Summer of Code program, Intramural Research Program of the National Institutes of Health, Center for Cancer Research, National Cancer Institute;"
+
+"d through funding for the National Resource for Network Biology (NRNB) from the National Institute of General Medical Sciences (NIGMS) grant (P41 GM103504)."
+Logos: http://nrnb.org/images/NRNB_black.png
+
+- will talk about blog post stuff next week. 
+
+- maybe pull in a table if possible to show the code. 
+- have an rmarkdown file on github
+- reach out to Scooter about being stuck on clustermaker
+- think about PaxToolsR on poster? 
