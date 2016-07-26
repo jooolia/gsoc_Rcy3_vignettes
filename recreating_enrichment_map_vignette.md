@@ -1,6 +1,8 @@
 # Recreating EnrichmentMap tutorials with RCy3
 Julia Gustavsen  
 May 24, 2016  
+# To do:
+missing the narrative for this vignette
 
 # Purpose: 
 
@@ -12,6 +14,7 @@ May 24, 2016
 ### Enrichment Map
 ### Functional enrichment analysis
 Many scientists use perform experiments to determine which biological pathways are enriched in certain diseases or conditions. Processed sequence data from RNAseq(ref) experiments from different treatments can be used  to visualize which pathways are present based on which genes ones are more enriched compared to the baseline. This informs which genes are important for regulating what is happening in the disease, what is causing the disease or the reaction of the organism to the disease state. Based on the  which genes are enriched, it can be determined which pathways are present in the specific state or treatment. 
+
 These pathways are retrieved from databases that are curated from data  from many different experiments where the expression data have been measured **(is this true? where do the data from SEED come from). **
 These pathways are important for looking at new experiments and can also be used in enviromental samples to examine the functional components of a community (see [Tara oceans vignette](Tara_oceans_vignette_here.html) for this use). 
 Where I can use this pathway method applied to a metagenomic data set....see the curtis huttenhower lab for ideas and examples). 
@@ -39,26 +42,13 @@ library(RCy3)
 library(httr)
 library(RJSONIO)
 ```
+
 ## Important note:
-* Make sure cytoscape is open!
-
-## Reference for the API
-
-found this page which is helpful for the api:
-http://idekerlab.github.io/cyREST/#1637304040
-
-## Finding command names available in Cytoscape using R
-
-Finally found: 
-
-http://localhost:1234/v1/commands
-
-Which gives the same as when you type `help` in the Command Line Dialog in cytoscape
+* Make sure Cytoscape is open!
 
 ### Accessing the commands within Enrichment map?
 
-
-## Enrichment map stuff
+## Enrichment map
 
 ### For reference list of arguments for EnrichmentMap "build"
 ```help enrichmentmap build```
@@ -129,29 +119,30 @@ getEnrichmentMapCommandsNames(cy, "gseabuild")
 ## [7] "pvalue"           "qvalue"           "similaritymetric"
 ```
 
-So first we read in the data.
-Then we use the function X (as part of package ....y) to read in the enrichment data and set the parameters. 
 
-If we wanted to see the full list of parameters we could run for this we could use X() and if we wanted to run functions for X types of analysis we could run X(, "other analysis"). 
-
-These parameters could also be set in cytoscape. The function that we run also attaches the window created in Cytoscape to our R session, so that we are able to manipulate the stylistic aspects of our network. 
 
 ## Send data to the cytoscape network
 
 
 
-
+ 
 Use data from the Bader lab tutorial
+So first we read in the data.
+Then we use the function X (as part of package ....y) to read in the enrichment data and set the parameters. 
 
 ```r
 ## Note: You cannot use relative paths in this,
 ## it needs to be the absolute path
 path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
 
-enr_file = paste(path_to_file,
-                 "gprofiler_results_mesenonly_ordered_computedinR.txt",
-                 sep="")
+enr_file = paste0(path_to_file,
+                 "gprofiler_results_mesenonly_ordered_computedinR.txt")
+exp_file = paste0(path_to_file,
+                 "MesenchymalvsImmunoreactive_expression.txt")
 ```
+
+If we wanted to see the full list of parameters we could run for this we could use `getEnrichmentMapCommandsNames(cy, "build")` and if we wanted to run functions for X types of analysis we could run `getEnrichmentMapCommandsNames(cy, "gseabuild")`. 
+
 
 
 Set the parameters for use in the Em.
@@ -161,11 +152,14 @@ em_params <- list(analysisType = "generic",
                   enrichmentsDataset1 = enr_file,
                   pvalue = "1.0",
                   qvalue = "0.00001",
-                  #expressionDataset1 = exp_file, 
+                  expressionDataset1 = exp_file, 
                   similaritycutoff = "0.25",
                   coeffecients = "JACCARD")
+# Note there was a problem with the expressionDataset1 type files and it has been fixed in https://github.com/BaderLab/EnrichmentMapApp/issues/153 so when I update the Enrichment Map it should work. 
 
-## no graph is returned, just the connection to the graph
+
+## No graph details is returned, just the connection to the graph
+## so that it can be manipulated in Cytoscape via R. 
 EM_1 <- setEnrichmentMapProperties(cy,
                                   "build",
                                   em_params)
@@ -173,10 +167,12 @@ EM_1 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM1_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM4_Enrichment Map successfully connected to R session."
 ```
+These parameters could also be set in Cytoscape, but we are setting them here via script. The function that we run also attaches the window created in Cytoscape to our R session, so that we are able to manipulate the stylistic aspects of our network.
 
 Is there a situation where using the last made window for this enrichment map will fail? What other option could I find?
+## Save Enrichment map network
 
 
 ```r
@@ -296,7 +292,7 @@ EM_ex_4 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM3_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM5_Enrichment Map successfully connected to R session."
 ```
 
 
@@ -377,7 +373,7 @@ EM_ex_6 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM4_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM6_Enrichment Map successfully connected to R session."
 ```
 
 
@@ -396,3 +392,18 @@ saveImage(EM_ex_6,
 - Verify that I have made these functions correctly for use in S4 framework
 - Clean up the use of the functions
 - command to print list of setable properties?
+
+## Helpful references:
+
+### Reference for the API
+
+found this page which is helpful for the api:
+http://idekerlab.github.io/cyREST/#1637304040
+
+### Finding command names available in Cytoscape using R
+
+Finally found: 
+
+http://localhost:1234/v1/commands
+
+Which gives the same as when you type `help` in the Command Line Dialog in cytoscape

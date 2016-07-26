@@ -54,12 +54,9 @@ library(RJSONIO)
 ## Important note:
 * Make sure Cytoscape is open!
 
-
-
 ### Accessing the commands within Enrichment map?
 
-
-## Enrichment map stuff
+## Enrichment map
 
 ### For reference list of arguments for EnrichmentMap "build"
 ```help enrichmentmap build```
@@ -124,9 +121,11 @@ Then we use the function X (as part of package ....y) to read in the enrichment 
 ## it needs to be the absolute path
 path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
 
-enr_file = paste(path_to_file,
-                 "gprofiler_results_mesenonly_ordered_computedinR.txt",
-                 sep="")
+enr_file = paste0(path_to_file,
+                 "gprofiler_results_mesenonly_ordered_computedinR.txt")
+exp_file = paste0(path_to_file,
+                 "MesenchymalvsImmunoreactive_expression.txt")
+
 ```
 
 If we wanted to see the full list of parameters we could run for this we could use `getEnrichmentMapCommandsNames(cy, "build")` and if we wanted to run functions for X types of analysis we could run `getEnrichmentMapCommandsNames(cy, "gseabuild")`. 
@@ -139,10 +138,9 @@ em_params <- list(analysisType = "generic",
                   enrichmentsDataset1 = enr_file,
                   pvalue = "1.0",
                   qvalue = "0.00001",
-                  #expressionDataset1 = exp_file, 
+                  expressionDataset1 = exp_file, 
                   similaritycutoff = "0.25",
                   coeffecients = "JACCARD")
-# Note there was a problem with the expressionDataset1 type files and it has been fixed in https://github.com/BaderLab/EnrichmentMapApp/issues/153 so when I update the Enrichment Map it should work. 
 
 
 ## No graph details is returned, just the connection to the graph
