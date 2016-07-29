@@ -12,9 +12,10 @@
 #' @export
 #' 
 #' @importFrom methods setGeneric
-setGeneric ('getEnrichmentMapCommandsNames',	
-            signature='obj', function(obj,
-                                      command.name) standardGeneric('getEnrichmentMapCommandsNames'))
+setGeneric('getEnrichmentMapCommandsNames',	
+            signature = 'obj',
+            function(obj,
+                     command.name) standardGeneric('getEnrichmentMapCommandsNames'))
 
 setMethod('getEnrichmentMapCommandsNames',
           'CytoscapeConnectionClass', 
@@ -24,19 +25,17 @@ setMethod('getEnrichmentMapCommandsNames',
                                  pluginVersion(obj),
                                  "commands/enrichmentmap",
                                  as.character(command.name),
-                                 sep="/")
-            request.res <- GET(url=request.uri)
+                                 sep = "/")
+            request.res <- GET(url = request.uri)
             
-            command.property.names <-unlist(strsplit(rawToChar(request.res$content),
-                                                     split = "\n\\s*"))
-            ## how to remove "Available commands ..."?
-            ## not happy with this
+            command.property.names <- unlist(strsplit(rawToChar(request.res$content),
+                                                      split = "\n\\s*"))
+            ## remove title "Available commands ..."
             command.property.names <- command.property.names[-1]
             
             return(command.property.names)
             
-          })## END getEnrichmentMapCommandsNames
-
+          }) ## END getEnrichmentMapCommandsNames
 
 #' Runs Enrichment Map with a list of parameters and creates a connection to the Enrichment Map so that it can be further manipulated from R. 
 #'
@@ -52,7 +51,7 @@ setMethod('getEnrichmentMapCommandsNames',
 #' 
 #' @importFrom methods setGeneric
 setGeneric('setEnrichmentMapProperties', 
-           signature='obj',
+           signature = 'obj',
            function(obj,
                     command.name,
                     properties.list, 

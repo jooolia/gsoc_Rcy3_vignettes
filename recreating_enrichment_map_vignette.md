@@ -1,41 +1,33 @@
 # Recreating EnrichmentMap tutorials with RCy3
 Julia Gustavsen  
 May 24, 2016  
-# To do:
-missing the narrative for this vignette
-
 # Purpose: 
 
-* Recreating tutorials from [Bader lab] (http://www.baderlab.org/Software/EnrichmentMap/Tutorial) using Rcy3 and cytoscape.
-* Create functions using RCy3 that make Enrichment Map easy to use in R. 
+* Recreating tutorials from [Bader lab](http://www.baderlab.org/Software/EnrichmentMap/Tutorial) using Rcy3 and cytoscape.
+* Create and test out functions using RCy3 that make Enrichment Map easy to use in R. 
 
+# Enrichment Map
+## Functional enrichment analysis
 
-## Draft writing: Free writing that has not bee edited. Hidden from output for today.
-### Enrichment Map
-### Functional enrichment analysis
-Many scientists use perform experiments to determine which biological pathways are enriched in certain diseases or conditions. Processed sequence data from RNAseq(ref) experiments from different treatments can be used  to visualize which pathways are present based on which genes ones are more enriched compared to the baseline. This informs which genes are important for regulating what is happening in the disease, what is causing the disease or the reaction of the organism to the disease state. Based on the  which genes are enriched, it can be determined which pathways are present in the specific state or treatment. 
+Many scientists use perform experiments to determine which biological pathways are expressed more in certain diseases or conditions. From processed sequence data from RNAseq experiments from different treatments and/or samples the genes ones that are more or less enriched compared to the baseline can be visualized. This informs which genes are important for regulating processes related to the disease or disease state. Visualizing which genes are statistically more highly expressed under certain conditions can be helpful for interpretation and further analysis of the data. Based on which genes are enriched, it can also be determined which pathways are present in the specific state or treatment. 
 
-These pathways are retrieved from databases that are curated from data  from many different experiments where the expression data have been measured **(is this true? where do the data from SEED come from). **
-These pathways are important for looking at new experiments and can also be used in enviromental samples to examine the functional components of a community (see [Tara oceans vignette](Tara_oceans_vignette_here.html) for this use). 
-Where I can use this pathway method applied to a metagenomic data set....see the curtis huttenhower lab for ideas and examples). 
 
 The functional enrichment analysis is done outside of this vignette. Here we will use already processed data and we will use them to make a network in Cytoscape using the package RCy3.
 
 ## Reproducible Functional enrichment analysis
-So twhere we come in is with [RCy3](https://github.com/tmuetze/Bioconductor_RCy3_the_new_RCytoscape), [Cytoscape](http://www.cytoscape.org/) and [EnrichmentMap](http://www.baderlab.org/Software/EnrichmentMap). The basic workflow is that you can use R scripts to build EnrichmentMaps that can be visualized and analysed in Cytoscape. The benefit of using R scripts is that it is easier to reproduce your analysis or even to repeat it with different data. 
+The basic workflow is that you can use R scripts with [RCy3](https://github.com/tmuetze/Bioconductor_RCy3_the_new_RCytoscape) to build [EnrichmentMaps](http://www.baderlab.org/Software/EnrichmentMap) that can be visualized and analysed in [Cytoscape](http://www.cytoscape.org/). The benefit of using R scripts is that it is easier to reproduce your analysis or to repeat it with different data. 
 
-## Install done?
+# Install done?
 -  To proceed please follow instructions in [installation vignette](Install_vignette.html) if you do not already have RCy3 and Cytoscape installed. 
 
-RCy3 (stands for R to Cytoscape 3, there is also a RCy that was used with Cytoscape 2 see [here](https://www.bioconductor.org/packages/release/bioc/html/RCytoscape.html). The RCy3 package (actively developped by Tanja Muetze, Georgi Kolishovski, Paul Shannon) uses the [CyREST api](https://github.com/idekerlab/cyREST/wiki) to allow communication between R and Cytoscape. CyREST now comes with all installations of Cytoscape. It uses the API (application programming interface) from Cytoscape to send and receive information via R. This means that you can send data from R to Cytoscape and also receive information about the graphs that you have made in Cytoscape in R. This is useful for reproducibility, but also if you are analysing networks in ways that are not yet supported by plugins in Cytoscape. 
+RCy3 (stands for R to Cytoscape 3, there is also a RCy that was used with Cytoscape 2 see [here](https://www.bioconductor.org/packages/release/bioc/html/RCytoscape.html). The RCy3 package (actively developed by Tanja Muetze, Georgi Kolishovski, Paul Shannon) uses the [CyREST api](https://github.com/idekerlab/cyREST/wiki) to allow communication between R and Cytoscape. CyREST now comes with all installations of Cytoscape. It uses the API (application programming interface) from Cytoscape to send and receive information from R. This means that we can send data from R to Cytoscape and also receive information about the graphs that you have made in Cytoscape in R. This is useful for reproducibility, but also if you are analysing networks in ways that are not yet supported by plugins in Cytoscape. 
 
 # GSEA processed data
-So what we will do today is to use data already processed in Gene Set Enrichment Analysis (GSEA  which "determines whether an a priori defined set of genes shows statistically  significant, concordant differences between two biological states " ). 
- So this data is what?? 
+So what we will do today is to use data already processed in Gene Set Enrichment Analysis (GSEA which "determines whether an *a priori* defined set of genes shows statistically  significant, concordant differences between two biological states"). 
 
-We will do is use this processed data to make an Enrichment Map in Cytoscape and then manipulate the network stylistically to our preferences. 
+We will use this processed data to make an Enrichment Map in Cytoscape from R. 
 
-### Load the appropriate libraries
+## Load the appropriate libraries
 
 ```r
 library(RCy3)
@@ -44,47 +36,7 @@ library(RJSONIO)
 ```
 
 ## Important note:
-* Make sure Cytoscape is open!
-
-### Accessing the commands within Enrichment map?
-
-## Enrichment map
-
-### For reference list of arguments for EnrichmentMap "build"
-```help enrichmentmap build```
-analysisType=<ListSingleSelection GSEA|generic|DAVID/BiNGO/Great)>: Analysis Type
-classDataset1=<File>: Classes
-classDataset2=<File>: Classes
-coeffecients=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: Similarity Coeffecient
-enrichments2Dataset1=<File>: Enrichments 2
-enrichments2Dataset2=<File>: Enrichments 2
-enrichmentsDataset1=<File>: Enrichments
-enrichmentsDataset2=<File>: Enrichments
-expressionDataset1=<File>: Expression
-expressionDataset2=<File>: Expression
-gmtFile=<File>: GMT
-phenotype1Dataset1=<String>: Phenotype1
-phenotype1Dataset2=<String>: Phenotype1
-phenotype2Dataset1=<String>: Phenotype2
-phenotype2Dataset2=<String>: Phenotype2
-pvalue=<Double>: P-value Cutoff
-qvalue=<Double>: FDR Q-value Cutoff
-ranksDataset1=<File>: Ranks
-ranksDataset2=<File>: Ranks
-similaritycutoff=<Double>: Similarity Cutoff
-
-### For reference list of arguments for EnrichmentMap gseabuild
-```help enrichmentmap gseabuild``` at Cytoscape command line
-enrichmentmap gseabuild arguments:
-combinedconstant=<Double>: combinedconstant
-edbdir=<String>: edbdir
-edbdir2=<String>: edbdir2
-expressionfile=<String>: expressionfile
-expressionfile2=<String>: expressionfile2
-overlap=<Double>: overlap
-pvalue=<Double>: P-value Cutoff
-qvalue=<Double>: FDR Q-value Cutoff
-similaritymetric=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: similaritymetric
+* Make sure Cytoscape is open before running the code below!
 
 ## Load functions for creating Enrichment map
 
@@ -93,9 +45,15 @@ similaritymetric=<ListSingleSelection (OVERLAP|JACCARD|COMBINED)>: similaritymet
 source("./functions_to_add_to_RCy3/working_with_EM.R")
 ```
 
+Create the connection to Cytoscape
 
 ```r
 cy <- CytoscapeConnection ()
+```
+
+Examine the commands that are available in Enrichment Map.
+
+```r
 getEnrichmentMapCommandsNames(cy, "build")
 ```
 
@@ -119,33 +77,51 @@ getEnrichmentMapCommandsNames(cy, "gseabuild")
 ## [7] "pvalue"           "qvalue"           "similaritymetric"
 ```
 
+## Files that can be used
 
+See the Bader lab website for full explanation:<https://github.com/BaderLab/EnrichmentMapApp/blob/EM_Cyto3_port/EnrichmentMapPlugin/doc/EM_wiki_manual.txt>
+
+- **"gmtFile"**:  Tab-separated file where the header has name, description and samples and each row is one gene in the geneset.
+- **"analysisType"** Analysis type can be "generic", "GSEA", or "DAVID/BiNGO/Great""
+- **"classDataset1"** Classes (optional) for dataset1
+- **"classDataset2"** Classes (optional) for dataset2 
+- **"coeffecients"** Similarity Coefficient type (typo in name, but you must type it that way). Can be "OVERLAP","JACCARD", or "COMBINED" (both OVERLAP and JACCARD)
+- **"similaritycutoff"** Similarity Cutoff for the coefficient chosen, 0.0 is least similar and 1.0 is most similar. 
+- **"enrichments2Dataset1"** Tab-separated File containing gene names and their p-values from enrichment condition 2 from dataset 1
+- **"enrichments2Dataset2"** Tab-separated File containing gene names and their p-values from enrichment condition 2 from dataset 2
+-  **"enrichmentsDataset1"** Tab-separated File containing gene names and their p-values from enrichment condition 1 from dataset 1 
+-  **"enrichmentsDataset2"** Tab-separated File containing gene names and their p-values from enrichment condition 1 from dataset 2
+- **"expressionDataset1"** Expression (optional) tab-separated file containing gene name, description and expression values. For dataset1
+- **"expressionDataset2"** Expression (optional) tab-separated file containing gene name, description and expression values. For dataset2
+- **"phenotype1Dataset1"** Default is "Up" for Phenotype1. Can change to a descriptive word for enrichment 1 
+- **"phenotype2Dataset1"** Default is "Down" for Phenotype2. Can change to a descriptive word for enrichment 2 
+- **"phenotype1Dataset2"**  same as above but for Dataset2
+- **"phenotype2Dataset2"** same as above but for Dataset2
+- **"pvalue"** P-value Cutoff for enrichment data to be used.       
+- **"qvalue"** False discovery rate (Q-value) cutoff. Used with multiple comparisons. 
+- **"ranksDataset1"** Ranks (optional) tab-separated file containing genes and their rank (from GSEA) for Dataset1
+-  **"ranksDataset2"** Ranks (optional) tab-separated file containing genes and their rank (from GSEA) for Dataset2
 
 ## Send data to the cytoscape network
 
+So first we read in the data from the supplied files and set the parameters.
 
+**Note on file paths**: 
+You cannot use relative paths with EnrichmentMap from R. The filenames need to be given as their absolute paths.
 
- 
-Use data from the Bader lab tutorial
-So first we read in the data.
-Then we use the function X (as part of package ....y) to read in the enrichment data and set the parameters. 
 
 ```r
-## Note: You cannot use relative paths in this,
-## it needs to be the absolute path
-path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+path_to_file <- "/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
 
-enr_file = paste0(path_to_file,
-                 "gprofiler_results_mesenonly_ordered_computedinR.txt")
-exp_file = paste0(path_to_file,
-                 "MesenchymalvsImmunoreactive_expression.txt")
+enr_file <- paste0(path_to_file,
+                   "gprofiler_results_mesenonly_ordered_computedinR.txt")
+exp_file <- paste0(path_to_file,
+                   "MesenchymalvsImmunoreactive_expression.txt")
 ```
 
-If we wanted to see the full list of parameters we could run for this we could use `getEnrichmentMapCommandsNames(cy, "build")` and if we wanted to run functions for X types of analysis we could run `getEnrichmentMapCommandsNames(cy, "gseabuild")`. 
+If we wanted to see the full list of parameters available, we could use `getEnrichmentMapCommandsNames(cy, "build")` and if we wanted to run functions for GSEA types of analysis we could run `getEnrichmentMapCommandsNames(cy, "gseabuild")`. 
 
-
-
-Set the parameters for use in the Em.
+## Set the parameters for use in the Enrichment Map.
 
 ```r
 em_params <- list(analysisType = "generic",
@@ -155,24 +131,26 @@ em_params <- list(analysisType = "generic",
                   expressionDataset1 = exp_file, 
                   similaritycutoff = "0.25",
                   coeffecients = "JACCARD")
-# Note there was a problem with the expressionDataset1 type files and it has been fixed in https://github.com/BaderLab/EnrichmentMapApp/issues/153 so when I update the Enrichment Map it should work. 
+```
 
+No graph details are returned, this is just setting the parameters that will be sent to Cytoscape via RCy3. 
 
-## No graph details is returned, just the connection to the graph
-## so that it can be manipulated in Cytoscape via R. 
+Now build the enrichment map
+
+```r
 EM_1 <- setEnrichmentMapProperties(cy,
-                                  "build",
-                                  em_params)
+                                   "build",
+                                   em_params)
 ```
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM4_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM8_Enrichment Map successfully connected to R session."
 ```
-These parameters could also be set in Cytoscape, but we are setting them here via script. The function that we run also attaches the window created in Cytoscape to our R session, so that we are able to manipulate the stylistic aspects of our network.
 
-Is there a situation where using the last made window for this enrichment map will fail? What other option could I find?
-## Save Enrichment map network
+These parameters can also be set in Cytoscape, but we are setting them here via script. The function that we run also attaches the window created in Cytoscape to our R session, so that we are able to manipulate the stylistic aspects of our network by using "EM_1".
+
+## Save Enrichment map network image
 
 
 ```r
@@ -185,29 +163,33 @@ saveImage(EM_1,
 ![](./EM_1.png)
 
 
-```r
-print(noa.names(getGraph(EM_1)))
-```
+## Change the layout of the network
 
-```
-## NULL
-```
+Can change any of the visual properties of "EM_1" now. For demonstration let's change the layout. 
 
 ```r
-## test setting layout from R
 layoutNetwork(EM_1,
-                  'grid')
+              'kamada-kawai')
 
+## save network visualization
 saveImage(EM_1,
-          "EM_1_gridded",
+          "EM_1_kamada-kawai",
           "png",
           scale=4)
 ```
-![](./EM_1_gridded.png)
+![](./EM_1_kamada-kawai.png)
+
+We can also save our network file to use at a later date or to send to collaborators.
 
 
 ```r
-saveNetwork(EM_1, "EM_1")    
+saveNetwork(EM_1, "EM_1") ## Creates "EM_1.cys" which can be reopened in Cytoscape
+```
+
+In our R session we are connected to the graph in Cytoscape and can manipulate the graph's visual properties, but we do not have the graph information in R. 
+
+
+```r
 EM_1@graph
 ```
 
@@ -217,13 +199,14 @@ EM_1@graph
 ## Number of Edges = 0
 ```
 
+If we want the graph pulled in to R then we can set the argument "copy.graph.to.R" to ```TRUE``` in `setEnrichmentMapProperties()`. This redoes our EM analysis in Cytoscape and stores it as EM_1_2.  
+
+
 ```r
-## if we want the graph data to be returned
-## this part is slooooow!
 EM_1_2 <- setEnrichmentMapProperties(cy,
-                                   "build",
-                                   em_params,
-                                   copy.graph.to.R = TRUE)
+                                     "build",
+                                     em_params,
+                                     copy.graph.to.R = TRUE)
 ```
 
 ```
@@ -231,8 +214,20 @@ EM_1_2 <- setEnrichmentMapProperties(cy,
 ## [1] "Cytoscape windowEM2_Enrichment Map successfully connected to R session and graph copied to R."
 ```
 
+Now if we have a look at the graph part of the stored object we will see we have retrieved the information from the graph. 
+
 ```r
-print(noa.names(getGraph(EM_1_2)))
+EM_1_2@graph
+```
+
+```
+## A graphNEL graph with directed edges
+## Number of Nodes = 297 
+## Number of Edges = 1793
+```
+
+```r
+print(noa.names(getGraph(EM_1_2))) # retrieves node attributes from the graph
 ```
 
 ```
@@ -252,49 +247,59 @@ saveImage(EM_1_2,
 
 ![](./EM_1_2.png)
 
-## Following :
-[Protocol 4 - Summarize Enrichment Results with Enrichment] Maps(https://github.com/BaderLab/EM-tutorials-docker/blob/master/notebooks/Protocol%204%20-%20Summarize%20Enrichment%20Results%20with%20Enrichment%20Maps.ipynb)
+# Summarizing Enrichment Results with Enrichment Maps
+
+WHAT IS THE PURPOSE HERE??
+
+## Following:
+[Protocol 4 - Summarize Enrichment Results with Enrichment Maps](https://github.com/BaderLab/EM-tutorials-docker/blob/master/notebooks/Protocol%204%20-%20Summarize%20Enrichment%20Results%20with%20Enrichment%20Maps.ipynb)
 
 ### Option 1: Load enrichment results from g:Profiler
 
+Load in the datafiles
+
 ```r
-path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+path_to_file <- "/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
 
-enr_file = paste0(path_to_file,
-                 "gprofiler_results_mesenonly_ordered.txt")
+enr_file <-  paste0(path_to_file,
+                    "gprofiler_results_mesenonly_ordered.txt")
 
-expression_RNA_seq <- paste0(path_to_file,
-                               "MesenchymalvsImmunoreactive_RNSseq_expression.txt")
-
+exp_file <- paste0(path_to_file,
+                   "MesenchymalvsImmunoreactive_expression.txt") # this one works. 
+#expression_RNA_seq <- paste0(path_to_file,
+#                             "MesenchymalvsImmunoreactive_RNSseq_expression_ed.txt") ## not working
+# ranks_file <- paste0(path_to_file,
+#                      "MesenchymalvsImmunoreactive_RNA_seq_ranks.rnk") ## does not work
 ranks_file <- paste0(path_to_file,
-                      "MesenchymalvsImmunoreactive_RNA_seq_ranks.rnk")
+                     "MesenchymalvsImmunoreactive_edger_ranks.rnk")
+
 classes_file <- paste0(path_to_file,
-                      "MesenchymalvsImmunoreactive_RNAseq_classes.cls")
+                       "MesenchymalvsImmunoreactive_RNAseq_classes.cls")
+```
 
-# Phenotype - In the text boxes replace "UP" with "Mesenchymal" and "DOWN" with Immunoreactive. Mesenchymal will be associated with red nodes because it corresponds to the positive phenotype in the gprofiler_results_mesenonly_ordered.
 
+```r
 em_params <- list(analysisType = "generic",
                   enrichmentsDataset1 = enr_file,
                   pvalue = "1.0",
                   qvalue = "0.0001",
-                  #expressionDataset1 = expression_RNA_seq, 
-                  #ranksDataset1 = ranks_file,
+                  expressionDataset1 = exp_file, 
+                  ranksDataset1 = ranks_file, ## not working from RNA seq data
                   classDataset1 = classes_file,
-                  phenotype1Dataset1 ="Mesenchymal",
-                  phenotype2Dataset1 ="Immunoreactive",
+                  phenotype1Dataset1 = "Mesenchymal", # shows up as positive, red, nodes. 
+                  phenotype2Dataset1 = "Immunoreactive",
                   similaritycutoff = "0.25",
                   coeffecients = "JACCARD")
 
 EM_ex_4 <- setEnrichmentMapProperties(cy,
-                                  "build",
-                                  em_params)
+                                      "build",
+                                      em_params)
 ```
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM5_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM9_Enrichment Map successfully connected to R session."
 ```
-
 
 
 
@@ -304,54 +309,95 @@ saveImage(EM_ex_4,
           "png",
           scale=4)
 ```
-![](./EM_ex_4.png)
 
+![](./EM_ex_4.png)
 
 ### Option 2: Load enrichment results from GSEA
 
 
 ```r
-path_to_file="/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
+path_to_file <- "/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
 
-gmt_file = paste0(path_to_file,
-                 "Human_GOBP_AllPathways_no_GO_iea_December_24_2015_symbol.gmt")
+gmt_file <-  paste0(path_to_file,
+                    "Human_GOBP_AllPathways_no_GO_iea_December_24_2015_symbol.gmt")
 expression_file <- paste0(path_to_file,
-                          "MesenchymalvsImmunoreactive_RNSseq_expression.txt")
-## come back here! was running
-# enrichments_1 <- paste0(path_to_file,
-#                         )
-# 
-# Enrichments 1- gsea_home/output/[data]/ Mesen_vs_Immuno_edgeR.GseaPreranked.1453221178549 / gsea_report_for_na_pos_1453221178549.xls (example file name. Number is automatically generated and will be different for results run by user.
-# Enrichments 2 – gsea_home/output/[data]/ Mesen_vs_Immuno_edgeR.GseaPreranked.1453221178549 /gsea_report_for_na_neg_1453221178549.xls (example file name. Number is automatically generated and will be different for results run by user.
-# Classes - MesenchymalvsImmunoreactive_RNAseq_classes.cls
+                          "MesenchymalvsImmunoreactive_expression.txt") ## changed from RNA seq one
+enrichments_1 <- paste0(path_to_file,
+                        "testing_out_GSEA.GseaPreranked.1466070031657/gsea_report_for_na_pos_1466070031657.xls")
+enrichments_2 <- paste0(path_to_file,
+                        "testing_out_GSEA.GseaPreranked.1466070031657/gsea_report_for_na_neg_1466070031657.xls")
+ranks_file <- paste0(path_to_file,
+                     "MesenchymalvsImmunoreactive_RNAseq_ranks.rnk")
+classes_file <- paste0(path_to_file,
+                       "MesenchymalvsImmunoreactive_RNAseq_classes.cls")
+```
+
+Not working!
+
+```r
+# Note on Phenotype - In the text boxes replace "UP" with "Mesenchymal" and "DOWN" with "Immunoreactive". Mesenchymal will be associated with red nodes because it corresponds to the positive phenotype in the gprofiler_results_mesenonly_ordered.
+
+## don't think these are available with GSEA. :()
+# em_params <- list(analysisType = "GSEA",
+#                  #gmtFile = gmt_file,
+#                   pvalue = "1.0",
+#                   qvalue = "0.0001",
+#                   #expressionDataset1 = expression_file,
+#                   #ranksDataset1 = ranks_file,
+#                   #classDataset1 = classes_file,
+#                   enrichmentsDataset1 = enrichments_1,
+#                   enrichments2Dataset1 = enrichments_2,
+#                   phenotype1Dataset1 ="Mesenchymal",
+#                   phenotype2Dataset1 ="Immunoreactive",
+#                   similaritycutoff = "0.25",
+#                   coeffecients = "JACCARD")
+# # 
+# EM_ex_5 <- setEnrichmentMapProperties(cy,
+#                                       "build",
+#                                       em_params)
 ```
 
 
 
-## Recreate tutorial on lab website: http://www.baderlab.org/Software/EnrichmentMap/Tutorial
+```r
+# saveImage(EM_ex_5,
+#           "EM_ex_5",
+#           "png",
+#           scale=4)
+```
+
+[](./EM_ex_5.png)
+
+
+# Recreate tutorial from lab website: http://www.baderlab.org/Software/EnrichmentMap/Tutorial
+
+What is purpose??
 
 
 ```r
-gsea_tut_path="/home/julia_g/windows_school/gsoc/gsoc_Rcy3_vignettes/GSEATutorial/"
+gsea_tut_path <- "/home/julia_g/windows_school/gsoc/gsoc_Rcy3_vignettes/GSEATutorial/"
 
 gmt_file <- paste0(gsea_tut_path,
                    "Human_GO_AllPathways_no_GO_iea_April_15_2013_symbol.gmt")
 
 data_1_ex_1 <- paste0(gsea_tut_path,
-                     "MCF7_ExprMx_v2_names.gct")
+                      "MCF7_ExprMx_v2_names.gct")
 
 gsea_tut_path="/home/julia_g/gsea_home/output/may23/estrogen_treatment_12hr_gsea_enrichment_results.Gsea.1464036337021/"
 
 data_1_en_1_es <- paste0(gsea_tut_path,
-                      "gsea_report_for_ES12_1464036337021.xls")
+                         "gsea_report_for_ES12_1464036337021.xls")
 data_1_en_2_nt <- paste0(gsea_tut_path,
                          "gsea_report_for_NT12_1464036337021.xls")
 
 rank_file <- paste0(gsea_tut_path,
                     "edb/MCF7_ExprMx_v2_names_ExprMx_v2_names.ES_NT.cls_ES12_versus_NT12.rnk")
+```
 
 
-#Dataset 1 / Phenotypes 1: ES12 VS NT12 (OPTIONAL)
+
+```r
+#Dataset 1 / Phenotypes 1: ES12 VS NT12 
 
 em_params <- list(analysisType = "GSEA",
                   gmtFile = gmt_file,
@@ -367,17 +413,19 @@ em_params <- list(analysisType = "GSEA",
                   coeffecients = "JACCARD")
 
 EM_ex_6 <- setEnrichmentMapProperties(cy,
-                                  "build",
-                                  em_params)
+                                      "build",
+                                      em_params)
 ```
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM6_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM10_Enrichment Map successfully connected to R session."
 ```
 
 
 Successfully built!
+
+We are examining Estrogen treatment vs no treatment at 12hr
 
 ```r
 saveImage(EM_ex_6,
@@ -387,23 +435,9 @@ saveImage(EM_ex_6,
 ```
 ![](./EM_ex_6.png)
 
-## Next steps
-
-- Verify that I have made these functions correctly for use in S4 framework
-- Clean up the use of the functions
-- command to print list of setable properties?
-
 ## Helpful references:
 
 ### Reference for the API
 
-found this page which is helpful for the api:
+found this page which is helpful for the cyREST api:
 http://idekerlab.github.io/cyREST/#1637304040
-
-### Finding command names available in Cytoscape using R
-
-Finally found: 
-
-http://localhost:1234/v1/commands
-
-Which gives the same as when you type `help` in the Command Line Dialog in cytoscape
