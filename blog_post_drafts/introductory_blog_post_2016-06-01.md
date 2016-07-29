@@ -2,7 +2,7 @@
 
 [Cytoscape](http://www.cytoscape.org/) is a popular open-source program for visualizing and analysing networks (biological and otherwise).
 
-This summer [I](www.juliagustavsen.com) I have been working on a [Google Summer of Code project](https://summerofcode.withgoogle.com/projects/#6682250145955840) with the [National Resource for Network Biology](http://nrnb.org/) that aims to make it easier for scientists to run [Cytoscape](http://www.cytoscape.org/) via R (using [CyREST](https://github.com/cytoscape/cyREST)). Cytoscape is a very powerful tool for visualizing and analysing networks, and as scientists generate more data it can be efficient to reuse the same analytical steps on different dataset or to easily re-run analyses. The main objective of the project has been and will be to create code demonstrations of common workflows using the Bioconductor R package [RCy3](https://bioconductor.org/packages/release/bioc/html/RCy3.html). 
+This summer [I](www.juliagustavsen.com) have been working on a [Google Summer of Code project](https://summerofcode.withgoogle.com/projects/#6682250145955840) with the [National Resource for Network Biology](http://nrnb.org/) that aims to make it easier for scientists to run [Cytoscape](http://www.cytoscape.org/) via R (using [CyREST](https://github.com/cytoscape/cyREST)). Cytoscape is a very powerful tool for visualizing and analysing networks, and as scientists generate more data it can be efficient to reuse the same analytical steps on different dataset or to easily re-run analyses. The main objective of the project has been and will be to create code demonstrations of common workflows using the Bioconductor R package [RCy3](https://bioconductor.org/packages/release/bioc/html/RCy3.html). 
 
 ## Description of the project
 
@@ -48,6 +48,4 @@ Work will be done in [this Github repository](https://github.com/jooolia/gsoc_Rc
 
 If you use Cytoscape and R, do you use them together? What would you like to see? What kind of data do you use? What would you like to do, but can't or find challenging to do in your current analysis?
 
-If interested you can fill [this google form](https://docs.google.com/forms/d/1_XsAFzIE1YQbBnLRdql2KLpYo4namn7PPdsVhX7CpD0/viewform?c=0&w=1&usp=mail_form_link) or get in touch via [e-mail](mailto:j.gustavsen@gmail.com) or [twitter](http://twitter.com/JuliaGustavsen).
-
- 
+If interested you can fill in [this google form](https://docs.google.com/forms/d/1_XsAFzIE1YQbBnLRdql2KLpYo4namn7PPdsVhX7CpD0/viewform?c=0&w=1&usp=mail_form_link) or get in touch via [e-mail](mailto:j.gustavsen@gmail.com) or [twitter](http://twitter.com/JuliaGustavsen).
