@@ -10,8 +10,7 @@ library(RJSONIO)
 source("./functions_to_add_to_RCy3/working_with_namespaces.R")
 ```
 
-Trying out cluster maker with R 
-
+# Trying out clusterMaker with R 
 
 ```r
 cy <- CytoscapeConnection ()
@@ -31,17 +30,13 @@ getCommandsWithinNamespace(cy, "cluster")
 ## [28] "pam"                 "scps"                "transclust"
 ```
 
+Following this tutorial: 
 
 http://opentutorials.cgl.ucsf.edu/index.php/Tutorial:Cluster_Maker
 
-
-
-## need to read in cys
-
+# Read in provided session file (.cys file)
 
 ```r
-#help session
-
 command.name <- "open"
 
 request.uri <- paste(cy@uri,
@@ -49,16 +44,10 @@ request.uri <- paste(cy@uri,
                      "commands/session",
                      as.character(command.name),
                      sep = "/")
-## file
-
 ## load session
 properties.list <- list(file="/home/julia_g/windows_school/gsoc/gsoc_Rcy3_vignettes/data/GalFiltered.cys")
 request.res <- GET(url = request.uri,
                    query = properties.list)
-
-#cy.window <- new('CytoscapeWindowClass', title=title, window.id=existing.window.id, uri=uri)
-## how do I list networks in cy?
-#get
 
 getWindowList(cy)
 ```
@@ -68,14 +57,14 @@ getWindowList(cy)
 ```
 
 ```r
-connect_EM_to_R_session <- existing.CytoscapeWindow("galFiltered.sif",                                                                      copy.graph.from.cytoscape.to.R = FALSE)
+connect_window_to_R_session <- existing.CytoscapeWindow("galFiltered.sif",                                                                      copy.graph.from.cytoscape.to.R = FALSE)
 ```
 
 Graph from session is loaded into Cytoscape
 
 
 ```r
-getCommandsWithinNamespace(cy, "cluster/hierarchical")
+getCommandsWithinNamespace(connect_window_to_R_session, "cluster/hierarchical")
 ```
 
 ```
@@ -85,30 +74,63 @@ getCommandsWithinNamespace(cy, "cluster/hierarchical")
 ## [10] "selectedOnly"      "showUI"            "zeroMissing"
 ```
 
+
+
 ```r
-properties.list <- list(nodeAttributeList = c("node.gal1RGexp",
-                                           "node.gal4RGexp",
-                                           "node.gal80Rexp"),
-                     selectedOnly = FALSE)
+node_list <- list("gal1RGexp",
+                  "gal4RGexp",
+                  "gal80Rexp")
 
-
-## I think this works to send an array to via json...
-node_list <- c('[ "node.gal1RGexp",
-                                          "node.gal4RGexp",
-                                          "node.gal80Rexp"]')
-
-properties.list <- list(nodeAttributeList = node_list,
-                     selectedOnly = FALSE)
+properties.list <- list(nodeAttributeList = node_list[[1]],
+                        nodeAttributeList = node_list[[2]],
+                        nodeAttributeList = node_list[[3]],
+                        network = connect_window_to_R_session@title,
+                        selectedOnly = FALSE,
+                        clusterAttributes = FALSE,
+                        ignoreMissing = FALSE,
+                        createGroups = TRUE,
+                        showUI = FALSE)
 
 command.name <- "hierarchical"
-request.uri <- paste(cy@uri,pluginVersion(cy),
+request.uri <- paste(connect_window_to_R_session@uri,
+                     pluginVersion(cy),
                      "commands/cluster",
                      as.character(command.name),
                      sep = "/")
-## file
+
 request.res <- GET(url = request.uri,
-                   query = properties.list)
+                   query = properties.list,
+                   verbose())
+request.res$url
 ```
 
-Ok so how to get this to be more like a function? make specific things for the R funciton??
-- also connect to this network in R
+```
+## [1] "http://localhost:1234/v1/commands/cluster/hierarchical?nodeAttributeList=gal1RGexp&nodeAttributeList=gal4RGexp&nodeAttributeList=gal80Rexp&network=galFiltered.sif&selectedOnly=FALSE&clusterAttributes=FALSE&ignoreMissing=FALSE&createGroups=TRUE&showUI=FALSE"
+```
+
+```r
+http_status(request.res)
+```
+
+```
+## $category
+## [1] "Success"
+## 
+## $reason
+## [1] "OK"
+## 
+## $message
+## [1] "Success: (200) OK"
+```
+
+```r
+request.res$status_code
+```
+
+```
+## [1] 200
+```
+
+# Stuck here. Cannot get this to work. 
+
+- Cannot see clustermaker window in Cytoscape
