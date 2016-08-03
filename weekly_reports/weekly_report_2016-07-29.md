@@ -3,7 +3,10 @@
 ## Week July 25th-29th
 Things I did this week:
 
-- edited first potential blog post of RCy3
+- edited first potential blog post of [RCy3](https://github.com/jooolia/gsoc_Rcy3_vignettes/blob/master/blog_post_drafts/introductory_blog_post_2016-06-01.md)
+  - Feedback and further instructions from Mentor:
+    - second sentence two I's
+    - get two post images with solid backgrounds e.g nrb logo. 
 - tidy up Enrichment map vignette 
 	- download new release with bug fix
 	- recreated the tutorials.
@@ -15,6 +18,9 @@ Things I did this week:
 - question about functions used for working with EnrichmentMap:
   - setEnrichmentMapProperties() uses the last made window in Cytoscape as the one to connect to to get the EnrichmentMap graph into R. Is there a situation where using the last made window for this enrichment map will fail? What other option could I find?
 
+## Feedback from mentor:
+- Follow up with Ruth on the files from . Ask about the wordcloud and how they are labelling the clusters manually, where are the terms coming from. Is there a module picking/clustering and hiding the labels and summary making. 
+- Get the pictures to be something closer to readable. Play around with the scale to make it legible. 
 
 ## Next week: 
 - Tara oceans network:
