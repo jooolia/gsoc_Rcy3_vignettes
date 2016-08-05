@@ -48,17 +48,17 @@ library(RJSONIO)
 
 ## Load functions for creating Enrichment map
 
-```{r}
+```{r, cache = TRUE}
 source("./functions_to_add_to_RCy3/working_with_EM.R")
 ```
 
 Create the connection to Cytoscape
-```{r}
+```{r, cache = TRUE}
 cy <- CytoscapeConnection ()
 ```
 
 Examine the commands that are available in Enrichment Map.
-```{r}
+```{r, cache = TRUE}
 getEnrichmentMapCommandsNames(cy, "build")
 getEnrichmentMapCommandsNames(cy, "gseabuild")
 ```
@@ -95,7 +95,7 @@ So first we read in the data from the supplied files and set the parameters.
 **Note on file paths**: 
 You cannot use relative paths with EnrichmentMap from R. The filenames need to be given as their absolute paths.
 
-```{r}
+```{r, cache = TRUE}
 path_to_file <- "/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
 
 enr_file <- paste0(path_to_file,
@@ -107,7 +107,7 @@ exp_file <- paste0(path_to_file,
 If we wanted to see the full list of parameters available, we could use `getEnrichmentMapCommandsNames(cy, "build")` and if we wanted to run functions for GSEA types of analysis we could run `getEnrichmentMapCommandsNames(cy, "gseabuild")`. 
 
 ## Set the parameters for use in the Enrichment Map.
-```{r}
+```{r, cache = TRUE}
 em_params <- list(analysisType = "generic",
                   enrichmentsDataset1 = enr_file,
                   pvalue = "1.0",
@@ -120,7 +120,7 @@ em_params <- list(analysisType = "generic",
 No graph details are returned, this is just setting the parameters that will be sent to Cytoscape via RCy3. 
 
 Now build the enrichment map
-```{r}
+```{r, cache = TRUE}
 EM_1 <- setEnrichmentMapProperties(cy,
                                    "build",
                                    em_params)
@@ -130,7 +130,7 @@ These parameters can also be set in Cytoscape, but we are setting them here via 
 
 ## Save Enrichment map network image
 
-```{r}
+```{r, cache = TRUE}
 saveImage(EM_1,
           "EM_1",
           "png",
@@ -139,19 +139,39 @@ saveImage(EM_1,
 
 ![](./EM_1.png)
 
+```{r, cache = TRUE}
+saveImage(EM_1,
+          "EM_1_s1",
+          "png",
+          scale=1)
+```
+
+![](./EM_1_s1.png)
+
+```{r, cache = TRUE}
+saveImage(EM_1,
+          "EM_1_s025",
+          "png",
+          scale=0.25)
+```
+
+![](./EM_1_s025.png)
+
 
 ## Change the layout of the network
 
 Can change any of the visual properties of "EM_1" now. For demonstration let's change the layout. 
-```{r}
-layoutNetwork(EM_1,
-              'kamada-kawai')
+```{r, cache = TRUE}
 
-## save network visualization
-saveImage(EM_1,
-          "EM_1_kamada-kawai",
-          "png",
-          scale=4)
+## turn off the names....
+# layoutNetwork(EM_1,
+#               'kamada-kawai')
+# 
+# ## save network visualization
+# saveImage(EM_1,
+#           "EM_1_kamada-kawai",
+#           "png",
+#           scale=4)
 ```
 ![](./EM_1_kamada-kawai.png)
 
@@ -163,7 +183,7 @@ saveNetwork(EM_1, "EM_1") ## Creates "EM_1.cys" which can be reopened in Cytosca
 
 In our R session we are connected to the graph in Cytoscape and can manipulate the graph's visual properties, but we do not have the graph information in R. 
 
-```{r}
+```{r, cache = TRUE}
 EM_1@graph
 ```
 
@@ -177,7 +197,7 @@ EM_1_2 <- setEnrichmentMapProperties(cy,
 ```
 
 Now if we have a look at the graph part of the stored object we will see we have retrieved the information from the graph. 
-```{r}
+```{r, cache = TRUE}
 EM_1_2@graph
 print(noa.names(getGraph(EM_1_2))) # retrieves node attributes from the graph
 
@@ -199,7 +219,7 @@ WHAT IS THE PURPOSE HERE??
 ### Option 1: Load enrichment results from g:Profiler
 
 Load in the datafiles
-```{r}
+```{r, cache = TRUE}
 path_to_file <- "/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
 
 enr_file <-  paste0(path_to_file,
@@ -218,7 +238,7 @@ classes_file <- paste0(path_to_file,
                        "MesenchymalvsImmunoreactive_RNAseq_classes.cls")
 ```
 
-```{r}
+```{r, cache = TRUE}
 em_params <- list(analysisType = "generic",
                   enrichmentsDataset1 = enr_file,
                   pvalue = "1.0",
@@ -237,7 +257,7 @@ EM_ex_4 <- setEnrichmentMapProperties(cy,
 ```
 
 
-```{r}
+```{r, cache = TRUE}
 saveImage(EM_ex_4,
           "EM_ex_4",
           "png",
@@ -248,7 +268,7 @@ saveImage(EM_ex_4,
 
 ### Option 2: Load enrichment results from GSEA
 
-```{r}
+```{r, cache = TRUE}
 path_to_file <- "/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
 
 gmt_file <-  paste0(path_to_file,
@@ -266,7 +286,7 @@ classes_file <- paste0(path_to_file,
 ```
 
 Not working!
-```{r}
+```{r, cache = TRUE}
 # Note on Phenotype - In the text boxes replace "UP" with "Mesenchymal" and "DOWN" with "Immunoreactive". Mesenchymal will be associated with red nodes because it corresponds to the positive phenotype in the gprofiler_results_mesenonly_ordered.
 
 ## don't think these are available with GSEA. :()
@@ -291,7 +311,7 @@ Not working!
 ```
 
 
-```{r}
+```{r, cache = TRUE}
 # saveImage(EM_ex_5,
 #           "EM_ex_5",
 #           "png",
@@ -305,7 +325,7 @@ Not working!
 
 What is purpose??
 
-```{r}
+```{r, cache = TRUE}
 
 gsea_tut_path <- "/home/julia_g/windows_school/gsoc/gsoc_Rcy3_vignettes/GSEATutorial/"
 
@@ -327,7 +347,7 @@ rank_file <- paste0(gsea_tut_path,
 ```
 
 
-```{r}
+```{r, cache = TRUE}
 #Dataset 1 / Phenotypes 1: ES12 VS NT12 
 
 em_params <- list(analysisType = "GSEA",
@@ -352,13 +372,140 @@ EM_ex_6 <- setEnrichmentMapProperties(cy,
 Successfully built!
 
 We are examining Estrogen treatment vs no treatment at 12hr
-```{r}
+```{r, cache = TRUE}
 saveImage(EM_ex_6,
           "EM_ex_6",
           "png",
           scale=4)
 ```
 ![](./EM_ex_6.png)
+
+
+# Follow their protocol 5 and use the auto annotate
+
+```{r, cache = TRUE}
+
+source("./functions_to_add_to_RCy3/working_with_auto_annotate.R")
+
+## autoannotate label-clusterBoosted  
+# Run label algorithm 'clusterBoosted'. Uses WordCloud to calculate the labels. Words in the label are the most frequent words and their adjacent words. The higher the "adjacent word bonus" is, the more likely adjacent words will be in the label.
+
+# autoannotate label-sizeSorted  Run label algorithm 'sizeSorted'. Uses WordCloud to calculate the labels. Words in the label are the most frequent words.
+
+#autoannotate label-clusterBoosted arguments:
+#adjacentWordBonus=: Size bonus given to words that are adjacent to the largest words. Default: 8
+#labelColumn=: Name of node column to use to generate the labels
+#maxWords=: Max words to include in label. Default: 4
+#nodeList=[nodeColumn:value|node name,...]|all|selected|unselected: List of nodes in the cluster
+
+```
+
+```{r, cache = TRUE}
+getAutoAnnotateCommandsNames(cy, "label-clusterBoosted")
+getAutoAnnotateCommandsNames(cy, "label-sizeSorted")
+
+## get list of columns
+source("./functions_to_add_to_RCy3/functions_for_selection_and_copying.R")
+selectAllNodes(EM_ex_6) ## with wordcloud when I run this I get a window asking to cluster. 
+getSelectedNodes(EM_ex_6)
+getWindowList(cy)
+
+##GET http://example.com/v1/networks/networkId/nodes/selected/
+```
+
+```{r, cache = TRUE}
+connect_to_R_session <- existing.CytoscapeWindow("EM7_Enrichment Map",
+                                                                      copy.graph.from.cytoscape.to.R = TRUE)
+## get error "ERROR in RCy3::getGraphFromCyWindow(): Node names cannot contain parentheses."
+
+selectAllNodes(connect_to_R_session)
+graph_selected_nodes <- getSelectedNodes(connect_to_R_session)
+
+## problems here with the column label, 
+## need to generate it from the network to be queried.
+## make sure to select the appropriate network. 
+autoa_params <- list(adjacentWordBonus = 8,   # int
+                     labelColumn = "EM10_GS_DESCR", # string
+                     maxWords = 30,        # int
+                     nodeList = "all"
+)   # list nodes in the cluster
+
+
+
+EM_ex_7 <- setAutoAnnotateProperties(connect_to_R_session,
+                                      "label-clusterBoosted",
+                                      autoa_params)
+
+request.uri <- "http://localhost:1234/v1/commands/autoannotate/label-clusterBoosted"
+request.res <- GET(url = request.uri,
+                                 query = autoa_params)
+## http://localhost:1234/v1/commands/autoannotate/label-clusterBoosted?adjacentWordBonus=8&labelColumn=EM10_GS_DESCR&maxWords=30&nodeList=all
+request.res
+## same problem as in clustermaker...
+
+request.res <- POST(url = request.uri,
+                                 query = autoa_params)
+request.res
+
+request.res <- PUT(url = request.uri,
+                                 query = autoa_params)
+request.res
+```
+
+
+
+# Test out word cloud
+
+wordcloud create Creates a Word Cloud from a list of nodes. This is an ObservableTask that returns a result. Result type: Map.class. The map contains 4 parallel lists. Key: "name", Value: String, Cloud name. Key: "size", Value: Integer, Number of words in the cloud (and size of each List). Key: "words", Value: List<String>, List of words in the cloud. Key: "fontSizes", Value: List<Integer>, The font size of each word. Key: "clusters", Value: List<Integer>, An ID for the cluster that the word belongs to. Key: "numbers", Value: List<Integer>, A unique ID for each word. 
+
+wordcloud delete Deletes a cloud
+wordcloud select Selects the nodes that are associated with the cloud
+wordcloud version Return wordcloud app version. This is an ObservableTask that returns a result. Result type: int[].class. The returned array contains 3 elements: major version, minor version, patch version
+
+wordcloud create arguments:
+cloudGroupTableName=<String>: Cloud group table name (deprecated)
+cloudName=<String>: Cloud name ----
+create=true|false: Actually create the cloud or just return the results without creating the cloud.
+nodeList=[nodeColumn:value|node name,...]|all|selected|unselected: List of Nodes
+wordColumnName=<String>: Column with words
+
+wordcloud delete arguments:
+cloudName=<String>: Name of cloud to be destroyed
+
+wordcloud select arguments:
+cloudName=<String>: Name of cloud to be selected
+updateNodeSelection=true|false: If true then the graph nodes will be selected to match the cloud. Default: true
+
+
+```{r, cache = TRUE}
+## get version
+request.uri <- "http://localhost:1234/v1/commands/wordcloud/version"
+request.res <- GET(url = request.uri)
+request.res
+rawToChar(request.res$content)
+## doesn't give anything??
+```
+
+
+```{r, cache = TRUE}
+## create
+
+## find columns
+
+wordcloud_params <- list(cloudName = "Test_cloud_from_R",  
+                     create = TRUE,
+                     nodeList = "all",
+                     wordColumnName = "EM7_GS_DESCR"
+)   # list nodes in the cluster
+
+request.uri <- "http://localhost:1234/v1/commands/wordcloud/create"
+request.res <- GET(url = request.uri,
+                   query = wordcloud_params)
+request.res
+
+## would like an export function like in the GUI.
+
+```
 
 ## Helpful references:
 

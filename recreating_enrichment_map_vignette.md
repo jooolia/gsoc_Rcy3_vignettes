@@ -145,7 +145,7 @@ EM_1 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM8_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM1_Enrichment Map successfully connected to R session."
 ```
 
 These parameters can also be set in Cytoscape, but we are setting them here via script. The function that we run also attaches the window created in Cytoscape to our R session, so that we are able to manipulate the stylistic aspects of our network by using "EM_1".
@@ -163,19 +163,40 @@ saveImage(EM_1,
 ![](./EM_1.png)
 
 
+```r
+saveImage(EM_1,
+          "EM_1_s1",
+          "png",
+          scale=1)
+```
+
+![](./EM_1_s1.png)
+
+
+```r
+saveImage(EM_1,
+          "EM_1_s025",
+          "png",
+          scale=0.25)
+```
+
+![](./EM_1_s025.png)
+
+
 ## Change the layout of the network
 
 Can change any of the visual properties of "EM_1" now. For demonstration let's change the layout. 
 
 ```r
-layoutNetwork(EM_1,
-              'kamada-kawai')
-
-## save network visualization
-saveImage(EM_1,
-          "EM_1_kamada-kawai",
-          "png",
-          scale=4)
+## turn off the names....
+# layoutNetwork(EM_1,
+#               'kamada-kawai')
+# 
+# ## save network visualization
+# saveImage(EM_1,
+#           "EM_1_kamada-kawai",
+#           "png",
+#           scale=4)
 ```
 ![](./EM_1_kamada-kawai.png)
 
@@ -298,7 +319,7 @@ EM_ex_4 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM9_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM2_Enrichment Map successfully connected to R session."
 ```
 
 
@@ -419,7 +440,7 @@ EM_ex_6 <- setEnrichmentMapProperties(cy,
 
 ```
 ## [1] "Successfully built the EnrichmentMap."
-## [1] "Cytoscape window EM10_Enrichment Map successfully connected to R session."
+## [1] "Cytoscape window EM3_Enrichment Map successfully connected to R session."
 ```
 
 
@@ -434,6 +455,9 @@ saveImage(EM_ex_6,
           scale=4)
 ```
 ![](./EM_ex_6.png)
+
+
+# Follow their protocol 5 and use the auto annotate
 
 ## Helpful references:
 
