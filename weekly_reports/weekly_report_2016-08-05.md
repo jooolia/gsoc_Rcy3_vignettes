@@ -25,3 +25,15 @@ Things I did this week:
 - Prepare for the final evaluation:
   - What can I reasonably finish and what are the most important aspects?
   - Discuss with mentor
+  
+## Mentor feedback
+  
+  - make sure that some vignettes are finished soon. 
+  - PaxtoolsR and microbiome should be more straightforward and need to be completed. 
+  - ones that were discussed previously clusterMaker, cyanimator, chemviz, enrichmentmap, microbiome, paxtoolsr. Need to have basic steps taken on them. 
+  - share screen to show what the problem is with clustermaker window
+  - send reminder e-mail to Scooter regarding clusterMaker
+  - blog post - a few people have seen it.
+  - submit issues for :scale issue for RCy3 and cyREST h parameter. 
+  
+  
