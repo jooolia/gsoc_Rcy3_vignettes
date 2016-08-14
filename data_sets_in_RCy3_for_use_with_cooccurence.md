@@ -1,20 +1,10 @@
----
-title: "data_sets_in_RCy3"
-author: "Julia Gustavsen"
-output: 
-    html_document:
-      keep_md: true
-      number_sections: yes
-      theme: cerulean
-      toc: yes
-      toc_depth: 6 
----
+# data_sets_in_RCy3
+Julia Gustavsen  
+May 24, 2016  
 
 # Descriptions of vignette
 
 ## Tara Oceans
-
-http://science.sciencemag.org/content/348/6237/873
 
 So there has been many projects where they collect data from all over the world. Some, such as the pioneering Venter study have pioneered metagenomic and others have just been interesting ways to collect a lot of data.
 
@@ -40,7 +30,8 @@ In this data set we have data that have come from the bacterial dataset and also
 
 # Set up Cytoscape and R connection
 
-```{r, message=FALSE}
+
+```r
 library(RCy3)
 library(igraph)
 library(RJSONIO)
@@ -53,7 +44,8 @@ library(RColorBrewer)
 We will run this example using RCy3 to provide a connection between our Rsession and Cytoscape using CyREST (link here).
 
 Here we create a connection in R that we can use to manipulate the networks and then we will delete any windows that we in Cytoscape (if there are none that was no problem) so that we don't use up all of our memory. 
-```{r}
+
+```r
 cy <- CytoscapeConnection()
 deleteAllWindows(cy)
 ```
@@ -63,7 +55,8 @@ deleteAllWindows(cy)
 We will read in a species co-occurrence matrix that was calculated using Spearman Rank coefficient. (If interested in seeing how this was done please see scripts in inst/data-raw)
 
 Or how to describe how this was done??
-```{r read-in-data}
+
+```r
 ## scripts for processing in "inst/data-raw/"
 prok_vir_cor <- read.delim("./data/virus_prok_cor_abundant.tsv")
 ```
@@ -71,7 +64,8 @@ prok_vir_cor <- read.delim("./data/virus_prok_cor_abundant.tsv")
 There are many different ways to work with graphs in R. We will use both the igraph (link) and the graph (link) package to work with our network with Cytoscape.
 
 The igraph package is used to convert the co-occurrence dataframe into a network that we can send to Cytoscape. In this case our graph is undirected (so "directed = FALSE") since we do not have any information about which way the interactions are going. 
-```{r}
+
+```r
 graph_vir_prok <- simplify(graph.data.frame(prok_vir_cor,
                                             directed = FALSE))
 ```
@@ -80,7 +74,8 @@ graph_vir_prok <- simplify(graph.data.frame(prok_vir_cor,
 
 Since these are data from small, microscopic organisms that were sequenced using shotgun sequencing (for details see the papers here: XXX) we do not always know what they are. It is useful to know what kind of organisms are in the samples. In this case the bacterial viruses (bacteriophage), were classified by Basic Local Alignment Search Tool (BLAST http://blast.ncbi.nlm.nih.gov/Blast.cgi) by searching for their closest resembling sequence in **XX* database (see methods here). The percent of the read and the identity required between the study sequences and the databases. that had to match the database
 
-```{r}
+
+```r
 phage_id_affiliation <- read.delim("./data/phage_ids_with_affiliation.tsv")
 bac_id_affi <- read.delim("./data/prok_tax_from_silva.tsv")
 ```
@@ -90,7 +85,8 @@ bac_id_affi <- read.delim("./data/prok_tax_from_silva.tsv")
 I think this could be hidden and put somewhere else so that if it is of interest it could be used, otherwise I could simplify things. 
 
 just have some key things here. 
-```{r}
+
+```r
 genenet.nodes <- as.data.frame(vertex.attributes(graph_vir_prok))
 
 ## ids do not match for the phage ids 
@@ -153,29 +149,27 @@ ug <- cyPlot(genenet.nodes,genenet.edges)
 
 # Send network to Cytoscape using RCy3
 
-```{r, message=FALSE}
+
+```r
 cw <- CytoscapeWindow("Tara oceans",
                       graph = ug,
                       overwriteWindow = TRUE)
 ```
 
-```{r, message=FALSE, results="hide"}
+
+```r
 displayGraph(cw)
 layoutNetwork(cw)
 ```
 
-```{r, echo=FALSE}
-saveImage(cw,
-          "co-occur0",
-          "svg")
-knitr::include_graphics("./co-occur0.svg")
-```
+![](./co-occur0.svg)<!-- -->
 
 # Colour network by prokaryotic phylum
 
 We would like to get an overview of the different phylum of bacteria that we have in our network. One way that this can be visualized is by colouring the different nodes based on their phylum classifications. Rcolorbrewer will be used to generate a set of good (???) colours to colour the nodes. It will be seen how many nodes there are and then it can be seen what the strong associations are. 
 
-```{r}
+
+```r
 families_to_colour <- unique(genenet.nodes$prok_tax_phylum)
 families_to_colour <- families_to_colour[!families_to_colour %in% "test"]
 node.colour <- brewer.pal(length(families_to_colour),
@@ -188,22 +182,23 @@ setNodeColorRule(cw,
                  default.color='#ffffff')
 ```
 
+```
+## Successfully set rule.
+```
 
-```{r, message=FALSE, results="hide"}
+
+
+```r
 displayGraph(cw)
 ```
 
-```{r, echo=FALSE}
-saveImage(cw,
-          "co-occur0_1",
-          "svg")
-knitr::include_graphics("./co-occur0_1.svg")
-```
+![](./co-occur0_1.svg)<!-- -->
 
 ## Set node shape to reflect virus or prokaryote
 
 Next we would like to change the shape of the node to reflect whether the nodes are viral or bacterial in origin. We know that in the dataset all of the viral node names start with "ph_", so thus we can set the viral nodes to be diamonds by looking for all the nodes that start with "ph" in the network. 
-```{r}
+
+```r
 ## set shape to be virus or prok
 shapes_for_nodes <- c('DIAMOND')
 
@@ -216,23 +211,24 @@ setNodeShapeRule(cw,
                  shapes_for_nodes)
 ```
 
-```{r, message=FALSE, results="hide"}
+```
+## Successfully set rule.
+```
+
+
+```r
 displayGraph(cw)
 ```
 
 
-```{r, echo=FALSE}
-saveImage(cw,
-          "co-occur1",
-          "svg")
-knitr::include_graphics("./co-occur1.svg")
-```
+![](./co-occur1.svg)<!-- -->
 
 # Colour edges of phage nodes
 
 The classification of the viral data was done in a very conservative manner, but if we do want to add some of this information in to our visualization we can add some colouring of the viral nodes by family. The main families that were identified in this dataset are the *Podoviridae*, the *Siphoviridae* and the *Myoviridae* (for more info see here: NCBI or GenBank link.)
 
-```{r}
+
+```r
 setDefaultNodeBorderWidth (cw, 5)
 families_to_colour <- c(" Podoviridae",
                         " Siphoviridae",
@@ -247,16 +243,16 @@ setNodeBorderColorRule(cw,
                  default.color = "#000000")
 ```
 
-```{r, message=FALSE, results="hide"}
+```
+## Successfully set rule.
+```
+
+
+```r
 displayGraph(cw)
 ```
 
-```{r, echo=FALSE}
-saveImage(cw,
-          "co-occur2",
-          "svg")
-knitr::include_graphics("./co-occur2.svg")
-```
+![](./co-occur2.svg)<!-- -->
 
 # Do layout to minimize overlap of nodes. 
 
@@ -264,38 +260,100 @@ After doing all of this colouring to the network we would like to lay out the ne
 
 If we are not sure what the current values are for a layout or we are not sure what kinds of values are accepted for the different parameters of our layout we can investigate using the RCy3 functions `getLayoutPropertyNames()` and then `getLayoutPropertyValue()`.
 
-```{r}
-getLayoutNames(cy)
 
+```r
+getLayoutNames(cy)
+```
+
+```
+##  [1] "attribute-circle"                           
+##  [2] "allegro-weak-clustering"                    
+##  [3] "allegro-edge-repulsive-fruchterman-reingold"
+##  [4] "stacked-node-layout"                        
+##  [5] "allegro-edge-repulsive-strong-clustering"   
+##  [6] "allegro-strong-clustering"                  
+##  [7] "degree-circle"                              
+##  [8] "allegro-fruchterman-reingold"               
+##  [9] "allegro-edge-repulsive-spring-electric"     
+## [10] "circular"                                   
+## [11] "attributes-layout"                          
+## [12] "kamada-kawai"                               
+## [13] "force-directed"                             
+## [14] "allegro-edge-repulsive-weak-clustering"     
+## [15] "grid"                                       
+## [16] "hierarchical"                               
+## [17] "allegro-spring-electric"                    
+## [18] "fruchterman-rheingold"                      
+## [19] "isom"
+```
+
+```r
 getLayoutPropertyNames(cw, layout.name = 'allegro-spring-electric')
+```
+
+```
+## [1] "randomize"                    "maxIterations"               
+## [3] "noOverlapIterations"          "deviceSelection"             
+## [5] "componentProcessingSelection" "componentSorting"            
+## [7] "scale"                        "gravityTypeSelection"        
+## [9] "gravity"
+```
+
+```r
 getLayoutPropertyValue(cw, 'allegro-spring-electric',"gravity") 
+```
+
+```
+## [[1]]
+## [1] 100
+```
+
+```r
 getLayoutPropertyValue(cw, 'allegro-spring-electric',"maxIterations")  
+```
+
+```
+## [[1]]
+## [1] 2000
+```
+
+```r
 getLayoutPropertyValue(cw, 'allegro-spring-electric',"noOverlapIterations")
+```
+
+```
+## [[1]]
+## [1] TRUE
 ```
 
 Once we decide on the properties we want, we can go ahead and set them like this:
 
-```{r}
+
+```r
 setLayoutProperties(cw,
                     layout.name = 'allegro-spring-electric',
                     list(gravity = 100,
                          scale = 6))
+```
+
+```
+## Successfully updated the property 'gravity'.
+## Successfully updated the property 'scale'.
+```
+
+```r
 layoutNetwork(cw,
               layout.name = 'allegro-spring-electric')
 ```
 
-```{r, echo=FALSE}
-saveImage(cw,
-          "co-occur3",
-          "svg")
-knitr::include_graphics("./co-occur3.svg")
-```
+![](./co-occur3.svg)<!-- -->
 
 # Look at network properties
 
 One thing that might be interesting when we look at our network is to highlight the nodes that are connected to many different nodes and those that are not very connected. We can use a gradient of colour to do this. 
 
-```{r}
+
+```r
 ## add degree property to cw
 ## r colour brewer colours for variety of degrees. From low to high. 
 ## YlGn as a series of colours?
@@ -313,7 +371,8 @@ cw2 <- CytoscapeWindow("Tara oceans with degree",
                       overwriteWindow = TRUE)
 ```
 
-```{r, message=FALSE, results="hide"}
+
+```r
 displayGraph(cw2)
 layoutNetwork(cw2)
 ```
@@ -321,7 +380,8 @@ layoutNetwork(cw2)
 # Size by degree
 
 (what do the different sizes mean? How do I find out about this?)
-```{r}
+
+```r
 degree_control_points <- c(min(degree(graph_vir_prok)),
                            mean(degree(graph_vir_prok)),
                            max(degree(graph_vir_prok)))
@@ -336,22 +396,24 @@ setNodeSizeRule(cw2,
                 degree_control_points,
                 node_sizes,
                 mode = "interpolate")
+```
 
+```
+## Locked node dimensions successfully even if the check box is not ticked.
+## Locked node dimensions successfully even if the check box is not ticked.
+## Successfully set rule.
+```
+
+```r
 layoutNetwork(cw2,
               "force-directed")
 ```
 
 
-```{r, echo=FALSE}
-saveImage(cw2,
-          "co-occur_degree",
-          "svg")
-```
 
 
-```{r, out.width = 1600, fig.retina = NULL, echo=FALSE}
-knitr::include_graphics("./co-occur_degree.svg")
-```
+
+<img src="./co-occur_degree.svg" width="1600" />
 
 # Select an interesting node and make a subnetwork
 
@@ -362,22 +424,44 @@ The degree visualization showed us that perhaps we would like to look at all the
 -make a new netwokr (ensuring there are all the nodes also selected)
 
 
-```{r}
+
+```r
 selectNodes(cw2,
             "GQ377772") # selects specific nodes
 getSelectedNodes(cw2)
+```
 
+```
+## [1] "GQ377772"
+```
+
+```r
 selectFirstNeighborsOfSelectedNodes(cw2)
 getSelectedNodes(cw2)
 ```
 
-```{r}
+```
+##  [1] "ph_3164"  "ph_1392"  "ph_1808"  "ph_3901"  "ph_407"   "ph_4377" 
+##  [7] "ph_553"   "ph_765"   "ph_7661"  "GQ377772"
+```
+
+
+```r
 selectFirstNeighborsOfSelectedNodes(cw2)
 getSelectedNodes(cw2)
 ```
 
+```
+##  [1] "ph_3164"       "ph_1392"       "ph_1808"       "ph_3901"      
+##  [5] "ph_407"        "ph_4377"       "ph_553"        "ph_765"       
+##  [9] "ph_7661"       "AACY020207233" "AY663941"      "AY663999"     
+## [13] "AY664000"      "AY664012"      "EF574484"      "EU802893"     
+## [17] "GQ377772"      "GU061586"      "GU119298"      "GU941055"
+```
 
-```{r}
+
+
+```r
 selectEdgesConnectedBySelectedNodes <- function(c_w) {
  selectedNodes = getSelectedNodes(c_w)
  if (length (selectedNodes) == 1 && is.na (selectedNodes))
@@ -394,8 +478,127 @@ selectEdgesConnectedBySelectedNodes(cw2)
 getSelectedEdges(cw2)
 ```
 
+```
+##   [1] "ph_1703 (unspecified) AY663941"     
+##   [2] "ph_1703 (unspecified) EF574484"     
+##   [3] "ph_1703 (unspecified) EU802893"     
+##   [4] "ph_1703 (unspecified) GU119298"     
+##   [5] "ph_1871 (unspecified) GU119298"     
+##   [6] "ph_18855 (unspecified) EU802893"    
+##   [7] "ph_193 (unspecified) EU802893"      
+##   [8] "ph_24577 (unspecified) EF574484"    
+##   [9] "ph_24577 (unspecified) EU802893"    
+##  [10] "ph_24577 (unspecified) GU119298"    
+##  [11] "ph_3280 (unspecified) EU802893"     
+##  [12] "ph_36155 (unspecified) EU802893"    
+##  [13] "ph_36155 (unspecified) GU119298"    
+##  [14] "ph_5108 (unspecified) EU802893"     
+##  [15] "ph_5981 (unspecified) EU802893"     
+##  [16] "ph_675 (unspecified) EU802893"      
+##  [17] "ph_675 (unspecified) GU119298"      
+##  [18] "ph_841 (unspecified) EF574484"      
+##  [19] "ph_1095 (unspecified) AY663941"     
+##  [20] "ph_1095 (unspecified) AY664000"     
+##  [21] "ph_1095 (unspecified) AY664012"     
+##  [22] "ph_1186 (unspecified) AY663941"     
+##  [23] "ph_1186 (unspecified) AY663999"     
+##  [24] "ph_1186 (unspecified) AY664000"     
+##  [25] "ph_1186 (unspecified) AY664012"     
+##  [26] "ph_1186 (unspecified) EF574484"     
+##  [27] "ph_1205 (unspecified) AY663941"     
+##  [28] "ph_1205 (unspecified) AY663999"     
+##  [29] "ph_1205 (unspecified) AY664000"     
+##  [30] "ph_1205 (unspecified) AY664012"     
+##  [31] "ph_1205 (unspecified) EF574484"     
+##  [32] "ph_1392 (unspecified) AY663941"     
+##  [33] "ph_1392 (unspecified) AY664000"     
+##  [34] "ph_1392 (unspecified) AY664012"     
+##  [35] "ph_1392 (unspecified) EF574484"     
+##  [36] "ph_1392 (unspecified) GQ377772"     
+##  [37] "ph_1392 (unspecified) GU119298"     
+##  [38] "ph_1392 (unspecified) GU941055"     
+##  [39] "ph_1808 (unspecified) AY663941"     
+##  [40] "ph_1808 (unspecified) AY664000"     
+##  [41] "ph_1808 (unspecified) AY664012"     
+##  [42] "ph_1808 (unspecified) EF574484"     
+##  [43] "ph_1808 (unspecified) GQ377772"     
+##  [44] "ph_1808 (unspecified) GU119298"     
+##  [45] "ph_1808 (unspecified) GU941055"     
+##  [46] "ph_3901 (unspecified) AY663941"     
+##  [47] "ph_3901 (unspecified) AY664000"     
+##  [48] "ph_3901 (unspecified) AY664012"     
+##  [49] "ph_3901 (unspecified) EF574484"     
+##  [50] "ph_3901 (unspecified) GQ377772"     
+##  [51] "ph_3901 (unspecified) GU119298"     
+##  [52] "ph_3901 (unspecified) GU941055"     
+##  [53] "ph_407 (unspecified) AY663941"      
+##  [54] "ph_407 (unspecified) AY664000"      
+##  [55] "ph_407 (unspecified) AY664012"      
+##  [56] "ph_407 (unspecified) EF574484"      
+##  [57] "ph_407 (unspecified) GQ377772"      
+##  [58] "ph_407 (unspecified) GU119298"      
+##  [59] "ph_407 (unspecified) GU941055"      
+##  [60] "ph_4377 (unspecified) AY663941"     
+##  [61] "ph_4377 (unspecified) AY663999"     
+##  [62] "ph_4377 (unspecified) AY664000"     
+##  [63] "ph_4377 (unspecified) AY664012"     
+##  [64] "ph_4377 (unspecified) EF574484"     
+##  [65] "ph_4377 (unspecified) GQ377772"     
+##  [66] "ph_4377 (unspecified) GU061586"     
+##  [67] "ph_4377 (unspecified) GU119298"     
+##  [68] "ph_4377 (unspecified) GU941055"     
+##  [69] "ph_553 (unspecified) AY663941"      
+##  [70] "ph_553 (unspecified) AY664000"      
+##  [71] "ph_553 (unspecified) AY664012"      
+##  [72] "ph_553 (unspecified) EF574484"      
+##  [73] "ph_553 (unspecified) GQ377772"      
+##  [74] "ph_553 (unspecified) GU119298"      
+##  [75] "ph_553 (unspecified) GU941055"      
+##  [76] "ph_765 (unspecified) AY663941"      
+##  [77] "ph_765 (unspecified) EF574484"      
+##  [78] "ph_765 (unspecified) EU802893"      
+##  [79] "ph_765 (unspecified) GQ377772"      
+##  [80] "ph_765 (unspecified) GU119298"      
+##  [81] "ph_1431 (unspecified) AY663999"     
+##  [82] "ph_1431 (unspecified) GU061586"     
+##  [83] "ph_6665 (unspecified) AY663999"     
+##  [84] "ph_6665 (unspecified) EF574484"     
+##  [85] "ph_6665 (unspecified) GU061586"     
+##  [86] "ph_2435 (unspecified) AY664012"     
+##  [87] "ph_2435 (unspecified) GU119298"     
+##  [88] "ph_2435 (unspecified) GU941055"     
+##  [89] "ph_3450 (unspecified) AY664012"     
+##  [90] "ph_4276 (unspecified) AY664012"     
+##  [91] "ph_4276 (unspecified) EF574484"     
+##  [92] "ph_4358 (unspecified) AY664012"     
+##  [93] "ph_7661 (unspecified) AY664012"     
+##  [94] "ph_7661 (unspecified) GQ377772"     
+##  [95] "ph_7661 (unspecified) GU119298"     
+##  [96] "ph_11583 (unspecified) EF574484"    
+##  [97] "ph_16719 (unspecified) EF574484"    
+##  [98] "ph_16719 (unspecified) GU119298"    
+##  [99] "ph_2393 (unspecified) EU802893"     
+## [100] "ph_331 (unspecified) EU802893"      
+## [101] "ph_408 (unspecified) EU802893"      
+## [102] "ph_459 (unspecified) EU802893"      
+## [103] "ph_4072 (unspecified) GU940773"     
+## [104] "ph_4072 (unspecified) HQ671891"     
+## [105] "ph_1258 (unspecified) AACY020207233"
+## [106] "ph_3164 (unspecified) AACY020207233"
+## [107] "ph_3164 (unspecified) AY663941"     
+## [108] "ph_3164 (unspecified) AY664000"     
+## [109] "ph_3164 (unspecified) AY664012"     
+## [110] "ph_3164 (unspecified) EF574484"     
+## [111] "ph_3164 (unspecified) EU802893"     
+## [112] "ph_3164 (unspecified) GQ377772"     
+## [113] "ph_3164 (unspecified) GU061586"     
+## [114] "ph_3164 (unspecified) GU119298"     
+## [115] "ph_3164 (unspecified) GU941055"
+```
+
 Move to separate file
-```{r}
+
+```r
 library(httr)
 subnetwork_from_selected <- function(obj,
                                      copy.graph.to.R = TRUE) {
@@ -463,20 +666,20 @@ subnetwork_from_selected <- function(obj,
 }
 
 newnet <- subnetwork_from_selected(cw2)
+```
 
+```
+## [1] "Cytoscape window Tara oceans with degree(1) successfully connected to R session and graph copied to R."
+```
+
+```r
 layoutNetwork(newnet, "force-directed")
 ```
 
-```{r, echo=FALSE}
-saveImage(newnet,
-          "co-occur_subnet",
-          "svg")
-```
 
 
-```{r, echo=FALSE, out.width = 1600, fig.retina = NULL}
-knitr::include_graphics("./co-occur_subnet.svg")
-```
+
+<img src="./co-occur_subnet.svg" width="1600" />
 
 
 ## Conclusion 
