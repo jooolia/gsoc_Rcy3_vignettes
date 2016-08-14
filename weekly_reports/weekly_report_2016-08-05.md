@@ -34,6 +34,6 @@ Things I did this week:
   - share screen to show what the problem is with clustermaker window
   - send reminder e-mail to Scooter regarding clusterMaker
   - blog post - a few people have seen it.
-  - submit issues for :scale issue for RCy3 and cyREST h parameter. 
+  - submit issues for both: scale issue for RCy3 and cyREST h parameter. 
   
   
