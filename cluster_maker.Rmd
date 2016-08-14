@@ -51,8 +51,12 @@ Graph from session is loaded into Cytoscape
 
 ```{r}
 getCommandsWithinNamespace(connect_window_to_R_session, "cluster/hierarchical")
+getCommandsWithinNamespace(connect_window_to_R_session, "cluster/getcluster")
+
 ```
 
+
+( from Scooter "cluster getcluster algorithm=hierarchical")
 
 ```{r}
 node_list <- list("gal1RGexp",
@@ -82,8 +86,27 @@ request.res <- GET(url = request.uri,
 request.res$url
 http_status(request.res)
 request.res$status_code
+
+
+command.name <- "getcluster"
+
+properties.list <- list(algorithm = "hierarchical",
+                        type = "node")
+
+request.uri <- paste(connect_window_to_R_session@uri,
+                     pluginVersion(cy),
+                     "commands/cluster",
+                     as.character(command.name),
+                     sep = "/")
+
+request.res <- GET(url = request.uri,
+                   query = properties.list,
+                   verbose())
+request.res$url
+http_status(request.res)
+request.res$status_code
 ```
 
-# Stuck here. Cannot get this to work. 
+Ok puts things into the network table in Cytoscape.
 
-- Cannot see clustermaker window in Cytoscape
+How to work with this?

@@ -74,6 +74,16 @@ getCommandsWithinNamespace(connect_window_to_R_session, "cluster/hierarchical")
 ## [10] "selectedOnly"      "showUI"            "zeroMissing"
 ```
 
+```r
+getCommandsWithinNamespace(connect_window_to_R_session, "cluster/getcluster")
+```
+
+```
+## [1] "algorithm" "network"   "type"
+```
+
+
+( from Scooter "cluster getcluster algorithm=hierarchical")
 
 
 ```r
@@ -131,6 +141,51 @@ request.res$status_code
 ## [1] 200
 ```
 
-# Stuck here. Cannot get this to work. 
+```r
+command.name <- "getcluster"
 
-- Cannot see clustermaker window in Cytoscape
+properties.list <- list(algorithm = "hierarchical",
+                        type = "node")
+
+request.uri <- paste(connect_window_to_R_session@uri,
+                     pluginVersion(cy),
+                     "commands/cluster",
+                     as.character(command.name),
+                     sep = "/")
+
+request.res <- GET(url = request.uri,
+                   query = properties.list,
+                   verbose())
+request.res$url
+```
+
+```
+## [1] "http://localhost:1234/v1/commands/cluster/getcluster?algorithm=hierarchical&type=node"
+```
+
+```r
+http_status(request.res)
+```
+
+```
+## $category
+## [1] "Success"
+## 
+## $reason
+## [1] "OK"
+## 
+## $message
+## [1] "Success: (200) OK"
+```
+
+```r
+request.res$status_code
+```
+
+```
+## [1] 200
+```
+
+Ok puts things into the network table in Cytoscape.
+
+How to work with this?
