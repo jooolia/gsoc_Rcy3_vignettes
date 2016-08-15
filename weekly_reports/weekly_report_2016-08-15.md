@@ -14,7 +14,13 @@ Things I did this week:
 
 ## Next week: 
 
-Get basic steps on vignettes done on:
+For final work product submission:
+
+- Either: 
+    - Create a web page or blog post that describes the work you've done and links to the commits you've made. If there is still work to be done on the project, include that too.
+    - If using Github, link to a list of the commits you made: https://github.com/jooolia/gsoc_Rcy3_vignettes/commits/master?author=jooolia , but also https://github.com/tmuetze/Bioconductor_RCy3_the_new_RCytoscape/commits/master?author=jooolia
+
+Get basic steps done on the following vignettes:
 
 - clusterMaker
     - quickly check to see if it is straightforward to work with info in the network table (almost feel it would be easier to run the clustering R and add as an attribute without using clustermaker2)
@@ -24,6 +30,7 @@ Get basic steps on vignettes done on:
     - will revisit the autoAnnotate 
     - will complete what I have and manually export wordcloud generated. 
     - wrap up what is working
+- make a plan for blog posts that will come out in September
 
 
 ## Mentor feedback
