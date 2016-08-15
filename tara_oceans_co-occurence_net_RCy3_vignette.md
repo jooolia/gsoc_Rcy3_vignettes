@@ -161,7 +161,7 @@ displayGraph(cw)
 layoutNetwork(cw)
 ```
 
-![](./co-occur0.svg)<!-- -->
+<img src="./co-occur0.png" width="1366" />
 
 # Colour network by prokaryotic phylum
 
@@ -190,7 +190,7 @@ setNodeColorRule(cw,
 displayGraph(cw)
 ```
 
-![](./co-occur0_1.svg)<!-- -->
+<img src="./co-occur0_1.png" width="1366" />
 
 ## Set node shape to reflect virus or prokaryote
 
@@ -217,7 +217,7 @@ setNodeShapeRule(cw,
 displayGraph(cw)
 ```
 
-![](./co-occur1.svg)<!-- -->
+<img src="./co-occur1.png" width="1366" />
 
 # Colour edges of phage nodes
 
@@ -248,7 +248,7 @@ setNodeBorderColorRule(cw,
 displayGraph(cw)
 ```
 
-![](./co-occur2.svg)<!-- -->
+<img src="./co-occur2.png" width="1366" />
 
 # Do layout to minimize overlap of nodes. 
 
@@ -342,7 +342,7 @@ layoutNetwork(cw,
               layout.name = 'allegro-spring-electric')
 ```
 
-![](./co-occur3.svg)<!-- -->
+<img src="./co-occur3.png" width="1366" />
 
 # Look at network properties
 
@@ -407,7 +407,7 @@ layoutNetwork(cw2,
 
 
 
-<img src="./co-occur_degree.svg" width="1600" />
+<img src="./co-occur_degree.png" width="1600" />
 
 # Select an interesting node and make a subnetwork
 
@@ -430,8 +430,8 @@ getSelectedNodes(cw2)
 ```
 
 ```
-##  [1] "ph_3164"  "ph_1392"  "ph_1808"  "ph_3901"  "ph_407"   "ph_4377" 
-##  [7] "ph_553"   "ph_765"   "ph_7661"  "GQ377772"
+##  [1] "ph_1392"  "ph_1808"  "ph_3901"  "ph_407"   "ph_4377"  "ph_553"  
+##  [7] "ph_765"   "ph_7661"  "GQ377772" "ph_3164"
 ```
 Now select the second neighbours of node "GQ377772".
 
@@ -441,11 +441,11 @@ getSelectedNodes(cw2)
 ```
 
 ```
-##  [1] "ph_3164"       "ph_1392"       "ph_1808"       "ph_3901"      
-##  [5] "ph_407"        "ph_4377"       "ph_553"        "ph_765"       
-##  [9] "ph_7661"       "AACY020207233" "AY663941"      "AY663999"     
-## [13] "AY664000"      "AY664012"      "EF574484"      "EU802893"     
-## [17] "GQ377772"      "GU061586"      "GU119298"      "GU941055"
+##  [1] "ph_1392"       "ph_1808"       "ph_3901"       "ph_407"       
+##  [5] "ph_4377"       "ph_553"        "ph_765"        "ph_7661"      
+##  [9] "AACY020207233" "AY663941"      "AY663999"      "AY664000"     
+## [13] "AY664012"      "EF574484"      "EU802893"      "GQ377772"     
+## [17] "GU061586"      "GU119298"      "GU941055"      "ph_3164"
 ```
 This has only selected the nodes, but not the edges in Cytoscape, so we will need to select all of the edges before we make the new subnetwork. 
 
@@ -467,121 +467,121 @@ getSelectedEdges(cw2)
 ```
 
 ```
-##   [1] "ph_1258 (unspecified) AACY020207233"
-##   [2] "ph_3164 (unspecified) AACY020207233"
-##   [3] "ph_3164 (unspecified) AY663941"     
-##   [4] "ph_3164 (unspecified) AY664000"     
-##   [5] "ph_3164 (unspecified) AY664012"     
-##   [6] "ph_3164 (unspecified) EF574484"     
-##   [7] "ph_3164 (unspecified) EU802893"     
-##   [8] "ph_3164 (unspecified) GQ377772"     
-##   [9] "ph_3164 (unspecified) GU061586"     
-##  [10] "ph_3164 (unspecified) GU119298"     
-##  [11] "ph_3164 (unspecified) GU941055"     
-##  [12] "ph_1703 (unspecified) AY663941"     
-##  [13] "ph_1703 (unspecified) EF574484"     
-##  [14] "ph_1703 (unspecified) EU802893"     
-##  [15] "ph_1703 (unspecified) GU119298"     
-##  [16] "ph_1871 (unspecified) GU119298"     
-##  [17] "ph_18855 (unspecified) EU802893"    
-##  [18] "ph_193 (unspecified) EU802893"      
-##  [19] "ph_24577 (unspecified) EF574484"    
-##  [20] "ph_24577 (unspecified) EU802893"    
-##  [21] "ph_24577 (unspecified) GU119298"    
-##  [22] "ph_3280 (unspecified) EU802893"     
-##  [23] "ph_36155 (unspecified) EU802893"    
-##  [24] "ph_36155 (unspecified) GU119298"    
-##  [25] "ph_5108 (unspecified) EU802893"     
-##  [26] "ph_5981 (unspecified) EU802893"     
-##  [27] "ph_675 (unspecified) EU802893"      
-##  [28] "ph_675 (unspecified) GU119298"      
-##  [29] "ph_841 (unspecified) EF574484"      
-##  [30] "ph_1095 (unspecified) AY663941"     
-##  [31] "ph_1095 (unspecified) AY664000"     
-##  [32] "ph_1095 (unspecified) AY664012"     
-##  [33] "ph_1186 (unspecified) AY663941"     
-##  [34] "ph_1186 (unspecified) AY663999"     
-##  [35] "ph_1186 (unspecified) AY664000"     
-##  [36] "ph_1186 (unspecified) AY664012"     
-##  [37] "ph_1186 (unspecified) EF574484"     
-##  [38] "ph_1205 (unspecified) AY663941"     
-##  [39] "ph_1205 (unspecified) AY663999"     
-##  [40] "ph_1205 (unspecified) AY664000"     
-##  [41] "ph_1205 (unspecified) AY664012"     
-##  [42] "ph_1205 (unspecified) EF574484"     
-##  [43] "ph_1392 (unspecified) AY663941"     
-##  [44] "ph_1392 (unspecified) AY664000"     
-##  [45] "ph_1392 (unspecified) AY664012"     
-##  [46] "ph_1392 (unspecified) EF574484"     
-##  [47] "ph_1392 (unspecified) GQ377772"     
-##  [48] "ph_1392 (unspecified) GU119298"     
-##  [49] "ph_1392 (unspecified) GU941055"     
-##  [50] "ph_1808 (unspecified) AY663941"     
-##  [51] "ph_1808 (unspecified) AY664000"     
-##  [52] "ph_1808 (unspecified) AY664012"     
-##  [53] "ph_1808 (unspecified) EF574484"     
-##  [54] "ph_1808 (unspecified) GQ377772"     
-##  [55] "ph_1808 (unspecified) GU119298"     
-##  [56] "ph_1808 (unspecified) GU941055"     
-##  [57] "ph_3901 (unspecified) AY663941"     
-##  [58] "ph_3901 (unspecified) AY664000"     
-##  [59] "ph_3901 (unspecified) AY664012"     
-##  [60] "ph_3901 (unspecified) EF574484"     
-##  [61] "ph_3901 (unspecified) GQ377772"     
-##  [62] "ph_3901 (unspecified) GU119298"     
-##  [63] "ph_3901 (unspecified) GU941055"     
-##  [64] "ph_407 (unspecified) AY663941"      
-##  [65] "ph_407 (unspecified) AY664000"      
-##  [66] "ph_407 (unspecified) AY664012"      
-##  [67] "ph_407 (unspecified) EF574484"      
-##  [68] "ph_407 (unspecified) GQ377772"      
-##  [69] "ph_407 (unspecified) GU119298"      
-##  [70] "ph_407 (unspecified) GU941055"      
-##  [71] "ph_4377 (unspecified) AY663941"     
-##  [72] "ph_4377 (unspecified) AY663999"     
-##  [73] "ph_4377 (unspecified) AY664000"     
-##  [74] "ph_4377 (unspecified) AY664012"     
-##  [75] "ph_4377 (unspecified) EF574484"     
-##  [76] "ph_4377 (unspecified) GQ377772"     
-##  [77] "ph_4377 (unspecified) GU061586"     
-##  [78] "ph_4377 (unspecified) GU119298"     
-##  [79] "ph_4377 (unspecified) GU941055"     
-##  [80] "ph_553 (unspecified) AY663941"      
-##  [81] "ph_553 (unspecified) AY664000"      
-##  [82] "ph_553 (unspecified) AY664012"      
-##  [83] "ph_553 (unspecified) EF574484"      
-##  [84] "ph_553 (unspecified) GQ377772"      
-##  [85] "ph_553 (unspecified) GU119298"      
-##  [86] "ph_553 (unspecified) GU941055"      
-##  [87] "ph_765 (unspecified) AY663941"      
-##  [88] "ph_765 (unspecified) EF574484"      
-##  [89] "ph_765 (unspecified) EU802893"      
-##  [90] "ph_765 (unspecified) GQ377772"      
-##  [91] "ph_765 (unspecified) GU119298"      
-##  [92] "ph_1431 (unspecified) AY663999"     
-##  [93] "ph_1431 (unspecified) GU061586"     
-##  [94] "ph_6665 (unspecified) AY663999"     
-##  [95] "ph_6665 (unspecified) EF574484"     
-##  [96] "ph_6665 (unspecified) GU061586"     
-##  [97] "ph_2435 (unspecified) AY664012"     
-##  [98] "ph_2435 (unspecified) GU119298"     
-##  [99] "ph_2435 (unspecified) GU941055"     
-## [100] "ph_3450 (unspecified) AY664012"     
-## [101] "ph_4276 (unspecified) AY664012"     
-## [102] "ph_4276 (unspecified) EF574484"     
-## [103] "ph_4358 (unspecified) AY664012"     
-## [104] "ph_7661 (unspecified) AY664012"     
-## [105] "ph_7661 (unspecified) GQ377772"     
-## [106] "ph_7661 (unspecified) GU119298"     
-## [107] "ph_11583 (unspecified) EF574484"    
-## [108] "ph_16719 (unspecified) EF574484"    
-## [109] "ph_16719 (unspecified) GU119298"    
-## [110] "ph_2393 (unspecified) EU802893"     
-## [111] "ph_331 (unspecified) EU802893"      
-## [112] "ph_408 (unspecified) EU802893"      
-## [113] "ph_459 (unspecified) EU802893"      
-## [114] "ph_4072 (unspecified) GU940773"     
-## [115] "ph_4072 (unspecified) HQ671891"
+##   [1] "ph_1703 (unspecified) AY663941"     
+##   [2] "ph_1703 (unspecified) EF574484"     
+##   [3] "ph_1703 (unspecified) EU802893"     
+##   [4] "ph_1703 (unspecified) GU119298"     
+##   [5] "ph_1871 (unspecified) GU119298"     
+##   [6] "ph_18855 (unspecified) EU802893"    
+##   [7] "ph_193 (unspecified) EU802893"      
+##   [8] "ph_24577 (unspecified) EF574484"    
+##   [9] "ph_24577 (unspecified) EU802893"    
+##  [10] "ph_24577 (unspecified) GU119298"    
+##  [11] "ph_3280 (unspecified) EU802893"     
+##  [12] "ph_36155 (unspecified) EU802893"    
+##  [13] "ph_36155 (unspecified) GU119298"    
+##  [14] "ph_5108 (unspecified) EU802893"     
+##  [15] "ph_5981 (unspecified) EU802893"     
+##  [16] "ph_675 (unspecified) EU802893"      
+##  [17] "ph_675 (unspecified) GU119298"      
+##  [18] "ph_841 (unspecified) EF574484"      
+##  [19] "ph_1095 (unspecified) AY663941"     
+##  [20] "ph_1095 (unspecified) AY664000"     
+##  [21] "ph_1095 (unspecified) AY664012"     
+##  [22] "ph_1186 (unspecified) AY663941"     
+##  [23] "ph_1186 (unspecified) AY663999"     
+##  [24] "ph_1186 (unspecified) AY664000"     
+##  [25] "ph_1186 (unspecified) AY664012"     
+##  [26] "ph_1186 (unspecified) EF574484"     
+##  [27] "ph_1205 (unspecified) AY663941"     
+##  [28] "ph_1205 (unspecified) AY663999"     
+##  [29] "ph_1205 (unspecified) AY664000"     
+##  [30] "ph_1205 (unspecified) AY664012"     
+##  [31] "ph_1205 (unspecified) EF574484"     
+##  [32] "ph_1392 (unspecified) AY663941"     
+##  [33] "ph_1392 (unspecified) AY664000"     
+##  [34] "ph_1392 (unspecified) AY664012"     
+##  [35] "ph_1392 (unspecified) EF574484"     
+##  [36] "ph_1392 (unspecified) GQ377772"     
+##  [37] "ph_1392 (unspecified) GU119298"     
+##  [38] "ph_1392 (unspecified) GU941055"     
+##  [39] "ph_1808 (unspecified) AY663941"     
+##  [40] "ph_1808 (unspecified) AY664000"     
+##  [41] "ph_1808 (unspecified) AY664012"     
+##  [42] "ph_1808 (unspecified) EF574484"     
+##  [43] "ph_1808 (unspecified) GQ377772"     
+##  [44] "ph_1808 (unspecified) GU119298"     
+##  [45] "ph_1808 (unspecified) GU941055"     
+##  [46] "ph_3901 (unspecified) AY663941"     
+##  [47] "ph_3901 (unspecified) AY664000"     
+##  [48] "ph_3901 (unspecified) AY664012"     
+##  [49] "ph_3901 (unspecified) EF574484"     
+##  [50] "ph_3901 (unspecified) GQ377772"     
+##  [51] "ph_3901 (unspecified) GU119298"     
+##  [52] "ph_3901 (unspecified) GU941055"     
+##  [53] "ph_407 (unspecified) AY663941"      
+##  [54] "ph_407 (unspecified) AY664000"      
+##  [55] "ph_407 (unspecified) AY664012"      
+##  [56] "ph_407 (unspecified) EF574484"      
+##  [57] "ph_407 (unspecified) GQ377772"      
+##  [58] "ph_407 (unspecified) GU119298"      
+##  [59] "ph_407 (unspecified) GU941055"      
+##  [60] "ph_4377 (unspecified) AY663941"     
+##  [61] "ph_4377 (unspecified) AY663999"     
+##  [62] "ph_4377 (unspecified) AY664000"     
+##  [63] "ph_4377 (unspecified) AY664012"     
+##  [64] "ph_4377 (unspecified) EF574484"     
+##  [65] "ph_4377 (unspecified) GQ377772"     
+##  [66] "ph_4377 (unspecified) GU061586"     
+##  [67] "ph_4377 (unspecified) GU119298"     
+##  [68] "ph_4377 (unspecified) GU941055"     
+##  [69] "ph_553 (unspecified) AY663941"      
+##  [70] "ph_553 (unspecified) AY664000"      
+##  [71] "ph_553 (unspecified) AY664012"      
+##  [72] "ph_553 (unspecified) EF574484"      
+##  [73] "ph_553 (unspecified) GQ377772"      
+##  [74] "ph_553 (unspecified) GU119298"      
+##  [75] "ph_553 (unspecified) GU941055"      
+##  [76] "ph_765 (unspecified) AY663941"      
+##  [77] "ph_765 (unspecified) EF574484"      
+##  [78] "ph_765 (unspecified) EU802893"      
+##  [79] "ph_765 (unspecified) GQ377772"      
+##  [80] "ph_765 (unspecified) GU119298"      
+##  [81] "ph_1431 (unspecified) AY663999"     
+##  [82] "ph_1431 (unspecified) GU061586"     
+##  [83] "ph_6665 (unspecified) AY663999"     
+##  [84] "ph_6665 (unspecified) EF574484"     
+##  [85] "ph_6665 (unspecified) GU061586"     
+##  [86] "ph_2435 (unspecified) AY664012"     
+##  [87] "ph_2435 (unspecified) GU119298"     
+##  [88] "ph_2435 (unspecified) GU941055"     
+##  [89] "ph_3450 (unspecified) AY664012"     
+##  [90] "ph_4276 (unspecified) AY664012"     
+##  [91] "ph_4276 (unspecified) EF574484"     
+##  [92] "ph_4358 (unspecified) AY664012"     
+##  [93] "ph_7661 (unspecified) AY664012"     
+##  [94] "ph_7661 (unspecified) GQ377772"     
+##  [95] "ph_7661 (unspecified) GU119298"     
+##  [96] "ph_11583 (unspecified) EF574484"    
+##  [97] "ph_16719 (unspecified) EF574484"    
+##  [98] "ph_16719 (unspecified) GU119298"    
+##  [99] "ph_2393 (unspecified) EU802893"     
+## [100] "ph_331 (unspecified) EU802893"      
+## [101] "ph_408 (unspecified) EU802893"      
+## [102] "ph_459 (unspecified) EU802893"      
+## [103] "ph_4072 (unspecified) GU940773"     
+## [104] "ph_4072 (unspecified) HQ671891"     
+## [105] "ph_1258 (unspecified) AACY020207233"
+## [106] "ph_3164 (unspecified) AACY020207233"
+## [107] "ph_3164 (unspecified) AY663941"     
+## [108] "ph_3164 (unspecified) AY664000"     
+## [109] "ph_3164 (unspecified) AY664012"     
+## [110] "ph_3164 (unspecified) EF574484"     
+## [111] "ph_3164 (unspecified) EU802893"     
+## [112] "ph_3164 (unspecified) GQ377772"     
+## [113] "ph_3164 (unspecified) GU061586"     
+## [114] "ph_3164 (unspecified) GU119298"     
+## [115] "ph_3164 (unspecified) GU941055"
 ```
 
 
@@ -665,7 +665,7 @@ layoutNetwork(newnet, "force-directed")
 
 
 
-<img src="./co-occur_subnet.svg" width="1600" />
+<img src="./co-occur_subnet.png" width="1600" />
 
 ## Conclusion 
 

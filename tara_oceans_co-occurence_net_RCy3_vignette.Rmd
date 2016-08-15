@@ -164,8 +164,8 @@ layoutNetwork(cw)
 ```{r, echo=FALSE}
 saveImage(cw,
           "co-occur0",
-          "svg")
-knitr::include_graphics("./co-occur0.svg")
+          "png")
+knitr::include_graphics("./co-occur0.png")
 ```
 
 # Colour network by prokaryotic phylum
@@ -192,8 +192,8 @@ displayGraph(cw)
 ```{r, echo=FALSE}
 saveImage(cw,
           "co-occur0_1",
-          "svg")
-knitr::include_graphics("./co-occur0_1.svg")
+          "png")
+knitr::include_graphics("./co-occur0_1.png")
 ```
 
 ## Set node shape to reflect virus or prokaryote
@@ -218,8 +218,8 @@ displayGraph(cw)
 ```{r, echo=FALSE}
 saveImage(cw,
           "co-occur1",
-          "svg")
-knitr::include_graphics("./co-occur1.svg")
+          "png")
+knitr::include_graphics("./co-occur1.png")
 ```
 
 # Colour edges of phage nodes
@@ -248,8 +248,8 @@ displayGraph(cw)
 ```{r, echo=FALSE}
 saveImage(cw,
           "co-occur2",
-          "svg")
-knitr::include_graphics("./co-occur2.svg")
+          "png")
+knitr::include_graphics("./co-occur2.png")
 ```
 
 # Do layout to minimize overlap of nodes. 
@@ -281,8 +281,8 @@ layoutNetwork(cw,
 ```{r, echo=FALSE}
 saveImage(cw,
           "co-occur3",
-          "svg")
-knitr::include_graphics("./co-occur3.svg")
+          "png")
+knitr::include_graphics("./co-occur3.png")
 ```
 
 # Look at network properties
@@ -337,12 +337,12 @@ layoutNetwork(cw2,
 ```{r, echo=FALSE}
 saveImage(cw2,
           "co-occur_degree",
-          "svg")
+          "png")
 ```
 
 
 ```{r, out.width = 1600, fig.retina = NULL, echo=FALSE}
-knitr::include_graphics("./co-occur_degree.svg")
+knitr::include_graphics("./co-occur_degree.png")
 ```
 
 # Select an interesting node and make a subnetwork
@@ -455,11 +455,11 @@ layoutNetwork(newnet, "force-directed")
 ```{r, echo=FALSE}
 saveImage(newnet,
           "co-occur_subnet",
-          "svg")
+          "png")
 ```
 
 ```{r, echo=FALSE, out.width = 1600, fig.retina = NULL}
-knitr::include_graphics("./co-occur_subnet.svg")
+knitr::include_graphics("./co-occur_subnet.png")
 ```
 
 ## Conclusion 
