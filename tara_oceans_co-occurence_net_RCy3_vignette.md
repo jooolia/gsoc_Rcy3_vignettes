@@ -159,9 +159,10 @@ cw <- CytoscapeWindow("Tara oceans",
 ```r
 displayGraph(cw)
 layoutNetwork(cw)
+fitContent(cw)
 ```
 
-<img src="./co-occur0.png" width="1366" />
+<img src="./co-occur0.png" width="1951" />
 
 # Colour network by prokaryotic phylum
 
@@ -185,12 +186,24 @@ setNodeColorRule(cw,
 ## Successfully set rule.
 ```
 
+Also nodes and fonts were a bit small. Let's increase that. 
+
+
+```r
+#setDefaultNodeSize (cw, 90) # an intermediate value
+#setDefaultNodeFontSize(cw, 20)
+```
+
+
+
 
 ```r
 displayGraph(cw)
+layoutNetwork(cw)
+fitContent(cw)
 ```
 
-<img src="./co-occur0_1.png" width="1366" />
+<img src="./co-occur0_1.png" width="1951" />
 
 ## Set node shape to reflect virus or prokaryote
 
@@ -215,9 +228,10 @@ setNodeShapeRule(cw,
 
 ```r
 displayGraph(cw)
+fitContent(cw)
 ```
 
-<img src="./co-occur1.png" width="1366" />
+<img src="./co-occur1.png" width="1951" />
 
 # Colour edges of phage nodes
 
@@ -225,7 +239,7 @@ The classification of the viral data was done in a very conservative manner so n
 
 
 ```r
-setDefaultNodeBorderWidth (cw, 5)
+setDefaultNodeBorderWidth(cw, 5)
 families_to_colour <- c(" Podoviridae",
                         " Siphoviridae",
                         " Myoviridae")
@@ -246,9 +260,10 @@ setNodeBorderColorRule(cw,
 
 ```r
 displayGraph(cw)
+fitContent(cw)
 ```
 
-<img src="./co-occur2.png" width="1366" />
+<img src="./co-occur2.png" width="1951" />
 
 # Do layout to minimize overlap of nodes. 
 
@@ -258,7 +273,7 @@ Using RCy3 to drive Cytoscape, if we are not sure what the current values are fo
 
 
 ```r
-getLayoutNames(cy)
+getLayoutNames(cw)
 ```
 
 ```
@@ -342,7 +357,7 @@ layoutNetwork(cw,
               layout.name = 'allegro-spring-electric')
 ```
 
-<img src="./co-occur3.png" width="1366" />
+<img src="./co-occur3.png" width="1951" />
 
 # Look at network properties
 
@@ -430,8 +445,8 @@ getSelectedNodes(cw2)
 ```
 
 ```
-##  [1] "ph_1392"  "ph_1808"  "ph_3901"  "ph_407"   "ph_4377"  "ph_553"  
-##  [7] "ph_765"   "ph_7661"  "GQ377772" "ph_3164"
+##  [1] "ph_3164"  "ph_1392"  "ph_1808"  "ph_3901"  "ph_407"   "ph_4377" 
+##  [7] "ph_553"   "ph_765"   "ph_7661"  "GQ377772"
 ```
 Now select the second neighbours of node "GQ377772".
 
@@ -441,217 +456,22 @@ getSelectedNodes(cw2)
 ```
 
 ```
-##  [1] "ph_1392"       "ph_1808"       "ph_3901"       "ph_407"       
-##  [5] "ph_4377"       "ph_553"        "ph_765"        "ph_7661"      
-##  [9] "AACY020207233" "AY663941"      "AY663999"      "AY664000"     
-## [13] "AY664012"      "EF574484"      "EU802893"      "GQ377772"     
-## [17] "GU061586"      "GU119298"      "GU941055"      "ph_3164"
+##  [1] "ph_3164"       "ph_1392"       "ph_1808"       "ph_3901"      
+##  [5] "ph_407"        "ph_4377"       "ph_553"        "ph_765"       
+##  [9] "ph_7661"       "AACY020207233" "AY663941"      "AY663999"     
+## [13] "AY664000"      "AY664012"      "EF574484"      "EU802893"     
+## [17] "GQ377772"      "GU061586"      "GU119298"      "GU941055"
 ```
 This has only selected the nodes, but not the edges in Cytoscape, so we will need to select all of the edges before we make the new subnetwork. 
 
 ```r
-selectEdgesConnectedBySelectedNodes <- function(c_w) {
- selectedNodes = getSelectedNodes(c_w)
- if (length (selectedNodes) == 1 && is.na (selectedNodes))
-   return ()
- graphEdges <- getAllEdges(c_w)  
- selectedEdges <- unlist(mapply(function(x) return(graphEdges [grep(x, graphEdges)]), selectedNodes)) 
- if (length (selectedEdges) > 0)
-    selectEdges(c_w, selectedEdges)
- }
-# END selectEdgesConnectedBySelectedNodes	
+source("./functions_to_add_to_RCy3/subnetwork_stuff.R")
 
 selectEdgesConnectedBySelectedNodes(cw2)
-
-getSelectedEdges(cw2)
-```
-
-```
-##   [1] "ph_1703 (unspecified) AY663941"     
-##   [2] "ph_1703 (unspecified) EF574484"     
-##   [3] "ph_1703 (unspecified) EU802893"     
-##   [4] "ph_1703 (unspecified) GU119298"     
-##   [5] "ph_1871 (unspecified) GU119298"     
-##   [6] "ph_18855 (unspecified) EU802893"    
-##   [7] "ph_193 (unspecified) EU802893"      
-##   [8] "ph_24577 (unspecified) EF574484"    
-##   [9] "ph_24577 (unspecified) EU802893"    
-##  [10] "ph_24577 (unspecified) GU119298"    
-##  [11] "ph_3280 (unspecified) EU802893"     
-##  [12] "ph_36155 (unspecified) EU802893"    
-##  [13] "ph_36155 (unspecified) GU119298"    
-##  [14] "ph_5108 (unspecified) EU802893"     
-##  [15] "ph_5981 (unspecified) EU802893"     
-##  [16] "ph_675 (unspecified) EU802893"      
-##  [17] "ph_675 (unspecified) GU119298"      
-##  [18] "ph_841 (unspecified) EF574484"      
-##  [19] "ph_1095 (unspecified) AY663941"     
-##  [20] "ph_1095 (unspecified) AY664000"     
-##  [21] "ph_1095 (unspecified) AY664012"     
-##  [22] "ph_1186 (unspecified) AY663941"     
-##  [23] "ph_1186 (unspecified) AY663999"     
-##  [24] "ph_1186 (unspecified) AY664000"     
-##  [25] "ph_1186 (unspecified) AY664012"     
-##  [26] "ph_1186 (unspecified) EF574484"     
-##  [27] "ph_1205 (unspecified) AY663941"     
-##  [28] "ph_1205 (unspecified) AY663999"     
-##  [29] "ph_1205 (unspecified) AY664000"     
-##  [30] "ph_1205 (unspecified) AY664012"     
-##  [31] "ph_1205 (unspecified) EF574484"     
-##  [32] "ph_1392 (unspecified) AY663941"     
-##  [33] "ph_1392 (unspecified) AY664000"     
-##  [34] "ph_1392 (unspecified) AY664012"     
-##  [35] "ph_1392 (unspecified) EF574484"     
-##  [36] "ph_1392 (unspecified) GQ377772"     
-##  [37] "ph_1392 (unspecified) GU119298"     
-##  [38] "ph_1392 (unspecified) GU941055"     
-##  [39] "ph_1808 (unspecified) AY663941"     
-##  [40] "ph_1808 (unspecified) AY664000"     
-##  [41] "ph_1808 (unspecified) AY664012"     
-##  [42] "ph_1808 (unspecified) EF574484"     
-##  [43] "ph_1808 (unspecified) GQ377772"     
-##  [44] "ph_1808 (unspecified) GU119298"     
-##  [45] "ph_1808 (unspecified) GU941055"     
-##  [46] "ph_3901 (unspecified) AY663941"     
-##  [47] "ph_3901 (unspecified) AY664000"     
-##  [48] "ph_3901 (unspecified) AY664012"     
-##  [49] "ph_3901 (unspecified) EF574484"     
-##  [50] "ph_3901 (unspecified) GQ377772"     
-##  [51] "ph_3901 (unspecified) GU119298"     
-##  [52] "ph_3901 (unspecified) GU941055"     
-##  [53] "ph_407 (unspecified) AY663941"      
-##  [54] "ph_407 (unspecified) AY664000"      
-##  [55] "ph_407 (unspecified) AY664012"      
-##  [56] "ph_407 (unspecified) EF574484"      
-##  [57] "ph_407 (unspecified) GQ377772"      
-##  [58] "ph_407 (unspecified) GU119298"      
-##  [59] "ph_407 (unspecified) GU941055"      
-##  [60] "ph_4377 (unspecified) AY663941"     
-##  [61] "ph_4377 (unspecified) AY663999"     
-##  [62] "ph_4377 (unspecified) AY664000"     
-##  [63] "ph_4377 (unspecified) AY664012"     
-##  [64] "ph_4377 (unspecified) EF574484"     
-##  [65] "ph_4377 (unspecified) GQ377772"     
-##  [66] "ph_4377 (unspecified) GU061586"     
-##  [67] "ph_4377 (unspecified) GU119298"     
-##  [68] "ph_4377 (unspecified) GU941055"     
-##  [69] "ph_553 (unspecified) AY663941"      
-##  [70] "ph_553 (unspecified) AY664000"      
-##  [71] "ph_553 (unspecified) AY664012"      
-##  [72] "ph_553 (unspecified) EF574484"      
-##  [73] "ph_553 (unspecified) GQ377772"      
-##  [74] "ph_553 (unspecified) GU119298"      
-##  [75] "ph_553 (unspecified) GU941055"      
-##  [76] "ph_765 (unspecified) AY663941"      
-##  [77] "ph_765 (unspecified) EF574484"      
-##  [78] "ph_765 (unspecified) EU802893"      
-##  [79] "ph_765 (unspecified) GQ377772"      
-##  [80] "ph_765 (unspecified) GU119298"      
-##  [81] "ph_1431 (unspecified) AY663999"     
-##  [82] "ph_1431 (unspecified) GU061586"     
-##  [83] "ph_6665 (unspecified) AY663999"     
-##  [84] "ph_6665 (unspecified) EF574484"     
-##  [85] "ph_6665 (unspecified) GU061586"     
-##  [86] "ph_2435 (unspecified) AY664012"     
-##  [87] "ph_2435 (unspecified) GU119298"     
-##  [88] "ph_2435 (unspecified) GU941055"     
-##  [89] "ph_3450 (unspecified) AY664012"     
-##  [90] "ph_4276 (unspecified) AY664012"     
-##  [91] "ph_4276 (unspecified) EF574484"     
-##  [92] "ph_4358 (unspecified) AY664012"     
-##  [93] "ph_7661 (unspecified) AY664012"     
-##  [94] "ph_7661 (unspecified) GQ377772"     
-##  [95] "ph_7661 (unspecified) GU119298"     
-##  [96] "ph_11583 (unspecified) EF574484"    
-##  [97] "ph_16719 (unspecified) EF574484"    
-##  [98] "ph_16719 (unspecified) GU119298"    
-##  [99] "ph_2393 (unspecified) EU802893"     
-## [100] "ph_331 (unspecified) EU802893"      
-## [101] "ph_408 (unspecified) EU802893"      
-## [102] "ph_459 (unspecified) EU802893"      
-## [103] "ph_4072 (unspecified) GU940773"     
-## [104] "ph_4072 (unspecified) HQ671891"     
-## [105] "ph_1258 (unspecified) AACY020207233"
-## [106] "ph_3164 (unspecified) AACY020207233"
-## [107] "ph_3164 (unspecified) AY663941"     
-## [108] "ph_3164 (unspecified) AY664000"     
-## [109] "ph_3164 (unspecified) AY664012"     
-## [110] "ph_3164 (unspecified) EF574484"     
-## [111] "ph_3164 (unspecified) EU802893"     
-## [112] "ph_3164 (unspecified) GQ377772"     
-## [113] "ph_3164 (unspecified) GU061586"     
-## [114] "ph_3164 (unspecified) GU119298"     
-## [115] "ph_3164 (unspecified) GU941055"
 ```
 
 
 ```r
-## function to create a subnetwork from selected nodes
-subnetwork_from_selected <- function(obj,
-                                     copy.graph.to.R = TRUE) {
-  ## get selected nodes
-  resource.uri <- paste(obj@uri,
-                        pluginVersion(obj),
-                        "networks",
-                        obj@window.id,
-                        "nodes?column=selected&query=true",
-                        sep = "/")
-  request.res <- GET(url = resource.uri)
-  
-  selected.node.SUIDs <- fromJSON(rawToChar(request.res$content))
-  
-  selected_node_SUIDs.json <- toJSON(selected.node.SUIDs)
-  
-  ## create new network from the selected nodes
-  resource.uri <- paste(obj@uri,
-                        pluginVersion(obj),
-                        "networks",
-                        obj@window.id,
-                        sep = "/")
-  request.res <- POST(resource.uri,
-                      body = selected_node_SUIDs.json,
-                      encode = "json")
-  
-  ## connect to this new network
-  resource.uri <- paste(cy@uri,
-                        pluginVersion(cy),
-                        "networks",
-                        sep = "/")
-  request.res <- GET(resource.uri)
-  # SUIDs list of the existing Cytoscape networks	
-  cy.networks.SUIDs <- fromJSON(rawToChar(request.res$content))
-  # most recently made will have the highest SUID
-  cy.networks.SUIDs.last <- max(cy.networks.SUIDs)
-  
-  res.uri.last <- paste(cy@uri,
-                        pluginVersion(cy),
-                        "networks",
-                        as.character(cy.networks.SUIDs.last),
-                        sep = "/")
-  result <- GET(res.uri.last)
-  net.name <- fromJSON(rawToChar(result$content))$data$name
-  
-  if (copy.graph.to.R){
-    subnetwork_from_selected <- existing.CytoscapeWindow(net.name,
-                                                         copy.graph.from.cytoscape.to.R = TRUE)
-    
-    print(paste("Cytoscape window",
-                net.name,
-                "successfully connected to R session and graph copied to R."))
-  } 
-  else {
-    subnetwork_from_selected <- existing.CytoscapeWindow(net.name,
-                                                         copy.graph.from.cytoscape.to.R = FALSE) 
-    print(paste0("Cytoscape window ",
-                 net.name,
-                 " successfully connected to R session."))
-  }
-  
-  invisible(request.res)
-  return(subnetwork_from_selected)    
-  
-}
-
 newnet <- subnetwork_from_selected(cw2)
 ```
 

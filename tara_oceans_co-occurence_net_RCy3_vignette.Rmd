@@ -159,12 +159,14 @@ cw <- CytoscapeWindow("Tara oceans",
 ```{r, message=FALSE, results="hide"}
 displayGraph(cw)
 layoutNetwork(cw)
+fitContent(cw)
 ```
 
 ```{r, echo=FALSE}
 saveImage(cw,
           "co-occur0",
-          "png")
+          "png",
+          h=2000)
 knitr::include_graphics("./co-occur0.png")
 ```
 
@@ -185,14 +187,26 @@ setNodeColorRule(cw,
                  default.color='#ffffff')
 ```
 
+Also nodes and fonts were a bit small. Let's increase that. 
+
+```{r}
+#setDefaultNodeSize (cw, 90) # an intermediate value
+#setDefaultNodeFontSize(cw, 20)
+```
+
+
+
 ```{r, message=FALSE, results="hide"}
 displayGraph(cw)
+layoutNetwork(cw)
+fitContent(cw)
 ```
 
 ```{r, echo=FALSE}
 saveImage(cw,
           "co-occur0_1",
-          "png")
+          "png",
+          h = 2000)
 knitr::include_graphics("./co-occur0_1.png")
 ```
 
@@ -213,12 +227,14 @@ setNodeShapeRule(cw,
 
 ```{r, message=FALSE, results="hide"}
 displayGraph(cw)
+fitContent(cw)
 ```
 
 ```{r, echo=FALSE}
 saveImage(cw,
           "co-occur1",
-          "png")
+          "png",
+          h = 2000)
 knitr::include_graphics("./co-occur1.png")
 ```
 
@@ -227,7 +243,7 @@ knitr::include_graphics("./co-occur1.png")
 The classification of the viral data was done in a very conservative manner so not a lot of the viral nodes were classified. However, if we do want to add some of this information  to our visualization we can colour the edges of the viral nodes by family. The main families that were identified in this dataset are the *Podoviridae*, the *Siphoviridae* and the *Myoviridae* (for more info see [NCBI Podoviridae](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=10744&lvl=3&p=7&lin=f&keep=1&srchmode=1&unlock), [NCBI Myoviridae](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Tree&id=10662&lvl=3&p=7&lin=f&keep=1&srchmode=1&unlock), and [NCBI Siphoviridae](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Tree&id=10699&lvl=3&p=7&lin=f&keep=1&srchmode=1&unlock))
 
 ```{r}
-setDefaultNodeBorderWidth (cw, 5)
+setDefaultNodeBorderWidth(cw, 5)
 families_to_colour <- c(" Podoviridae",
                         " Siphoviridae",
                         " Myoviridae")
@@ -243,12 +259,14 @@ setNodeBorderColorRule(cw,
 
 ```{r, message=FALSE, results="hide"}
 displayGraph(cw)
+fitContent(cw)
 ```
 
 ```{r, echo=FALSE}
 saveImage(cw,
           "co-occur2",
-          "png")
+          "png",
+          h = 2000)
 knitr::include_graphics("./co-occur2.png")
 ```
 
@@ -259,7 +277,7 @@ After doing all of this colouring to the network we would like to layout the net
 Using RCy3 to drive Cytoscape, if we are not sure what the current values are for a layout or we are not sure what kinds of values are accepted for the different parameters of our layout, we can investigate using the RCy3 functions `getLayoutPropertyNames()` and then `getLayoutPropertyValue()`.
 
 ```{r}
-getLayoutNames(cy)
+getLayoutNames(cw)
 
 getLayoutPropertyNames(cw, layout.name = 'allegro-spring-electric')
 getLayoutPropertyValue(cw, 'allegro-spring-electric',"gravity") 
@@ -279,9 +297,11 @@ layoutNetwork(cw,
 ```
 
 ```{r, echo=FALSE}
+fitContent(cw)
 saveImage(cw,
           "co-occur3",
-          "png")
+          "png", 
+          h = 2000)
 knitr::include_graphics("./co-occur3.png")
 ```
 
@@ -335,9 +355,12 @@ layoutNetwork(cw2,
 
 
 ```{r, echo=FALSE}
+fitContent(cw2)
+Sys.sleep(10)
+fitContent(cw2)
 saveImage(cw2,
           "co-occur_degree",
-          "png")
+          "png", h=2000)
 ```
 
 
@@ -364,88 +387,13 @@ getSelectedNodes(cw2)
 ```
 This has only selected the nodes, but not the edges in Cytoscape, so we will need to select all of the edges before we make the new subnetwork. 
 ```{r}
-selectEdgesConnectedBySelectedNodes <- function(c_w) {
- selectedNodes = getSelectedNodes(c_w)
- if (length (selectedNodes) == 1 && is.na (selectedNodes))
-   return ()
- graphEdges <- getAllEdges(c_w)  
- selectedEdges <- unlist(mapply(function(x) return(graphEdges [grep(x, graphEdges)]), selectedNodes)) 
- if (length (selectedEdges) > 0)
-    selectEdges(c_w, selectedEdges)
- }
-# END selectEdgesConnectedBySelectedNodes	
+source("./functions_to_add_to_RCy3/subnetwork_stuff.R")
 
 selectEdgesConnectedBySelectedNodes(cw2)
-
-getSelectedEdges(cw2)
 ```
 
 ```{r}
-## function to create a subnetwork from selected nodes
-subnetwork_from_selected <- function(obj,
-                                     copy.graph.to.R = TRUE) {
-  ## get selected nodes
-  resource.uri <- paste(obj@uri,
-                        pluginVersion(obj),
-                        "networks",
-                        obj@window.id,
-                        "nodes?column=selected&query=true",
-                        sep = "/")
-  request.res <- GET(url = resource.uri)
-  
-  selected.node.SUIDs <- fromJSON(rawToChar(request.res$content))
-  
-  selected_node_SUIDs.json <- toJSON(selected.node.SUIDs)
-  
-  ## create new network from the selected nodes
-  resource.uri <- paste(obj@uri,
-                        pluginVersion(obj),
-                        "networks",
-                        obj@window.id,
-                        sep = "/")
-  request.res <- POST(resource.uri,
-                      body = selected_node_SUIDs.json,
-                      encode = "json")
-  
-  ## connect to this new network
-  resource.uri <- paste(cy@uri,
-                        pluginVersion(cy),
-                        "networks",
-                        sep = "/")
-  request.res <- GET(resource.uri)
-  # SUIDs list of the existing Cytoscape networks	
-  cy.networks.SUIDs <- fromJSON(rawToChar(request.res$content))
-  # most recently made will have the highest SUID
-  cy.networks.SUIDs.last <- max(cy.networks.SUIDs)
-  
-  res.uri.last <- paste(cy@uri,
-                        pluginVersion(cy),
-                        "networks",
-                        as.character(cy.networks.SUIDs.last),
-                        sep = "/")
-  result <- GET(res.uri.last)
-  net.name <- fromJSON(rawToChar(result$content))$data$name
-  
-  if (copy.graph.to.R){
-    subnetwork_from_selected <- existing.CytoscapeWindow(net.name,
-                                                         copy.graph.from.cytoscape.to.R = TRUE)
-    
-    print(paste("Cytoscape window",
-                net.name,
-                "successfully connected to R session and graph copied to R."))
-  } 
-  else {
-    subnetwork_from_selected <- existing.CytoscapeWindow(net.name,
-                                                         copy.graph.from.cytoscape.to.R = FALSE) 
-    print(paste0("Cytoscape window ",
-                 net.name,
-                 " successfully connected to R session."))
-  }
-  
-  invisible(request.res)
-  return(subnetwork_from_selected)    
-  
-}
+
 
 newnet <- subnetwork_from_selected(cw2)
 
@@ -453,9 +401,12 @@ layoutNetwork(newnet, "force-directed")
 ```
 
 ```{r, echo=FALSE}
+fitContent(newnet)
+Sys.sleep(10)
 saveImage(newnet,
           "co-occur_subnet",
-          "png")
+          "png",
+          h = 2000)
 ```
 
 ```{r, echo=FALSE, out.width = 1600, fig.retina = NULL}
