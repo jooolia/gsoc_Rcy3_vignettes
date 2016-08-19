@@ -107,5 +107,10 @@ for (row in 1:nrow(network_ids_with_affiliation)){
   }
 }
 
+## ids do not match for the phage ids 
+phage_ids_with_affiliation$first_sheet.Phage_id_network <- gsub("-",
+                                                                "_",
+                                                                phage_ids_with_affiliation$first_sheet.Phage_id_network)
+
 write.table(phage_ids_with_affiliation, "../../data/phage_ids_with_affiliation.tsv",
             sep = "\t")
