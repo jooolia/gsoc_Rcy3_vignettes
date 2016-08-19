@@ -23,3 +23,6 @@ vignettes/*.pdf
 blog_post_drafts/*.html
 *.html
 weekly_reports/*.html
+
+# images for blog posts
+blog_post_drafts/images/*.*
