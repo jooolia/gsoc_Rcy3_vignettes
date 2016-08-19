@@ -51,6 +51,65 @@ setMethod('selectAllNodes',
             invisible(request.res)
           })
 
+
+  #' Select all neighbours of selected nodes
+  #'
+  #' Select all neighbours of selected nodes 
+  #'
+  #' @param object Cytoscape network  
+#' 
+#' @return Selects neighbours of selected nodes in a specified network. 
+#'
+#' @author Julia Gustavsen, \email{j.gustavsen@@gmail.com}
+#' @seealso \code{\link{selectNodes}}
+#'
+#' @concept RCy3
+#' @export
+#' 
+#' @examples 
+#' cw <- CytoscapeWindow('new.demo', new('graphNEL'))
+#' selectAllNodes(cw)
+#' 
+#' @importFrom methods setGeneric
+setGeneric('selectAllNodes',	
+           signature = 'obj',
+           function(obj) standardGeneric('selectAllNodes'))
+
+setMethod('selectAllNodes',
+          'CytoscapeWindowClass', 
+          function(obj) {
+
+           ## http://example.com/v1/networks/networkId/nodes/selected/neighbors/            
+            resource.uri <- paste(obj@uri,
+                                  pluginVersion(obj),
+                                  "networks",
+                                  obj@window.id,
+                                  "nodes",
+                                  sep = "/")
+            
+            request.res <- GET(resource.uri) # returns all of the node SUIDs
+            all_node_SUIDs <- fromJSON(rawToChar(request.res$content))
+            SUID.value.pairs <- lapply(all_node_SUIDs,
+                                       function(s) {list('SUID' = s, 'value' = TRUE)})
+            SUID.value.pairs.JSON <- toJSON(SUID.value.pairs)
+            
+            resource.uri <- paste(obj@uri,
+                                  pluginVersion(obj),
+                                  "networks",
+                                  obj@window.id,
+                                  "tables/defaultnode/columns/selected",
+                                  sep = "/")
+            request.res <- PUT(url = resource.uri,
+                               body = SUID.value.pairs.JSON,
+                               encode = "json")
+            invisible(request.res)
+          })
+
+
+
+
+
+
 #' Select all edges 
 #'
 #' Selects all edges in a Cytoscape Network 
