@@ -19,11 +19,9 @@ prok_matrix <- prok_matrix[!grepl("_filter", rownames(prok_matrix)),]
 prok_matrix <- prok_matrix[!grepl("unclass",
                                   rownames(prok_matrix)),]
 
-## only 19 sites in common. Let's say that rows have to be in at least 30% of them
+## keep rows that are present in at least 80% of sites
 n_sites <- ncol(virus_matrix)
 eighty_percent_sites <- 0.2 * n_sites
-
-## keep rows that are present in at least 80% of sites
 virus_matrix <- virus_matrix[rowSums(virus_matrix == 0) < eighty_percent_sites,]
 
 prok_in_virus <- prok_matrix[rowSums(prok_matrix == 0) < eighty_percent_sites,]
