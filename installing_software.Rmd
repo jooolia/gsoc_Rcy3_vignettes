@@ -1,0 +1,51 @@
+---
+title: "installing_software"
+author: "Julia Gustavsen"
+date: "May 23, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Installation
+
+The basic workflow is the you can use R scripts to build EnrichmentMaps in Cytoscape. The benefit of using R scripts is that it is easier to reproduce your analyse or even to repeat it with different data. So to get setup it can take a little bit of effort (but it will be worth it we promise): 
+
+- Install R (https://www.r-project.org/ and optionally install the amazing [Rstudio](https://www.rstudio.com/), * if you love using git you can use [these instructions](http://stat545.com/git00_index.html) to get Rstudio and git working).
+- Install the package RCy3 
+- make sure you have Java 8 installed (http://java.com/en/download/help/index_installing.xml)
+- Install [Cytoscape](http://www.cytoscape.org/) (version >3 is best)
+- Install the plugin Enrichment Map (http://www.baderlab.org/Software/EnrichmentMap)
+- Problems? Please comment in github repo here (https://github.com/tmuetze/Bioconductor_RCy3_the_new_RCytoscape)
+
+So once you have installed all of these things then you are ready to work with RCy3 and Cytoscape. RCy3 (R to Cytoscape 3, there is also a RCy that was used with Cytoscape 2). Additional info about RCy3: this R package uses the CyREST protocol that now comes with all installations of Cytoscape. It uses the API  from cytoscape to send and receive information via R. This means that you can send data from R and also receive information about the graphs that you have made in Cytoscape in R. This is useful for reproducibility, but also if you are analysing networks in ways that are not yet supported by plugins in Cytoscape. 
+
+
+# How to install different programs needed for the analysis
+
+## Install RCy3
+
+https://www.bioconductor.org/packages/release/bioc/html/RCy3.html
+
+```{r}
+## try http:// if https:// URLs are not supported
+source("https://bioconductor.org/biocLite.R")
+biocLite("RCy3")
+```
+
+- Can take a while to install all of the updated dependencies
+
+
+```{r}
+browseVignettes("RCy3")
+```
+
+## Install enrichment map
+
+Install via Cytoscape app manager
+
+Apps <- App Manager <- search for Enrichment map <- install
+
+
+
