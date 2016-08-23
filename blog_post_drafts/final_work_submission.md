@@ -15,7 +15,7 @@ There have been several unanticipated challenges that I have encountered while w
 I will elaborate further in a forthcoming blog post, but I will list a few of the surprising challenges here:
 
 1) Saving images from Cytoscape via cyREST is really dependent on the size of the window that you have open. You can use a parameter "h" which sets the size of the final image, but the width is set automatically.
-2) Plugins in Cytoscape that present an API interface do not have a standard verb-action vocabulary. This is not a huge deal, but requires some guessing of how plugins can be used via cyREST. 
+2) Plugins in Cytoscape that present an API interface do not have a standard verb-action vocabulary. This is not a huge deal, but requires some guessing of how plugins can be used via cyREST. It can be unclear why certain arguments are available in the app gui and these are not avaible via cyREST. 
 
 # Work by topic
 
@@ -44,7 +44,7 @@ Paxtoolsr is an R package (http://bioconductor.org/packages/release/bioc/html/pa
 
 ## clustermaker2
 
-Another common activity done with networks is clustering the nodes based on the network properties to be be able to make inferences about the network. In Cytoscape there is a popular plugin that is used to do this called "Clustermaker2" (http://apps.cytoscape.org/apps/clustermaker2). Working with this plugin was a bit of a challenge because commands that I thought would work exactly as they did with the graphical user interface (gui) required a little playing around with. This vignette is not completed, I have created a demo of the commands that are required to run clustermaker2 via RCy3. The clusters end up as information that is associated with the "network table " (http://idekerlab.github.io/cyREST/), so the network table thus needs to be parsed to find out which clusters belong to which group. See here for the work in progress: https://github.com/jooolia/gsoc_Rcy3_vignettes/blob/master/cluster_maker.md
+Another common activity done with networks is clustering the nodes based on the network properties to be be able to make inferences about the network. In Cytoscape there is a popular plugin that is used to do this called "Clustermaker2" (http://apps.cytoscape.org/apps/clustermaker2). Working with this plugin was a bit of a challenge because commands that I thought would work exactly as they did with the graphical user interface (gui) required a little playing around with. This vignette is not completed, I have created a demo of the commands that are required to run clustermaker2 via RCy3. The clusters are supposed to end up as information that is associated with the "network table " (http://idekerlab.github.io/cyREST/), so the network table thus needs to be parsed to find out which clusters belong to which group. See here for the work in progress: https://github.com/jooolia/gsoc_Rcy3_vignettes/blob/master/cluster_maker.md
 
 ## Chemviz
 
