@@ -103,7 +103,7 @@ properties.list <- list(nodeAttributeList = node_list[[1]],
 
 command.name <- "hierarchical"
 request.uri <- paste(connect_window_to_R_session@uri,
-                     pluginVersion(cy),
+                     pluginVersion(connect_window_to_R_session),
                      "commands/cluster",
                      as.character(command.name),
                      sep = "/")
@@ -148,7 +148,7 @@ properties.list <- list(algorithm = "hierarchical",
                         type = "node")
 
 request.uri <- paste(connect_window_to_R_session@uri,
-                     pluginVersion(cy),
+                     pluginVersion(connect_window_to_R_session),
                      "commands/cluster",
                      as.character(command.name),
                      sep = "/")
@@ -186,6 +186,27 @@ request.res$status_code
 ## [1] 200
 ```
 
-Ok puts things into the network table in Cytoscape.
+This puts the clusters into the network table in Cytoscape.
 
-How to work with this?
+How to work with this? Need to look at network table. 
+
+```r
+request.uri <- paste(connect_window_to_R_session@uri,
+                     pluginVersion(connect_window_to_R_session),
+                     "networks",
+                     connect_window_to_R_session@window.id,
+                     "tables/defaultnetwork",
+                     sep = "/")
+
+## can view at http://localhost:1234/v1/networks/15728/tables/defaultnetwork under node_clusters
+request.res <- GET(request.uri) # returns all of the node SUIDs
+
+cluster_content <- fromJSON(rawToChar(request.res$content))
+  
+## returns the clusters to which each node belongs.           
+cluster_content$rows[[1]]$`__nodeClusters`
+```
+
+```
+## NULL
+```
