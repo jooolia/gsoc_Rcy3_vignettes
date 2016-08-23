@@ -57,7 +57,8 @@ getWindowList(cy)
 ```
 
 ```r
-connect_window_to_R_session <- existing.CytoscapeWindow("galFiltered.sif",                                                                      copy.graph.from.cytoscape.to.R = FALSE)
+connect_window_to_R_session <- existing.CytoscapeWindow("galFiltered.sif",
+                                                        copy.graph.from.cytoscape.to.R = FALSE)
 ```
 
 Graph from session is loaded into Cytoscape
@@ -87,23 +88,25 @@ getCommandsWithinNamespace(connect_window_to_R_session, "cluster/getcluster")
 
 
 ```r
-node_list <- list("gal1RGexp",
+node_list <- c("gal1RGexp",
                   "gal4RGexp",
                   "gal80Rexp")
 
-properties.list <- list(nodeAttributeList = node_list[[1]],
-                        nodeAttributeList = node_list[[2]],
-                        nodeAttributeList = node_list[[3]],
+properties.list <- list(
+  nodeAttributeList = node_list[1],
+                        nodeAttributeList = node_list[2],
+                        nodeAttributeList = node_list[3],
                         network = connect_window_to_R_session@title,
                         selectedOnly = FALSE,
-                        clusterAttributes = FALSE,
+                        clusterAttributes = TRUE,
                         ignoreMissing = FALSE,
                         createGroups = TRUE,
-                        showUI = FALSE)
+                        showUI = FALSE
+                        )
 
 command.name <- "hierarchical"
 request.uri <- paste(connect_window_to_R_session@uri,
-                     pluginVersion(connect_window_to_R_session),
+                     pluginVersion(cy),
                      "commands/cluster",
                      as.character(command.name),
                      sep = "/")
@@ -115,7 +118,7 @@ request.res$url
 ```
 
 ```
-## [1] "http://localhost:1234/v1/commands/cluster/hierarchical?nodeAttributeList=gal1RGexp&nodeAttributeList=gal4RGexp&nodeAttributeList=gal80Rexp&network=galFiltered.sif&selectedOnly=FALSE&clusterAttributes=FALSE&ignoreMissing=FALSE&createGroups=TRUE&showUI=FALSE"
+## [1] "http://localhost:1234/v1/commands/cluster/hierarchical?nodeAttributeList=gal1RGexp&nodeAttributeList=gal4RGexp&nodeAttributeList=gal80Rexp&network=galFiltered.sif&selectedOnly=FALSE&clusterAttributes=TRUE&ignoreMissing=FALSE&createGroups=TRUE&showUI=FALSE"
 ```
 
 ```r
@@ -133,13 +136,7 @@ http_status(request.res)
 ## [1] "Success: (200) OK"
 ```
 
-```r
-request.res$status_code
-```
-
-```
-## [1] 200
-```
+Need to run a second set of commands to get the clusters
 
 ```r
 command.name <- "getcluster"
@@ -186,6 +183,9 @@ request.res$status_code
 ## [1] 200
 ```
 
+
+Do I get http://localhost:1234/v1/commands/cluster/getcluster?algorithm=hierarchical&type=node
+
 This puts the clusters into the network table in Cytoscape.
 
 How to work with this? Need to look at network table. 
@@ -210,3 +210,5 @@ cluster_content$rows[[1]]$`__nodeClusters`
 ```
 ## NULL
 ```
+
+Not currently working. Should have a list of all of the clusters and the membership of each node. 
