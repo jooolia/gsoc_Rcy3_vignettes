@@ -15,29 +15,27 @@ bibliography: co-occurrence_vignette.bib
 
 ## Tara Oceans
 
-There have been many projects where samples have been collected from different parts of the ocean. Some, such as the pioneering study by Craig Venter[@venter_environmental_2004] have pioneered metagenomic sequencing and others  have collected large amounts of data with global ecological questions in mind.
+Many projects have collected samples from different regions and from different depths of the ocean. Some, such as the pioneering study by Craig Venter [@venter_environmental_2004] have pioneered metagenomic sequencing and others, such as [Tara Oceans Expedition](http://oceans.taraexpeditions.org/) have collected large amounts of data with global ecological questions in mind. On the Tara Oceans ([8th and 9th expedition for this vessel ](http://oceans.taraexpeditions.org/en/m/about-tara/les-expeditions/tara-oceans/) researchers used a small sailboat outfitted with a lab and filtration supplies to collect samples from many different size fractions of microorganisms in the oceans over three years. They collected these samples to look at the different kinds of microorganisms present in different parts of the oceans to look at their composition and to observe their spatial patterns and distribution. 
 
-In the [Tara Oceans Expedition](http://oceans.taraexpeditions.org/) the researchers outfitted a small sailboat with a lab and filtration supplies. On the Tara Oceans ([8th and 9th expedition for this vessel ](http://oceans.taraexpeditions.org/en/m/about-tara/les-expeditions/tara-oceans/) scientists collected samples from many different size fractions of microorganisms in the oceans over three years. They collected these samples to look at the different kinds of microorganisms present in different parts of the oceans and to observe the spatial patterns and distribution of these microorganisms. 
+The scientists collected the samples and then used either targeted sequencing (amplicon approach using primers for specific targets such as the ribosomal genes and then amplifying these targets using PCR) or using metagenomic sequencing (where all the genetic material in a sample is sequenced) of each of the size fractions.
 
-The scientists collected the samples and then either used targeted sequencing (amplicon approach using primers for specific targets such as the ribosomal genes and then amplifying these targets using PCR) or using metagenomic sequencing (where all of the  genetic material in a sample is sequenced) of each of the size fractions.
+After the sequencing and quality checking of the samples was done, the sequences were taxonomically classified (different approaches for the different targets, see here for the details in @brum_patterns_2015 and @sunagawa_structure_2015). After that the data could be made into a species occurrence table where the rows are different sites and the columns are the observations of the different organisms at each site [@lima-mendez_determinants_2015].
 
-After the sequencing and quality checking of the samples was done the sequences were classified (different approaches for the different targets, see here for the details in @brum_patterns_2015 and @sunagawa_structure_2015). After that the data could be made into a species occurrence table where you have rows of the different sites and then columns are the observations of the different organisms found at each site [@lima-mendez_determinants_2015].
+## How to examine organisms that occur together: co-occurence networks
 
-## What is co-occurence data?
-
-Many of these microbial species in these types of studies have not yet been characterized in the lab. Thus to know more about the organisms and their interactions, we can observe which ones occur at the same sites or under the same kinds of environmental conditions. One way to do that is by using co-occurrence networks where it is examined which organisms occur together at which sites. The more frequently that organisms occur at the same site the stronger the interaction you predict among these organisms. For a review of some of the different kinds of techniques and software for creating interaction networks please see: @weiss_correlation_2016.
+Many of these microbial species in these types of studies have not yet been characterized in the lab. Thus, to know more about the organisms and their interactions, we can observe which ones occur at the same sites or under the same kinds of environmental conditions. One way to do that is by using co-occurrence networks where you examine which organisms occur together at which sites. The more frequently that organisms co-occur at the same site, the stronger the interaction predicted among these organisms. For a review of some of the different kinds of techniques and software for creating interaction networks see: @weiss_correlation_2016.
 
 ## What can we find out by creating co-occurence networks?
 
-These kinds of analyses can be useful for data where the organisms have not yet been characterized in the lab because they can provide insights about the communities and how the organisms are interacting within them. These analyses can be exploratory so that we can see which organisms warrant further insights and perhaps experiments. We can also learn about the overall community structure by looking at some of the network properties.
+These kinds of analyses can be useful for studies where the organisms have not yet been characterized in the lab because these analyses can provide insights about the communities and how the organisms within them are interacting. These analyses can be exploratory, so that we can see which organisms warrant further insights and perhaps experimental work . We can also learn about how the overall community is organized (community structure) by looking at some of the network properties (that is the overall way that the organisms are co-occurring and the properties of the network seen this way).
 
 ## What kind of data are used in this vignette?
 
-In this dataset we have data that have come from the bacterial dataset [@sunagawa_structure_2015]  and and also from the viral dataset [@brum_patterns_2015]. They have been examined in @lima-mendez_determinants_2015 and we have used the original relative abundances to visualize the data. Data were retrieved from: http://www.raeslab.org/companion/ocean-interactome.html
+In this analysis we are using a Tara Ocean data and we have data from the bacterial dataset [@sunagawa_structure_2015]  and also from the viral dataset [@brum_patterns_2015]. They have been examined in @lima-mendez_determinants_2015 and we have used the original relative abundances to visualize the data. Data were retrieved from: http://www.raeslab.org/companion/ocean-interactome.html
 
 # Set up Cytoscape and R connection
 
-We will run this example using RCy3 [@shannon_rcytoscape:_2013] to drive the visualization of these networks in Cytoscape[@shannon_cytoscape:_2003] using CyREST[@ono_cyrest:_2015].
+We will run this example using RCy3 [@shannon_rcytoscape:_2013] to drive the visualization of these networks in Cytoscape [@shannon_cytoscape:_2003] using CyREST [@ono_cyrest:_2015].
 
 ## Requirements
 ```{r, message=FALSE}
@@ -47,9 +45,10 @@ library(RJSONIO)
 library(RColorBrewer)
 library(httr)
 ```
-To run this example **Cytoscape software must be running**. If you are having problems installing please see [here](installing_software.html). In Cytoscape we will also need Allegro-plugin for this example. 
+To run this example **Cytoscape software must be running**. In Cytoscape we will also need Allegro-plugin for this example. 
 
 To begin we create a connection in R that we can use to manipulate the networks and then we will delete any windows that were already in Cytoscape so that we don't use up all of our memory. 
+
 ```{r}
 cy <- CytoscapeConnection()
 deleteAllWindows(cy)
@@ -60,7 +59,7 @@ deleteAllWindows(cy)
 We will read in a species co-occurrence matrix that was calculated using Spearman Rank coefficient. (If interested in seeing how this was done please see scripts and the raw data in inst/data-raw)
 
 ```{r read-in-data}
-## scripts for processing in "inst/data-raw/"
+## scripts for processing located in "inst/data-raw/"
 prok_vir_cor <- read.delim("./data/virus_prok_cor_abundant.tsv")
 ```
 
@@ -74,7 +73,7 @@ graph_vir_prok <- simplify(graph.data.frame(prok_vir_cor,
 
 # Read in taxonomic classification
 
-Since these are data from small, microscopic organisms that were sequenced using shotgun sequencing we rely on the classification of the sequences to know what kind of organisms are in the samples. In this case the bacterial viruses (bacteriophage), were classified by Basic Local Alignment Search Tool (BLAST http://blast.ncbi.nlm.nih.gov/Blast.cgi) by searching for their closest resembling sequence in the RefSeq database (see methods here [@brum_patterns_2015]). The prokaryotic taxonomic classifications were determined using the [SILVA database](https://www.arb-silva.de/).
+Since these are data from small, microscopic organisms that were sequenced using shotgun sequencing, we rely on the classification of the sequences to know what kind of organisms are in the samples. In this case the bacterial viruses (bacteriophage), were classified by Basic Local Alignment Search Tool (BLAST http://blast.ncbi.nlm.nih.gov/Blast.cgi) by searching for their closest sequence in the RefSeq database (see methods in @brum_patterns_2015). The prokaryotic taxonomic classifications were determined using the [SILVA database](https://www.arb-silva.de/).
 
 ```{r}
 phage_id_affiliation <- read.delim("./data/phage_ids_with_affiliation.tsv")
@@ -83,13 +82,12 @@ bac_id_affi <- read.delim("./data/prok_tax_from_silva.tsv")
 
 # Add the taxonomic classifications to the network and then send network to Cytoscape
 
-In preparation for sending the networks to Cytoscape we will add in the taxonomic data. Some of the organisms do not have taxonomic classifications associated with them so we have described them as "not_class" for not classified.
+In preparation for sending the networks to Cytoscape we will add in the taxonomic data. Some of the organisms do not have taxonomic classifications associated with them so we have described them as "not_class" for not classified. We do that because we have had problems sending "NA"s to Cytoscape from RCy3. 
 
 ```{r}
 genenet.nodes <- as.data.frame(vertex.attributes(graph_vir_prok))
 
 ## not all have classification, so create empty columns
-## before had NA but was worried it was messing up the setting of attributes.
 genenet.nodes$phage_aff <- rep("not_class", nrow(genenet.nodes))
 genenet.nodes$Tax_order <- rep("not_class", nrow(genenet.nodes))
 genenet.nodes$Tax_subfamily <- rep("not_class", nrow(genenet.nodes))
@@ -108,7 +106,6 @@ for (row in seq_along(1:nrow(genenet.nodes))){
   }
 }
 ```
-
 
 ```{r}
 ## do the same for proks
@@ -131,8 +128,8 @@ for (row in seq_along(1:nrow(genenet.nodes))){
 }
 ```
 
+Add to the network the data related to the connections between the organisms, the edge data, and then prepare to send the nodes and edges to Cytoscape using the function `cyPlot()`.
 
-Pull in the edge data and then prepare to send the nodes and edges to Cytoscape using the function `cyPlot()`.
 ```{r}
 genenet.edges <- data.frame(as_edgelist(graph_vir_prok))
 names(genenet.edges) <- c("name.1",
@@ -146,10 +143,10 @@ genenet.nodes$name <- as.character(genenet.nodes$name)
 ug <- cyPlot(genenet.nodes,genenet.edges)
 ```
 
-
 # Send network to Cytoscape using RCy3
 
 Now we will send the network from R to Cytoscape.
+
 ```{r, message=FALSE}
 cw <- CytoscapeWindow("Tara oceans",
                       graph = ug,
@@ -166,34 +163,31 @@ fitContent(cw)
 saveImage(cw,
           "co-occur0",
           "png",
-          h=2000)
+          h = 2000)
 knitr::include_graphics("./co-occur0.png")
 ```
 
 # Colour network by prokaryotic phylum
 
-We would like to get an overview of the different phylum of bacteria that are in the network. One way  is to colour the different nodes based on their phylum classification. The package Rcolorbrewer will be used to generate a set of good colours for the nodes. 
+We would like to get an overview of the different phylum of bacteria that are in the network. One way is to colour the different nodes based on their phylum classification. The package Rcolorbrewer will be used to generate a set of good colours for the nodes. 
 
 ```{r}
 families_to_colour <- unique(genenet.nodes$prok_tax_phylum)
 families_to_colour <- families_to_colour[!families_to_colour %in% "not_class"]
 node.colour <- brewer.pal(length(families_to_colour),
                           "Set3")
+```
+
+Use the colours from Rcolorbrewer to colour the nodes in Cytoscape.
+
+```{r}
 setNodeColorRule(cw,
-                 'prok_tax_phylum',
+                 "prok_tax_phylum",
                  families_to_colour,
                  node.colour,
                  "lookup",
-                 default.color='#ffffff')
+                 default.color = "#ffffff")
 ```
-
-Also nodes and fonts were a bit small. Let's increase that. 
-
-```{r}
-#setDefaultNodeSize (cw, 90) # an intermediate value
-#setDefaultNodeFontSize(cw, 20)
-```
-
 
 
 ```{r, message=FALSE, results="hide"}
@@ -214,7 +208,7 @@ knitr::include_graphics("./co-occur0_1.png")
 
 Next we would like to change the shape of the node to reflect whether the nodes are viral or prokaryotic in origin. In this dataset all of the viral node names start with "ph_", thus we can set the viral nodes to be diamond-shaped by looking for all the nodes that start with "ph" in the network. 
 ```{r}
-shapes_for_nodes <- c('DIAMOND')
+shapes_for_nodes <- c("DIAMOND")
 
 phage_names <- grep("ph_",
                     genenet.nodes$name,
@@ -240,7 +234,7 @@ knitr::include_graphics("./co-occur1.png")
 
 # Colour edges of phage nodes
 
-The classification of the viral data was done in a very conservative manner so not a lot of the viral nodes were classified. However, if we do want to add some of this information  to our visualization we can colour the edges of the viral nodes by family. The main families that were identified in this dataset are the *Podoviridae*, the *Siphoviridae* and the *Myoviridae* (for more info see [NCBI Podoviridae](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=10744&lvl=3&p=7&lin=f&keep=1&srchmode=1&unlock), [NCBI Myoviridae](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Tree&id=10662&lvl=3&p=7&lin=f&keep=1&srchmode=1&unlock), and [NCBI Siphoviridae](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Tree&id=10699&lvl=3&p=7&lin=f&keep=1&srchmode=1&unlock))
+The classification of the viral data was done in a very conservative manner so not many of the viral nodes were identified. However, if we do want to add some of this information to our visualization we can colour the edges of the viral nodes by family. The main families that were identified in this dataset are the *Podoviridae*, the *Siphoviridae* and the *Myoviridae* (for more info see [NCBI Podoviridae](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=10744&lvl=3&p=7&lin=f&keep=1&srchmode=1&unlock), [NCBI Myoviridae](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Tree&id=10662&lvl=3&p=7&lin=f&keep=1&srchmode=1&unlock), and [NCBI Siphoviridae](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Tree&id=10699&lvl=3&p=7&lin=f&keep=1&srchmode=1&unlock))
 
 ```{r}
 setDefaultNodeBorderWidth(cw, 5)
@@ -250,7 +244,7 @@ families_to_colour <- c(" Podoviridae",
 node.colour <- brewer.pal(length(families_to_colour),
                           "Dark2")
 setNodeBorderColorRule(cw,
-                       'Tax_subfamily',
+                       "Tax_subfamily",
                        families_to_colour,
                        node.colour,
                        "lookup", 
@@ -274,26 +268,26 @@ knitr::include_graphics("./co-occur2.png")
 
 After doing all of this colouring to the network we would like to layout the network in a way that allows us to more easily see which nodes are connected without overlap. To do the layout we will use the [Cytoscape plugin Allegro](http://apps.cytoscape.org/apps/allegrolayout). 
 
-Using RCy3 to drive Cytoscape, if we are not sure what the current values are for a layout or we are not sure what kinds of values are accepted for the different parameters of our layout, we can investigate using the RCy3 functions `getLayoutPropertyNames()` and then `getLayoutPropertyValue()`.
+When using RCy3 to drive Cytoscape, if we are not sure what the current values are for a layout or we are not sure what kinds of values are accepted for the different parameters of our layout, we can investigate using the RCy3 functions `getLayoutPropertyNames()` and then `getLayoutPropertyValue()`.
 
 ```{r}
 getLayoutNames(cw)
 
-getLayoutPropertyNames(cw, layout.name = 'allegro-spring-electric')
-getLayoutPropertyValue(cw, 'allegro-spring-electric',"gravity") 
-getLayoutPropertyValue(cw, 'allegro-spring-electric',"maxIterations")  
-getLayoutPropertyValue(cw, 'allegro-spring-electric',"noOverlapIterations")
+getLayoutPropertyNames(cw, layout.name = "allegro-spring-electric")
+getLayoutPropertyValue(cw, "allegro-spring-electric","gravity") 
+getLayoutPropertyValue(cw, "allegro-spring-electric","maxIterations")  
+getLayoutPropertyValue(cw, "allegro-spring-electric","noOverlapIterations")
 ```
 
 Once we decide on the properties we want, we can go ahead and set them like this:
 
 ```{r}
 setLayoutProperties(cw,
-                    layout.name = 'allegro-spring-electric',
+                    layout.name = "allegro-spring-electric",
                     list(gravity = 100,
                          scale = 6))
 layoutNetwork(cw,
-              layout.name = 'allegro-spring-electric')
+              layout.name = "allegro-spring-electric")
 ```
 
 ```{r, echo=FALSE}
@@ -307,13 +301,13 @@ knitr::include_graphics("./co-occur3.png")
 
 # Look at network properties
 
-One thing that might be interesting is nodes that are connected to many different nodes and those nodes that are to few other nodes. The number of other nodes to which one node is connected is called degree. We can use a gradient of size to quickly visualize which nodes are highly connected. 
+One thing that might be interesting to visualize is nodes that are connected to many different nodes and nodes that are connected to few other nodes. The number of other nodes to which one node is connected is called degree. We can use a gradient of size to quickly visualize nodes that have high degree. 
 
 ```{r}
 ## initiate a new node attribute
 ug2 <- initNodeAttribute(graph = ug,
-                          'degree',
-                          'numeric',
+                          "degree",
+                          "numeric",
                           0.0) 
 
 ## degree from graph package for undirected graphs not working well,
@@ -332,7 +326,6 @@ layoutNetwork(cw2)
 
 # Size by degree
 
-(what do the different sizes mean? How do I find out about this?)
 ```{r}
 degree_control_points <- c(min(degree(graph_vir_prok)),
                            mean(degree(graph_vir_prok)),
@@ -341,7 +334,8 @@ node_sizes <- c(20,
                 20,
                 80,
                 100,
-                110) # number of control points +2 that are "below" and "above"
+                110) # number of control points in interpolation mode,
+                     # the first and the last are for sizes "below" and "above" the attribute seen.
 
 setNodeSizeRule(cw2,
                 "degree",
@@ -356,7 +350,7 @@ layoutNetwork(cw2,
 
 ```{r, echo=FALSE}
 fitContent(cw2)
-Sys.sleep(10)
+Sys.sleep(10) # to make sure content is fit before taking an image
 fitContent(cw2)
 saveImage(cw2,
           "co-occur_degree",
@@ -364,13 +358,13 @@ saveImage(cw2,
 ```
 
 
-```{r, out.width = 1600, fig.retina = NULL, echo=FALSE}
+```{r, echo=FALSE}
 knitr::include_graphics("./co-occur_degree.png")
 ```
 
-# Select an interesting node and make a subnetwork
+# Select an interesting node and make a subnetwork from it
 
-The visualization displays several different areas where there are highly connected nodes that are in the same bacterial phylum. We will select one of these nodes, all of the nodes connected to this node, the first neighbours, and then those nodes connected to the first neighbours. One node that is in a group of highly connected nodes is the cyanobacterial node "GQ377772". We will select it  and its first and second neighbours and then make a new networks from these nodes and their connections.
+The visualization displays several different areas where there are highly connected nodes that are in the same bacterial phylum. We will select one of these nodes, all of the nodes connected to this node, its first neighbours, and then the nodes connected to the first neighbours. One node that is in a group of highly connected nodes is the cyanobacterial node "GQ377772". We will select it and its first and second neighbours and then make a new network from these nodes and their connections.
 
 ```{r}
 selectNodes(cw2,
@@ -380,21 +374,24 @@ getSelectedNodes(cw2)
 selectFirstNeighborsOfSelectedNodes(cw2)
 getSelectedNodes(cw2)
 ```
+
 Now select the second neighbours of node "GQ377772".
+
 ```{r}
 selectFirstNeighborsOfSelectedNodes(cw2)
 getSelectedNodes(cw2)
 ```
+
 This has only selected the nodes, but not the edges in Cytoscape, so we will need to select all of the edges before we make the new subnetwork. 
+
 ```{r}
 source("./functions_to_add_to_RCy3/subnetwork_stuff.R")
-
 selectEdgesConnectedBySelectedNodes(cw2)
 ```
 
+Now edges should appear selected in Cytoscape, in addition to the nodes. 
+
 ```{r}
-
-
 newnet <- subnetwork_from_selected(cw2)
 
 layoutNetwork(newnet, "force-directed")
@@ -409,13 +406,13 @@ saveImage(newnet,
           h = 2000)
 ```
 
-```{r, echo=FALSE, out.width = 1600, fig.retina = NULL}
+```{r, echo=FALSE}
 knitr::include_graphics("./co-occur_subnet.png")
 ```
 
 ## Conclusion 
 
-This has been a very basic introduction to exploring co-occurence networks in Cytoscape using RCy3. Please feel free to contact the authors with any questions or comments. 
+This has been a very basic introduction to exploring co-occurence networks in Cytoscape using RCy3. 
 
 # References
 
