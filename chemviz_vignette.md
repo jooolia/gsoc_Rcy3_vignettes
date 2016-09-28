@@ -3,18 +3,20 @@ Julia Gustavsen
 August 16, 2016  
 # Introduction
 
-# Required programs: 
+Scientists can have information about chemical compounds and then want a simple way to visualize the chemical structure and also the to understand the chemical similarity of compounds (Tanimoto similarity). This can be done in Cytoscape using the Chemviz plugin
+
+In this vignette we will use the R package rcellminer to generate some data that we will use to look a some drug compounds. Then, in Cytoscape, we will then see how these drugs are chemically related, look at the 2-dimensional structures of these compounds and then colour the compounds by their mechanism of action to see if it is related to their similarity. 
+
+# Required materials: 
 
 - Cytoscape (www.cytoscape.org)
 - Chemviz - plugin for Cytoscape (http://www.cgl.ucsf.edu/cytoscape/chemViz2/index.shtml)
-- Rpackages: RCy3, httr, JSONIO, rcellminer
+- Rpackages: RCy3, httr, JSONIO, rcellminer, RColorBrewer
 
-# Load up the packages
+# Load the packages
 
 ```r
 library(RCy3)
-library(httr)
-library(RJSONIO)
 library(rcellminer)
 library(RColorBrewer)
 source("./functions_to_add_to_RCy3/working_with_namespaces.R")
@@ -28,9 +30,6 @@ df <- getFeatureAnnot(rcellminerData::drugData)[["drug"]]
 ## smiles strings
 ## moa mechanism of action
 
-## could take drugs with stuff in the MOA colum
-x <- df[sample(nrow(df), 100), c("NSC", "NAME", "FDA_STATUS", "SMILES", "MOA")]
-
 moaToCompounds <- getMoaToCompounds()
 Moa_names <- names(moaToCompounds)
 
@@ -40,13 +39,24 @@ df_knownMoaDrugs <- subset(df, MOA %in% Moa_names)
 df_with_knownMoaDrugs <- subset(df_knownMoaDrugs, TOTAL_EXPS > 10)
 ```
 
+For display purposes we will chop off long names after 12 characters. 
+
+
+```r
+long_names <- df_with_knownMoaDrugs$NAME[nchar(df_with_knownMoaDrugs$NAME) > 12] 
+chopped_long_names <- gsub("^(.{12})(.*)$", "\\1", long_names)
+df_with_knownMoaDrugs$NAME[nchar(df_with_knownMoaDrugs$NAME) > 12 ] <- chopped_long_names
+```
+
+
 # Set up connection between R and Cytoscape 
 
 ```r
 # first, delete existing windows to save memory:
 deleteAllWindows(CytoscapeConnection())
 cy <- CytoscapeConnection()
-getCommandsWithinNamespace(cy, "chemviz")
+getCommandsWithinNamespace(cy,
+                           "chemviz")
 ```
 
 ```
@@ -62,11 +72,11 @@ getCommandsWithinNamespace(cy, "chemviz")
 # Format dataframe from RCellMiner to format that can be sent to cytoscape
 
 ```r
-g <- new('graphNEL',
-         nodes = df_with_knownMoaDrugs$NSC,
-         edgemode = 'undirected')
+g <- new("graphNEL",
+         nodes = df_with_knownMoaDrugs$NAME,
+         edgemode = "undirected")
 
-cw <- CytoscapeWindow('vignette_for_chemviz',
+cw <- CytoscapeWindow("vignette_for_chemviz",
                       graph = g,
                       overwrite = TRUE)
 ```
@@ -82,7 +92,7 @@ displayGraph(cw)
 
 ```r
 layoutNetwork(cw,
-              layout.name = 'grid')
+              layout.name = "grid")
 showGraphicsDetails(cw, new.value)
 ```
 
@@ -94,45 +104,45 @@ showGraphicsDetails(cw, new.value)
 ```r
 g <- cw@graph   
 g <- initNodeAttribute(graph = g,
-                       'SMILES',
-                       'char',
+                       "SMILES",
+                       "char",
                        "none")
-nodeData(g, nodes(g), 'SMILES') <- df_with_knownMoaDrugs$SMILES
+nodeData(g, nodes(g), "SMILES") <- df_with_knownMoaDrugs$SMILES
 
 g <- initNodeAttribute(graph = g,
-                       'NAME_from_df',
-                       'char',
+                       "NSC_from_df",
+                       "char",
                        "none")
-nodeData(g, nodes(g), 'NAME_from_df') <- df_with_knownMoaDrugs$NAME
+nodeData(g, nodes(g), "NSC_from_df") <- df_with_knownMoaDrugs$NSC
 
 g <- initNodeAttribute(graph = g,
-                       'MOA',
-                       'char',
+                       "MOA",
+                       "char",
                        "none")
-nodeData(g, nodes(g), 'MOA') <- df_with_knownMoaDrugs$MOA
+nodeData(g, nodes(g), "MOA") <- df_with_knownMoaDrugs$MOA
 ```
 
 
 ```r
 cw <- setGraph(cw,
                g)
-displayGraph(cw)    # cw's graph is sent to Cytoscape
+displayGraph(cw) # cw's graph is sent to Cytoscape
 ```
 
 ```
 ## [1] "label"
 ## [1] "SMILES"
-## [1] "NAME_from_df"
+## [1] "NSC_from_df"
 ## [1] "MOA"
 ```
 
-Network successfully sent to Cytoscape. The node attributes have also been sent. 
-<img src="./nodes_for_chemviz.png" width="1934" />
 
+Network successfully sent to Cytoscape. The node attributes have also been sent. 
+<img src="./nodes_for_chemviz.png" width="1616" />
 
 # Create similarity network
 
-Next based on the chemical properties of each node (which are associated using the SMILES strings (Simplified Molecular Input Line Entry System which are line reprensentations of chemical structures) we will use chemviz to calculate the similarity of each drug based on its chemical properties (using Tanimoto similarity which is a distance-based measure of chemical similarity). 
+Next based on the chemical properties of each node (which are associated using the SMILES strings (Simplified Molecular Input Line Entry System which are line representations of chemical structures) we will use chemviz to calculate the similarity of each drug based on its chemical properties (using Tanimoto similarity which is a distance-based measure of chemical similarity). 
 
 To begin let's look at some of the commands available to use in chemviz:
 
@@ -179,23 +189,7 @@ chemviz_cw <- setCommandProperties(cw,
 ## [1] "Cytoscape window vignette_for_chemviz copy successfully connected to R session."
 ```
 
-```r
-# request.uri <- paste(cw@uri,
-#                      pluginVersion(cw),
-#                      "commands/chemviz",
-#                      as.character(command.name),
-#                      sep = "/")
-# 
-# request.res <- GET(url = request.uri,
-#                     query = properties.list,
-#                     verbose())
-# request.res$url
-# http_status(request.res)
-# request.res$status_code
-```
-
-<img src="./chemviz_similarity_net.png" width="1934" />
-
+<img src="./chemviz_similarity_net.png" width="1616" />
 
 We currently just have the network in the grid format, but now with edges connecting the nodes we can do a layout that can help us visualize the connections.
 
@@ -224,7 +218,7 @@ connectToNewestCyWindow <- function(obj,
   
   ## to get edges request.res$elements$edges
   newest_CyWindow <- existing.CytoscapeWindow(net.name,
-                                     copy.graph.from.cytoscape.to.R = copyToR) ## having problems with edges for now!! so will set to false
+                                     copy.graph.from.cytoscape.to.R = copyToR) 
   return(newest_CyWindow)
 }
 
@@ -238,7 +232,7 @@ layoutNetwork(new_cw, "force-directed")
 ```
 
 
-<img src="./chemviz_similarity_net_layout_fd.png" width="1934" />
+<img src="./chemviz_similarity_net_layout_fd.png" width="1616" />
 
 # Add 2D chemical structures to nodes
 
@@ -283,12 +277,12 @@ setCommandProperties(new_cw,
 
 Now we have all of the chemical structures displayed on the nodes of our network. 
 
-<img src="./chemviz_similarity_net_node_structures.png" width="1934" />
+<img src="./chemviz_similarity_net_node_structures.png" width="1616" />
 
 
 # Colour nodes by mechanism of action (MOA)
 
-The nodes that we are examining have mechanisms of action (moa) associated with them. We can then colour these nodes by their MOA. 
+The nodes that we are examining have mechanisms of action (MOA) associated with them. We can then colour these nodes by their MOA. 
 
 
 ```r
@@ -303,7 +297,7 @@ We have 14 different MOA classes and have used RColorBrewer to generate differen
 
 ```r
 setNodeColorRule(new_cw,
-                 'MOA',
+                 "MOA",
                  MOA_classes,
                  colours_for_MOA_classes,
                  "lookup", 
@@ -316,14 +310,11 @@ setNodeColorRule(new_cw,
 
 ```r
 ## node font looks ugly, let's turn it off for now
-
 setDefaultNodeFontSize(new_cw,
                        0)
 ```
 
-We have coloured the nodes nicely, but we do not know which ones are associated with which classes. To know more about this we will print out the legend from Cytoscape. At the moment there is no automated way to do this so we need to go into Cytoscape, click on the "Style" tab and then click on the little arrow (that has a mouseover text of "Options"). Once the menu opens there you will find a dialogue that lets you export a legend (in gif,svg, or pdf formats). Once exported we will look at the legend beside our new coloured network. 
-
-
+We have coloured the nodes nicely, but we do not know which ones are associated with which classes. To know more about this we will print out the legend from Cytoscape. At the moment there is no automated way to do this so we need to go into Cytoscape, click on the "Style" tab and then click on the little arrow (that has a mouseover text of "Options"). Once the menu opens there you will find a dialogue that lets you export a legend (in gif, svg, or pdf formats). Once exported we will look at the legend beside our new coloured network. 
 
 
 
