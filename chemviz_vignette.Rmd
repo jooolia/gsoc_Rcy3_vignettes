@@ -2,13 +2,20 @@
 title: "Chemviz_vignette"
 author: "Julia Gustavsen"
 date: "August 16, 2016"
-output: 
-    html_document:
-      keep_md: true
-      number_sections: yes
-      theme: cerulean
-      toc: yes
-      toc_depth: 6 
+output:
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+    latex_engine: lualatex
+    number_sections: yes
+    toc: yes
+    toc_depth: 6
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    theme: cerulean
+    toc: yes
+    toc_depth: 6
 ---
 # Introduction
 
@@ -119,7 +126,8 @@ fitContent(cw)
 Sys.sleep(10)
 saveImage(cw,
           "nodes_for_chemviz",
-          "png", h = 2000)
+          "png",
+          h = 2000)
 knitr::include_graphics("./nodes_for_chemviz.png")
 ```
 
@@ -246,7 +254,7 @@ saveImage(new_cw,
 knitr::include_graphics("./chemviz_similarity_net_node_structures.png")
 ```
 
-
+\clearpage
 # Colour nodes by mechanism of action (MOA)
 
 The nodes that we are examining have mechanisms of action (MOA) associated with them. We can then colour these nodes by their MOA. 
@@ -282,6 +290,10 @@ saveImage(new_cw,
           "chemviz_similarity_net_coloured_by_MOA",
           "png",
           h = 2000)
+# removed this so that I could knit to pdf
+#<img src="./chemviz_similarity_net_coloured_by_MOA.png" width="600"> <img src="./chemviz_legend.svg" width="150">
+knitr::include_graphics("./chemviz_similarity_net_coloured_by_MOA.png")
+knitr::include_graphics("./chemviz_legend.png")
 ```
 
-<img src="./chemviz_similarity_net_coloured_by_MOA.png" width="600"> <img src="./chemviz_legend.svg" width="150"> 
+ 
