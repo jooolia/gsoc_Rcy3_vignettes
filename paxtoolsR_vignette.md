@@ -2,14 +2,15 @@
 Julia Gustavsen  
 # Purpose
 
-This vignette will show how to visualize networks retrieved using paxtoolsr [@luna_paxtoolsr:_2015] in Cytoscape [@shannon_cytoscape:_2003 ; @ono_cyrest:_2015] using RCy3. Paxtoolsr leverages the tools developped in the java toolkit paxtools to retrieve information from Pathway commons,retrieve a network or subnetwork related to a particular pathway. For more information please see @luna_paxtoolsr:_2015 and have a look at the paxtoolsr vignette:
+This vignette shows one way to visualize networks retrieved using paxtoolsr [@luna_paxtoolsr:_2015] in Cytoscape [@shannon_cytoscape:_2003 ; @ono_cyrest:_2015] using RCy3. Paxtoolsr leverages tools developped in the java toolkit paxtools to retrieve information from Pathway commons. For example you can retrieve a network or subnetwork related to a particular pathway. For more information please see @luna_paxtoolsr:_2015 and have a look at the paxtoolsr package vignette:
 
 ```
 library(paxtoolsr)
 browseVignettes("paxtoolsr")
 ```
+In this vignette we will visualize a network retrieved from Pathway Commons, query Pathway commons to find the neighbourhood of a specific gene, look at a subnetwork of a set of proteins, and visualize node metadata associated with the networks. 
 
-Load packages for use in this tutorial
+To get started, load packages for use in this tutorial
 
 ```r
 library(paxtoolsr)
@@ -20,22 +21,28 @@ library(RColorBrewer)
 
 # Visualize a network using paxtoolsr
 
-Here we will use paxtoolsr to convert a metabolic pathway file to the Simple Interaction Format (SIF). 
+We will use paxtoolsr to convert a metabolic pathway file (installed with paxtoolsr) to the Simple Interaction Format (SIF). 
 
 ```r
-sif <- toSif(system.file("extdata", "biopax3-short-metabolic-pathway.owl", package = "paxtoolsr"))
+sif <- toSif(system.file("extdata",
+                         "biopax3-short-metabolic-pathway.owl",
+                         package = "paxtoolsr"))
 ```
+
 We will use igraph to create a network from the SIF file and then convert that to node and edge lists that can be sent to Cytoscape via RCy3. 
 
+
 ```r
-g <- graph.edgelist(as.matrix(sif[, c(1, 3)]), directed = FALSE)
+g <- graph.edgelist(as.matrix(sif[, c(1, 3)]),
+                    directed = FALSE)
 
 g.nodes <- as.data.frame(vertex.attributes(g))
 g.edges <- data.frame(as_edgelist(g))
 names(g.edges) <- c("name.1",
                     "name.2")
 
-ug <- cyPlot(g.nodes,g.edges)
+ug <- cyPlot(g.nodes,
+             g.edges)
 ```
 
 ## Send network to Cytoscape using RCy3
@@ -45,39 +52,66 @@ ug <- cyPlot(g.nodes,g.edges)
 cw <- CytoscapeWindow("Metabolic pathway from paxtoolsr",
                       graph = ug,
                       overwriteWindow = TRUE)
+setDefaultNodeFontSize(cw,
+                       7)
 ```
 
 
 ```r
 displayGraph(cw)
-layoutNetwork(cw, "force-directed")
+layoutNetwork(cw,
+              "force-directed")
+fitContent(cw)
 ```
 
-<img src="./paxtools_met_path_1.png" width="1366" />
+<img src="./paxtools_met_path_1.png" width="1684" />
 
 # Pathway Commons Graph Query
 
-Paxtoolsr can also be used to query Pathway Commons for the neighbours of a particular gene. In this case we will examine the gene neighbourhood of gene Brain-derived neurotrophic factor( BDNF) and is involved in neuron growth and survival. 
+Paxtoolsr can also be used to query Pathway Commons for the neighbours of a particular gene. In this case we will examine the gene neighbourhood of gene Brain-derived neurotrophic factor(BDNF) which is involved in neuron growth and survival. 
+
 
 ```r
 gene <- "BDNF"
-t1 <- graphPc(source = gene, kind = "neighborhood", format = "BINARY_SIF", verbose = TRUE)
+t1 <- graphPc(source = gene,
+              kind = "neighborhood",
+              format = "BINARY_SIF",
+              verbose = TRUE)
 ```
 
 ```
 ## URL:  http://www.pathwaycommons.org/pc2/graph?kind=neighborhood&source=BDNF&format=BINARY_SIF
 ```
-For our network we only want to visualize interaction where BDNF controls a reactions that changes the state of the second protein ("controls-state-change-of", see more info on the binary relations in Pathway commons [here](http://www.pathwaycommons.org/pc2/formats).  
+
+For our network we only want to visualize interaction where BDNF controls a reactions that changes the state of the second protein ("controls-state-change-of", see more info on the binary relations in Pathway commons [here](http://www.pathwaycommons.org/pc2/formats)).  
+
+
 
 ```r
 t2 <- t1[which(t1[, 2] == "controls-state-change-of"), ]
 ```
-We will use this filtered dataframe to create a network using igraph's `graph.edgelist()`
+
+For our example we only want to use a small number of interactions so we will use `filterSIF()` to reduce the number visualized.
+
 
 ```r
-g <- graph.edgelist(as.matrix(t2[, c(1, 3)]), directed = FALSE)
+ids <- unique(c(t2$PARTICIPANT_A,
+                t2$PARTICIPANT_B))
+t3 <- filterSif(t2,
+                ids = sample(ids,
+                             25))
 ```
+
+We will use this filtered dataframe to create a network using igraph's `graph.edgelist()`
+
+
+```r
+g <- graph.edgelist(as.matrix(t3[, c(1, 3)]),
+                    directed = FALSE)
+```
+
 Format the graph for sending to Cytoscape.
+
 
 ```r
 g.nodes <- as.data.frame(vertex.attributes(g))
@@ -85,10 +119,19 @@ g.edges <- data.frame(as_edgelist(g))
 names(g.edges) <- c("name.1",
                     "name.2")
 
-ug <- cyPlot(g.nodes,g.edges)
+ug <- cyPlot(g.nodes,
+             g.edges)
 ```
 
 ## Send network to Cytoscape using RCy3
+
+Reset the default node size
+
+```r
+setDefaultNodeFontSize(cw,
+                       12)
+```
+
 
 
 ```r
@@ -100,35 +143,54 @@ cw <- CytoscapeWindow("Pathway Commons graph query from paxtoolsr",
 
 ```r
 displayGraph(cw)
-layoutNetwork(cw, "force-directed")
+# setLayoutProperties(cw,
+#                     layout.name = "allegro-spring-electric",
+#                     list(gravity = 100,
+#                          scale = 6))
+layoutNetwork(cw,
+              layout.name = "force-directed")
+fitContent(cw)
 ```
 
-<img src="./pathway_commons_gq.png" width="1366" />
+<img src="./pathway_commons_gq.png" width="1684" />
 
-# 7.3 Create a subnetwork from a set of proteins
+# Create a subnetwork from a set of proteins
 
-We will examine a network looking at genes AKT serine/threonine kinase 1 ("AKT1"), Insulin receptor substrate 1("IRS1"), mechanistic target of rapamycin("MTOR") and Insulin Like Growth Factor 1 Receptor ("IGF1R") and find all the paths that are between these genes. 
+We will examine a network composed of the genes AKT serine/threonine kinase 1 ("AKT1"), Insulin receptor substrate 1 ("IRS1"), mechanistic target of rapamycin ("MTOR") and Insulin Like Growth Factor 1 Receptor ("IGF1R"). The paths betwen these genes can represent metabolic and signaling pathways, molecular and genetic interactions or gene regulation.
+
 
 ```r
-genes <- c("AKT1", "IRS1", "MTOR", "IGF1R")
-t1 <- graphPc(source = genes, kind = "PATHSBETWEEN", format = "BINARY_SIF", 
+genes <- c("AKT1",
+           "IRS1",
+           "MTOR",
+           "IGF1R")
+t1 <- graphPc(source = genes,
+              kind = "PATHSBETWEEN",
+              format = "BINARY_SIF", 
               verbose = TRUE)
 ```
 
 ```
 ## URL:  http://www.pathwaycommons.org/pc2/graph?kind=PATHSBETWEEN&source=AKT1&source=IRS1&source=MTOR&source=IGF1R&format=BINARY_SIF
 ```
-We will again filter our network to visualize interactions where the genes control a reactions that changes the state of the second gene protein ("controls-state-change-of", see more info [here](http://www.pathwaycommons.org/pc2/formats).  
+
+We will again filter our network to visualize interactions where the genes control a reactions that changes the state of the second gene protein ("controls-state-change-of", see more info [here](http://www.pathwaycommons.org/pc2/formats)).  
+
 
 ```r
-t2 <- t1[which(t1[, 2] == "controls-state-change-of"), ]
+t2 <- t1[which(t1[, 2] == "controls-state-change-of"),]
 ```
+
 Create graph using igraph.
 
+
 ```r
-g <- graph.edgelist(as.matrix(t2[, c(1, 3)]), directed = FALSE)
+g <- graph.edgelist(as.matrix(t2[, c(1, 3)]),
+                    directed = FALSE)
 ```
+
 Convert graph to node and edges lists to send to Cytoscape.
+
 
 ```r
 g.nodes <- as.data.frame(vertex.attributes(g))
@@ -136,7 +198,8 @@ g.edges <- data.frame(as_edgelist(g))
 names(g.edges) <- c("name.1",
                     "name.2")
 
-ug <- cyPlot(g.nodes,g.edges)
+ug <- cyPlot(g.nodes,
+             g.edges)
 ```
 
 ## Send network to Cytoscape using RCy3
@@ -151,10 +214,11 @@ cw <- CytoscapeWindow("Subnetwork of Pathway Commons graph query from paxtoolsr"
 
 ```r
 displayGraph(cw)
-layoutNetwork(cw, "force-directed")
+layoutNetwork(cw,
+              layout.name = "force-directed")
 ```
 
-<img src="./subnet_pathway_commons_gq.png" width="1366" />
+<img src="./subnet_pathway_commons_gq.png" width="1684" />
 
 # Adding metadata to Pathway commons networks
 
@@ -162,8 +226,8 @@ It can be useful to overlay data from experiments or other sources onto the node
 
 
 ```r
-# Generate a color palette that goes from white to red that contains 10
-# colors
+# Generate a color palette that goes from white to red 
+# that contains 10 colours
 numColors <- 10
 colors <- colorRampPalette(brewer.pal(9, "Reds"))(numColors)
 
@@ -172,64 +236,67 @@ values <- runif(length(V(g)$name))
 
 # Scale values to generate indices from the color palette
 xrange <- range(values)
-newrange <- c(1, numColors)
+newrange <- c(1,
+              numColors)
 
 factor <- (newrange[2] - newrange[1])/(xrange[2] - xrange[1])
 scaledValues <- newrange[1] + (values - xrange[1]) * factor
 indices <- as.integer(scaledValues)
 ```
+
 After the colours and values for the nodes have been generated, we will add this information to the network that we used in the previous section.
 
-```r
-# Color the nodes based using the indices and the color palette created
-# above
-g <- set.vertex.attribute(g, "color", value = colors[indices])
-g <- set.vertex.attribute(g, "indices", value = indices)
-```
-
-Make node and edgelists and make sure to include the appropriate attributes for sending to Cytoscape.
 
 ```r
-g.nodes <- as.data.frame(vertex.attributes(g))
-g.edges <- data.frame(as_edgelist(g))
-names(g.edges) <- c("name.1",
-                    "name.2")
-g.nodes$color <- vertex_attr(g)[[2]]
-g.nodes$indices <- vertex_attr(g)[[3]]
-
-ug <- cyPlot(g.nodes,g.edges)
+g <- cw@graph   
+g <- initNodeAttribute(graph = g,
+                       'indices',
+                       "numeric",
+                       0)
+nodeData(g, nodes(g), "indices") <- indices
 ```
+
+
+```r
+cw <- CytoscapeWindow("Coloured network paxtoolsr",
+                      graph = g,
+                      overwriteWindow = TRUE)
+displayGraph(cw) # cw's graph is sent to Cytoscape
+```
+
+```
+## [1] "label"
+## [1] "indices"
+```
+
 
 ## Send network to Cytoscape using RCy3
 
 
 ```r
-cw <- CytoscapeWindow("Coloured network paxtoolsr",
-                      graph = ug,
-                      overwriteWindow = TRUE)
-```
-
-
-```r
 displayGraph(cw)
-layoutNetwork(cw, "force-directed")
+fitContent(cw)
 ```
 
 Now use the information contained in the "indices" column to add the colours to the nodes in Cytoscape. 
 
+
 ```r
+layoutNetwork(cw,
+              layout.name = "force-directed")
 setNodeColorRule(cw,
-                 'indices',
+                 "indices",
                  control.points = as.numeric(c(1.0:10.0)), # needs to match type of column in Cytoscape
                  colors,
                  "lookup",
-                 default.color='#ffffff')
+                 default.color="#ffffff")
 ```
 
 ```
 ## Successfully set rule.
 ```
 
-<img src="./coloured_paxtoolsr_ex.png" width="1366" />
+<img src="./coloured_paxtoolsr_ex.png" width="1684" /><img src="./paxtoolsR_metadata_colour_legend.png" width="609" />
+
 
 # References
