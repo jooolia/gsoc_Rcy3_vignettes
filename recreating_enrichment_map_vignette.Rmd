@@ -2,8 +2,15 @@
 title: "Recreating EnrichmentMap tutorials with RCy3"
 author: "Julia Gustavsen"
 date: "May 24, 2016"
-output: 
-    html_document:
+output:
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+    latex_engine: lualatex
+    number_sections: yes
+    toc: yes
+    toc_depth: 6
+  html_document:
       keep_md: true
       number_sections: yes
       theme: cerulean
@@ -16,35 +23,31 @@ output:
 * Create and test out functions using RCy3 that make Enrichment Map easy to use in R. 
 
 # Enrichment Map
+
 ## Functional enrichment analysis
 
-Many scientists use perform experiments to determine which biological pathways are expressed more in certain diseases or conditions. Using processed sequence data from RNAseq experiments, different treatments and/or samples can be visualized for genes that are more or less enriched compared to the baseline. This informs which genes are important for regulating processes related to the a disease or a treatment or another condition. Visualizing which genes are statistically more highly expressed under certain conditions can be helpful for interpretation and further analysis of the data. Based on which genes are enriched, it can also be determined which pathways are present in the specific disease or treatment. 
+Many scientists use perform experiments to determine which biological pathways are expressed more in certain diseases or conditions. Using processed sequence data from RNAseq experiments, different treatments and/or samples can be visualized for genes that are more or less enriched compared to the baseline. This informs which genes are important for regulating processes related to a disease or a treatment. Visualizing which genes are statistically more highly expressed under certain conditions can be helpful for interpretation and further analysis of the data and it can help determine which pathways are present during the specific disease or treatment. 
 
-The functional enrichment analysis is done outside of this vignette. We will use already processed data and make a network from these data in Cytoscape using the package RCy3.
+The functional enrichment analysis is done outside of this vignette. We will use already processed data and make a network from these data in Cytoscape using RCy3.
 
 ## Reproducible Functional enrichment analysis
 
 The basic workflow is using R scripts with [RCy3](https://github.com/tmuetze/Bioconductor_RCy3_the_new_RCytoscape) to build [EnrichmentMaps](http://www.baderlab.org/Software/EnrichmentMap) that can be visualized and analysed in [Cytoscape](http://www.cytoscape.org/). The benefit of using R scripts is that it is easier to reproduce your analysis or to repeat it with different data. 
 
-# Install done?
-
--  To proceed please follow instructions in [installation vignette](Install_vignette.html) if you do not already have RCy3 and Cytoscape installed. 
-
-RCy3 (stands for R to Cytoscape 3, there is also a RCy that was used with Cytoscape 2 see [here](https://www.bioconductor.org/packages/release/bioc/html/RCytoscape.html). The RCy3 package (actively developed by Tanja Muetze, Georgi Kolishovski, Paul Shannon) uses the [CyREST api](https://github.com/idekerlab/cyREST/wiki) to allow communication between R and Cytoscape. CyREST now comes with all installations of Cytoscape. It uses the API (application programming interface) from Cytoscape to send and receive information from R. This means that we can send data from R to Cytoscape and also receive information about the graphs that you have made in Cytoscape in R. This is useful for reproducibility, but also if you are analysing networks in ways that are not yet supported by plugins in Cytoscape. 
-
 # GSEA processed data
-So what we will do today is to use data already processed in Gene Set Enrichment Analysis (GSEA which "determines whether an *a priori* defined set of genes shows statistically  significant, concordant differences between two biological states"). 
+So what we will do today is to use data already processed in Gene Set Enrichment Analysis (GSEA which "determines whether an *a priori* defined set of genes shows statistically significant, concordant differences between two biological states"). 
 
 We will use this processed data to make an Enrichment Map in Cytoscape from R. 
 
 ## Load the appropriate libraries
+
 ```{r, message = FALSE}
 library(RCy3)
 library(httr)
 library(RJSONIO)
 ```
 
-## Important note:
+## Important note
 
 * Make sure Cytoscape is open before running the code below!
 
@@ -54,7 +57,8 @@ library(RJSONIO)
 source("./functions_to_add_to_RCy3/working_with_EM.R")
 ```
 
-Create the connection to Cytoscape
+Create the connection from R to Cytoscape
+
 ```{r, cache = TRUE}
 # first, delete existing windows to save memory:
 deleteAllWindows(CytoscapeConnection())
@@ -62,6 +66,7 @@ cy <- CytoscapeConnection ()
 ```
 
 Examine the commands that are available in Enrichment Map.
+
 ```{r, cache = TRUE}
 getEnrichmentMapCommandsNames(cy, "build")
 getEnrichmentMapCommandsNames(cy, "gseabuild")
@@ -75,7 +80,7 @@ See the Bader lab website for full explanation:<https://github.com/BaderLab/Enri
 - **"analysisType"** Analysis type can be "generic", "GSEA", or "DAVID/BiNGO/Great""
 - **"classDataset1"** Classes (optional) for dataset1
 - **"classDataset2"** Classes (optional) for dataset2 
-- **"coeffecients"** Similarity Coefficient type (typo in name, but you must type it that way). Can be "OVERLAP","JACCARD", or "COMBINED" (both OVERLAP and JACCARD)
+- **"coeffecients"** Similarity Coefficient type (contains a typo in the name, but you must type it that way). Can be "OVERLAP","JACCARD", or "COMBINED" (both OVERLAP and JACCARD)
 - **"similaritycutoff"** Similarity Cutoff for the coefficient chosen, 0.0 is least similar and 1.0 is most similar. 
 - **"enrichments2Dataset1"** Tab-separated File containing gene names and their p-values from enrichment condition 2 from dataset 1
 - **"enrichments2Dataset2"** Tab-separated File containing gene names and their p-values from enrichment condition 2 from dataset 2
@@ -97,7 +102,7 @@ See the Bader lab website for full explanation:<https://github.com/BaderLab/Enri
 So first we read in the data from the supplied files and set the parameters.
 
 **Note on file paths**: 
-You cannot use relative paths with EnrichmentMap from R. The filenames need to be given as their absolute paths.
+You cannot use relative paths when constructing EnrichmentMaps from R. The filenames need to be given as their absolute paths.
 
 ```{r, cache = TRUE}
 path_to_file <- "/home/julia_g/windows_school/gsoc/EM-tutorials-docker/notebooks/data/"
@@ -109,6 +114,7 @@ exp_file <- paste0(path_to_file,
 ```
 
 ## Set the parameters for use in the Enrichment Map.
+
 ```{r, cache = TRUE}
 em_params <- list(analysisType = "generic",
                   enrichmentsDataset1 = enr_file,
@@ -122,13 +128,14 @@ em_params <- list(analysisType = "generic",
 No graph details are returned, this is just setting the parameters that will be sent to Cytoscape via RCy3. 
 
 Now build the enrichment map
+
 ```{r, cache = TRUE}
 EM_1 <- setEnrichmentMapProperties(cy,
                                    "build",
                                    em_params)
 ```
 
-These parameters can also be set in Cytoscape, but we are setting them here via script. The function that we run also attaches the window created in Cytoscape to our R session, so that we are able to manipulate the stylistic aspects of our network by using "EM_1".
+These parameters can also be set in Cytoscape, but we are setting them here via script. The function `setEnrichmentMapProperties()` also attaches the window created in Cytoscape to our R session, so that we are able to manipulate the stylistic aspects of our network by using "EM_1".
 
 ## Save Enrichment map network image
 
@@ -138,7 +145,7 @@ Sys.sleep(10)
 saveImage(EM_1,
           "EM_1",
           "png",
-         h=2000)  
+         h = 2000)  
 ```
 
 ![](./EM_1.png)
@@ -157,12 +164,14 @@ saveImage(EM_1,
           "png",
           h = 2000)
 ```
+
 ![](./EM_1_kamada-kawai.png)
 
 We can also save our network file to use at a later date or to send to collaborators.
 
 ```{r, cache = TRUE}
-saveNetwork(EM_1, "EM_1") ## Creates "EM_1.cys" which can be reopened in Cytoscape
+saveNetwork(EM_1,
+            "EM_1") ## Creates "EM_1.cys" which can be reopened in Cytoscape
 ```
 
 In our R session we are connected to the graph in Cytoscape and can manipulate the graph's visual properties, but we do not have the graph information in R. 
@@ -171,7 +180,7 @@ In our R session we are connected to the graph in Cytoscape and can manipulate t
 EM_1@graph
 ```
 
-If we want the graph pulled in to R then we can set the argument "copy.graph.to.R" to `TRUE` in `setEnrichmentMapProperties()`. This pulls in our EM analysis graph in Cytoscape and stores it as EM_1_2 in R.  
+If we want the graph data pulled in to R then we can set the argument "copy.graph.to.R" to `TRUE` in `setEnrichmentMapProperties()`. This pulls in our EM analysis graph to Cytoscape and stores it as EM_1_2.  
 
 ```{r, cache = TRUE}
 EM_1_2 <- setEnrichmentMapProperties(cy,
@@ -181,19 +190,12 @@ EM_1_2 <- setEnrichmentMapProperties(cy,
 ```
 
 Now if we have a look at the graph part of the stored object we will see we have retrieved the information from the graph. 
+
 ```{r, cache = TRUE}
 EM_1_2@graph
 print(noa.names(getGraph(EM_1_2))) # retrieves node attributes from the graph
-
-fitContent(EM_1_2)
-Sys.sleep(10)
-saveImage(EM_1_2,
-          "EM_1_2",
-          "png",
-          h = 2000)
 ```
 
-![](./EM_1_2.png)
 
 # Summarizing Enrichment Results with Enrichment Maps
 
@@ -251,9 +253,6 @@ saveImage(EM_ex_4,
 
 ![](./EM_ex_4.png)
 
-
 ## Helpful references:
 
-### Reference for the API
-
-This site describes the cyREST API: http://idekerlab.github.io/cyREST/
+Reference for the API. This site describes the cyREST API: http://idekerlab.github.io/cyREST/
