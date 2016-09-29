@@ -1,13 +1,20 @@
 ---
 title: "Visualizing a co-occurence network in Cytoscape"
 author: "Julia Gustavsen"
-output: 
-    html_document:
-      keep_md: true
-      number_sections: yes
-      theme: cerulean
-      toc: yes
-      toc_depth: 6
+output:
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+    latex_engine: lualatex
+    number_sections: yes
+    toc: yes
+    toc_depth: 6
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    theme: cerulean
+    toc: yes
+    toc_depth: 6
 bibliography: co-occurrence_vignette.bib
 ---
 
@@ -288,10 +295,11 @@ setLayoutProperties(cw,
                          scale = 6))
 layoutNetwork(cw,
               layout.name = "allegro-spring-electric")
+fitContent(cw)
 ```
 
 ```{r, echo=FALSE}
-fitContent(cw)
+
 saveImage(cw,
           "co-occur3",
           "png", 
