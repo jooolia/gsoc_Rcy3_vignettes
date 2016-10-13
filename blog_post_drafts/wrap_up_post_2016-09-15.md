@@ -9,9 +9,10 @@ Today I want to discuss my experience with GSOC and working on my project this s
 Overall, working with NRNB as part of Google summer of Code was a great experience. I interacted with many different people and was well supported by my mentor and the overall community. It was a new challenge to work remotely for the whole of a project, but I am happy with how it turned out. 
 
 I worked on different aspects of the connection between R and Cytoscape while creating the vignettes as part of this project. I received a lot of help from many different people. Before starting this project I played around with the cyREST API in R and python and **Keichiro Ono** helpfully answered my questions about getting started with cyREST. One of the workflows that I wanted to work through included a Cytoscape plugin called Enrichment Map and **Ruth Isserlin** of the Bader Lab (*website*) provided a lot of troubleshooting and help for this vignette. We selected other Cytoscape applications for use with RCy3 and **Scooter Morris** was often very helpful in understanding how they were working (and was often an author of these plugins).
-The developpers of RCy3 were very helpful with this project. **Tanja Muetze** provided a lot of expertise and encouragement along the way and **Paul Shannon** helped get the project off the ground and helped determine the extent of what would be possible using cyREST with RCy3. Finally, my mentor **Augustin Luna** was great for discussing the direction of the project, and for providing expertise with web frameworks, R package development and general R coding. The GSOC projects were smoothly coordinated by **Alexander Pico**, of the NRNB. 
 
-Also DEMCHAK?
+The developers of RCy3 were very helpful with this project. **Tanja Muetze** provided a lot of expertise and encouragement along the way and **Paul Shannon** and **Barry Demchak** helped get the project off the ground and helped determine the extent of what would be possible using cyREST with RCy3. Finally, my mentor **Augustin Luna** was great for discussing the direction of the project, and for providing expertise with web frameworks, R package development and general R coding. The GSOC projects were smoothly coordinated by **Alexander Pico**, of the NRNB. 
+
+The RCy3 package (stands for R to Cytoscape 3 and is actively developed by Tanja Muetze, Georgi Kolishovski, Paul Shannon) uses the [CyREST api](https://github.com/idekerlab/cyREST/wiki) to allow communication between R and Cytoscape. CyREST now comes with all installations of Cytoscape. It uses the API (application programming interface) from Cytoscape to send and receive information from R. This means that we can send data from R to Cytoscape and also receive information about the graphs that you have made in Cytoscape in R. This is useful for reproducibility, but also if you are analysing networks in ways that are not yet supported by plugins in Cytoscape. )
 
 ## Working with cyREST
 
@@ -103,7 +104,7 @@ getCommandsWithinNamespace(cy, "view")
 
 # Other summer activities: Poster presentation of GSOC work
 
-I presented part of one of the workflows that I was working on at a scientific meeting this summer. The meeting was the Viruses of Microbes meeting in Liverpool, UK. The repository that contains the poster and the code used to generate it are [here](https://github.com/jooolia/RCy3_VOM_poster). This was my first time creating and presenting a poster like this and it was a good challange. The poster was well received and many jotted down the address for the Github repo. 
+I presented part of one of the workflows that I was working on at a scientific meeting this summer. The meeting was the Viruses of Microbes meeting in Liverpool, UK. The repository that contains the poster and the code used to generate it are [here](https://github.com/jooolia/RCy3_VOM_poster). This was my first time creating and presenting a poster like this and it was a good challenge. The poster was well received and many jotted down the address for the Github repo. 
 
 # Second blog post to come with workflows:
 
