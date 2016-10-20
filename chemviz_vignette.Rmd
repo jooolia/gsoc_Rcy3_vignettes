@@ -228,6 +228,7 @@ knitr::include_graphics("./chemviz_similarity_net_node_structures.png")
 ```
 
 \clearpage
+
 # Colour nodes by mechanism of action (MOA)
 
 The nodes that we are examining have mechanisms of action (MOA) associated with them. We can then colour these nodes by their MOA. 

@@ -1,8 +1,14 @@
 ---
 title: "Recreating EnrichmentMap tutorials with RCy3"
 author: "Julia Gustavsen"
-date: "May 24, 2016"
+date: "23 September 2016"
 output:
+  html_document:
+      keep_md: true
+      number_sections: yes
+      theme: cerulean
+      toc: yes
+      toc_depth: 6 
   pdf_document:
     fig_caption: yes
     keep_tex: yes
@@ -10,12 +16,7 @@ output:
     number_sections: yes
     toc: yes
     toc_depth: 6
-  html_document:
-      keep_md: true
-      number_sections: yes
-      theme: cerulean
-      toc: yes
-      toc_depth: 6   
+
 ---
 # Purpose: 
 
@@ -59,7 +60,7 @@ source("./functions_to_add_to_RCy3/working_with_EM.R")
 
 Create the connection from R to Cytoscape
 
-```{r, cache = TRUE}
+```{r}
 # first, delete existing windows to save memory:
 deleteAllWindows(CytoscapeConnection())
 cy <- CytoscapeConnection ()
@@ -115,7 +116,7 @@ exp_file <- paste0(path_to_file,
 
 ## Set the parameters for use in the Enrichment Map.
 
-```{r, cache = TRUE}
+```{r}
 em_params <- list(analysisType = "generic",
                   enrichmentsDataset1 = enr_file,
                   pvalue = "1.0",
@@ -129,7 +130,7 @@ No graph details are returned, this is just setting the parameters that will be 
 
 Now build the enrichment map
 
-```{r, cache = TRUE}
+```{r}
 EM_1 <- setEnrichmentMapProperties(cy,
                                    "build",
                                    em_params)
@@ -139,7 +140,7 @@ These parameters can also be set in Cytoscape, but we are setting them here via 
 
 ## Save Enrichment map network image
 
-```{r, cache = TRUE}
+```{r}
 fitContent(EM_1)
 Sys.sleep(10)
 saveImage(EM_1,
@@ -176,13 +177,13 @@ saveNetwork(EM_1,
 
 In our R session we are connected to the graph in Cytoscape and can manipulate the graph's visual properties, but we do not have the graph information in R. 
 
-```{r, cache = TRUE}
+```{r}
 EM_1@graph
 ```
 
 If we want the graph data pulled in to R then we can set the argument "copy.graph.to.R" to `TRUE` in `setEnrichmentMapProperties()`. This pulls in our EM analysis graph to Cytoscape and stores it as EM_1_2.  
 
-```{r, cache = TRUE}
+```{r}
 EM_1_2 <- setEnrichmentMapProperties(cy,
                                      "build",
                                      em_params,
@@ -191,7 +192,7 @@ EM_1_2 <- setEnrichmentMapProperties(cy,
 
 Now if we have a look at the graph part of the stored object we will see we have retrieved the information from the graph. 
 
-```{r, cache = TRUE}
+```{r}
 EM_1_2@graph
 print(noa.names(getGraph(EM_1_2))) # retrieves node attributes from the graph
 ```
@@ -223,7 +224,7 @@ classes_file <- paste0(path_to_file,
                        "MesenchymalvsImmunoreactive_RNAseq_classes.cls")
 ```
 
-```{r, cache = TRUE}
+```{r}
 em_params <- list(analysisType = "generic",
                   enrichmentsDataset1 = enr_file,
                   pvalue = "1.0",
@@ -242,7 +243,7 @@ EM_ex_4 <- setEnrichmentMapProperties(cy,
 ```
 
 
-```{r, cache = TRUE}
+```{r}
 fitContent(EM_ex_4)
 Sys.sleep(10)
 saveImage(EM_ex_4,
