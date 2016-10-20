@@ -1,18 +1,18 @@
 ---
-title: "paxtoolsR vignette"
+title: "paxtoolsr vignette"
 author: "Julia Gustavsen"
 output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    theme: cerulean
+    toc: yes
+    toc_depth: 6
   pdf_document:
     fig_caption: yes
     keep_tex: yes
     latex_engine: lualatex
     number_sections: yes
-    toc: yes
-    toc_depth: 6
-  html_document:
-    keep_md: yes
-    number_sections: yes
-    theme: cerulean
     toc: yes
     toc_depth: 6
 bibliography: paxtoolsr.bib

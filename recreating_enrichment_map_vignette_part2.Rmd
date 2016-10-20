@@ -10,9 +10,13 @@ output:
       toc: yes
       toc_depth: 6   
 ---
-# Recreate tutorial from lab website and attempts to work with autoannotate and wordcloud: http://www.baderlab.org/Software/EnrichmentMap/Tutorial
+
+# Recreate tutorial from lab website and attempt to work with autoannotate and wordcloud: http://www.baderlab.org/Software/EnrichmentMap/Tutorial
+
+- not currently fully functional because of problems with running autoannotate and wordcloud via cyREST. 
 
 ## Load the appropriate libraries
+
 ```{r, message = FALSE}
 library(RCy3)
 library(httr)
@@ -30,13 +34,12 @@ source("./functions_to_add_to_RCy3/working_with_EM.R")
 ```
 
 Create the connection to Cytoscape
+
 ```{r, cache = TRUE}
 # first, delete existing windows to save memory:
 deleteAllWindows(CytoscapeConnection())
 cy <- CytoscapeConnection ()
 ```
-
-
 
 ```{r, cache = TRUE}
 gsea_tut_path <- "/home/julia_g/windows_school/gsoc/gsoc_Rcy3_vignettes/GSEATutorial/"
@@ -57,7 +60,6 @@ data_1_en_2_nt <- paste0(gsea_tut_path,
 rank_file <- paste0(gsea_tut_path,
                     "edb/MCF7_ExprMx_v2_names_ExprMx_v2_names.ES_NT.cls_ES12_versus_NT12.rnk")
 ```
-
 
 ```{r, cache = TRUE}
 #Dataset 1 / Phenotypes 1: ES12 VS NT12 
@@ -82,8 +84,8 @@ EM_ex_6 <- setEnrichmentMapProperties(cy,
 ```
 
 Successfully built!
+The experiment concerns ??? and we are examining estrogen treatment vs no treatment at 12hr. 
 
-We are examining Estrogen treatment vs no treatment at 12hr
 ```{r, cache = TRUE}
 fitContent(EM_ex_6)
 Sys.sleep(10)
@@ -92,10 +94,10 @@ saveImage(EM_ex_6,
           "png",
           h = 2000)
 ```
+
 ![](./EM_ex_6.png)
 
-
-# Use the auto annotate to add better labels to the groups in Enrichment Map
+# Use the application auto annotate to add better labels to the groups in Enrichment Map
 
 ```{r, cache = TRUE}
 source("./functions_to_add_to_RCy3/working_with_auto_annotate.R")
@@ -114,8 +116,10 @@ source("./functions_to_add_to_RCy3/working_with_auto_annotate.R")
 ```
 
 ```{r, cache = TRUE}
-getAutoAnnotateCommandsNames(cy, "label-clusterBoosted")
-getAutoAnnotateCommandsNames(cy, "label-sizeSorted")
+getAutoAnnotateCommandsNames(cy,
+                             "label-clusterBoosted")
+getAutoAnnotateCommandsNames(cy,
+                             "label-sizeSorted")
 ```
 
 ** The app via cyrest does not add the annotations, but identifies the clusters, so not currently working to add in the labels. 
@@ -167,8 +171,3 @@ If it worked it would look something like this:
 
 ![](./em_word_cloud_manual_shot.png)
 
-## Helpful references:
-
-### Reference for the API
-
-This site describes the cyREST API: http://idekerlab.github.io/cyREST/
