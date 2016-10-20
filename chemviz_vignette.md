@@ -318,4 +318,4 @@ We have coloured the nodes nicely, but we do not know which ones are associated 
 
 
 
-<img src="./chemviz_similarity_net_coloured_by_MOA.png" width="600"> <img src="./chemviz_legend.svg" width="150"> 
+<img src="./chemviz_similarity_net_coloured_by_MOA.png" width="600"> <img src="./chemviz_legend.png" width="150"> 

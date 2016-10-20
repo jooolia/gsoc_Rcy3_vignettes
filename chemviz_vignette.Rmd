@@ -1,5 +1,5 @@
 ---
-title: "Chemviz_vignette"
+title: "Chemviz vignette"
 author: "Julia Gustavsen"
 date: "August 16, 2016"
 output:
@@ -27,7 +27,7 @@ In this vignette we will use the R package rcellminer to generate some data that
 
 - Cytoscape (www.cytoscape.org)
 - Chemviz - plugin for Cytoscape (http://www.cgl.ucsf.edu/cytoscape/chemViz2/index.shtml)
-- Rpackages: RCy3, httr, JSONIO, rcellminer, RColorBrewer
+- Rpackages: RCy3,rcellminer, RColorBrewer
 
 # Load the packages
 ```{r, message = FALSE}
@@ -42,15 +42,13 @@ source("./functions_to_add_to_RCy3/working_with_namespaces.R")
 ```{r}
 
 df <- getFeatureAnnot(rcellminerData::drugData)[["drug"]]
-## smiles strings
-## moa mechanism of action
 
 moaToCompounds <- getMoaToCompounds()
 Moa_names <- names(moaToCompounds)
 
 df_knownMoaDrugs <- subset(df, MOA %in% Moa_names)
 
-## use only those with greater than 3 experiments
+## use only those with greater than 10 experiments
 df_with_knownMoaDrugs <- subset(df_knownMoaDrugs, TOTAL_EXPS > 10)
 ```
 
@@ -74,7 +72,7 @@ getCommandsWithinNamespace(cy,
 ```
 
 
-# Format dataframe from RCellMiner to format that can be sent to cytoscape
+# Format dataframe from RCellMiner to format that can be sent to Cytoscape
 ```{r}
 g <- new("graphNEL",
          nodes = df_with_knownMoaDrugs$NAME,
@@ -173,32 +171,7 @@ We currently just have the network in the grid format, but now with edges connec
 
 Since we made a new network that is in Cytoscape, but not yet connected to our R session we will first need to connect to this window and then we can apply a layout. 
 ```{r}
-connectToNewestCyWindow <- function(obj,
-                                    copyToR = FALSE) {
-  resource.uri <- paste(obj@uri,
-                        pluginVersion(obj),
-                        "networks",
-                        sep = "/")
-  request.res <- GET(resource.uri)
-  # SUIDs list of the existing Cytoscape networks
-  cy.networks.SUIDs <- fromJSON(rawToChar(request.res$content))
-  # most recently made enrichment map will have the highest SUID
-  cy.networks.SUIDs.last <- max(cy.networks.SUIDs)
-  
-  res.uri.last <- paste(obj@uri,
-                        pluginVersion(obj),
-                        "networks",
-                        as.character(cy.networks.SUIDs.last),
-                        sep = "/")
-  result <- GET(res.uri.last)
-  net.name <- fromJSON(rawToChar(result$content))$data$name
-  
-  ## to get edges request.res$elements$edges
-  newest_CyWindow <- existing.CytoscapeWindow(net.name,
-                                     copy.graph.from.cytoscape.to.R = copyToR) 
-  return(newest_CyWindow)
-}
-
+source("./functions_to_add_to_RCy3/working_with_cytoscape_windows.R")
 new_cw <- connectToNewestCyWindow(chemviz_cw)
 ```
 
