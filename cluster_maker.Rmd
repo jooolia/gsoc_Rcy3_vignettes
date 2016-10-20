@@ -1,5 +1,5 @@
 ---
-title: "cluster_maker"
+title: "Cluster maker vignette"
 author: "Julia Gustavsen"
 date: "June 23, 2016"
 output: 
@@ -58,7 +58,7 @@ getCommandsWithinNamespace(connect_window_to_R_session, "cluster/getcluster")
 
 ## Make clusters
 
-describe what is happening...
+
 ```{r}
 node_list <- c("gal1RGexp",
                   "gal4RGexp",
@@ -131,8 +131,6 @@ cluster_content <- fromJSON(rawToChar(request.res$content))
   
 ## returns the clusters to which each node belongs.           
 node_cluster_data <- cluster_content$rows[[1]]$`__nodeClusters`
-
-
 ```
 
 
@@ -156,11 +154,7 @@ for (row in seq_along(2:nrow(split_node_cluster_data))){
 
 ```
 
-Not currently working. Should have a list of all of the clusters and the membership of each node. 
-
-
 ## Try to network viz one:
-
 
 # Read in provided session file (.cys file)
 ```{r}
@@ -212,9 +206,17 @@ request.uri <- paste(connect_window_to_R_session@uri,
 request.res <- GET(url = request.uri,
                    query = properties.list,
                    verbose())
-request.res$url
-http_status(request.res)
 ```
+
+```{r, echo=FALSE}
+Sys.sleep(10)
+saveImage(connect_window_to_R_session,
+          "clustermaker_clusters_viz1",
+          "png",
+          h = 2000)
+knitr::include_graphics("./clustermaker_clusters_viz1.png")
+```
+
 
 Colour different clusters by the cluster number. 
 ```{r}
@@ -230,3 +232,13 @@ a_lot_of_dark_colours <- colorRampPalette(Dark_colours)(427)
                     default.color='#AA0000')
 ```
 
+Need to connect to different window as notw called clustered....
+
+```{r, echo=FALSE}
+Sys.sleep(10)
+saveImage(connect_window_to_R_session,
+          "clustermaker_clusters_viz2",
+          "png",
+          h = 2000)
+knitr::include_graphics("./clustermaker_clusters_viz2.png")
+```
