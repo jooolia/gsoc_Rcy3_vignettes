@@ -1,18 +1,78 @@
 
-
-selectEdgesConnectedBySelectedNodes <- function(c_w) {
-  selectedNodes = getSelectedNodes(c_w)
+setGeneric ('selectEdgesConnectedBySelectedNodes', 
+            signature='obj', function(obj, window.title=NA) standardGeneric ('selectEdgesConnectedBySelectedNodes'))
+#' Select the edges connecting selected nodes in Cytoscape Network 
+#'
+#' Selects edges in a Cytoscape Network connecting the selected nodes 
+#'
+#' @param object Cytoscape network 
+#' @param new_title New name for the copy
+#' @param copy.graph.to.R Logical whether to copy the graph to a new object in R 
+#' 
+#' @return Connection to new copy of network. 
+#'
+#' @examples \dontrun{
+#' cw <- CytoscapeWindow('vignette select edges', graph = RCy3::makeSimpleGraph(), overwrite = TRUE)
+#' displayGraph(cw)
+#' selectNodes(cw,"A") # selects specific nodes
+#' getSelectedNodes(cw)
+#' getSelectedEdges(cw)
+#' selectFirstNeighborsOfSelectedNodes(cw)
+#' ## This has only selected the nodes, but not the edges in Cytoscape, so we will need to select all of the edges before we make the new subnetwork.
+#' selectEdgesConnectedBySelectedNodes(cw)
+#' getSelectedNodes(cw)
+#' getSelectedEdges(cw)
+#' }
+#'
+#' @author Julia Gustavsen, \email{j.gustavsen@@gmail.com}
+#' @seealso \code{\link{createWindowFromSelection}}, \code{\link{selectEdgesConnectedBySelectedNodes}}, \code{\link{renameCytoscapeNetwork}}
+#' 
+#' @concept RCy3
+#' @export
+#' 
+#' @importFrom methods setGeneric
+selectEdgesConnectedBySelectedNodes <- function(cw) {
+  selectedNodes = getSelectedNodes(cw)
   if (length (selectedNodes) == 1 && is.na (selectedNodes))
     return ()
-  graphEdges <- getAllEdges(c_w)  
+  graphEdges <- getAllEdges(cw)  
   selectedEdges <- unlist(mapply(function(x) return(graphEdges [grep(x, graphEdges)]), selectedNodes)) 
   if (length (selectedEdges) > 0)
-    selectEdges(c_w, selectedEdges)
+    selectEdges(cw, selectedEdges)
 }
 # END selectEdgesConnectedBySelectedNodes	
 
 
-## function to create a subnetwork from selected nodes
+
+setGeneric ('subnetwork_from_selected', 
+            signature='obj', function(obj,
+                                      copy.graph.to.R = TRUE) standardGeneric ('subnetwork_from_selected'))
+
+#' Create a subnetwork from selected nodes in Cytoscape Network 
+#'
+#' Creates a new network from selected nodes of a Cytoscape Network. New network includes all edges connecting the selected nodes. 
+#'
+#' @param object Cytoscape network 
+#' @param copy.graph.to.R Logical whether to copy the graph to a new object in R 
+#' 
+#' @return Connection to new subnetwork. 
+#'
+#' @examples \dontrun{
+#' cw <- CytoscapeWindow('vignette subnetwork', graph = RCy3::makeSimpleGraph(), overwrite = TRUE)
+#' displayGraph(cw)
+#' selectNodes(cw,c("A","B")) # selects specific nodes
+#' getSelectedNodes(cw)
+#' getSelectedEdges(cw)
+#' newnet <- subnetwork_from_selected(cw)
+#' }
+#'
+#' @author Julia Gustavsen, \email{j.gustavsen@@gmail.com}
+#' @seealso \code{\link{createWindowFromSelection}}, \code{\link{selectEdgesConnectedBySelectedNodes}}, \code{\link{renameCytoscapeNetwork}}
+#' 
+#' @concept RCy3
+#' @export
+#' 
+#' @importFrom methods setGeneric
 subnetwork_from_selected <- function(obj,
                                      copy.graph.to.R = TRUE) {
   ## get selected nodes
@@ -75,5 +135,5 @@ subnetwork_from_selected <- function(obj,
   
   invisible(request.res)
   return(subnetwork_from_selected)    
-  
 }
+# END subnetwork_from_selected

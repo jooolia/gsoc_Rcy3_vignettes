@@ -1,9 +1,14 @@
 library(RCy3)
 library(httr)
+library(RJSONIO)
 
 ## create functions to get command names for available plugins from Cytoscape
 
 
+
+setGeneric('getCommandNames', 
+           signature='obj',
+           function(obj) standardGeneric ('getCommandNames'))
 #' Gets commands available from within cytoscape from 
 #' functions within cytoscape and from installed plugins.
 #'
@@ -15,10 +20,6 @@ library(httr)
 #' @export
 #' 
 #' @importFrom methods setGeneric
-setGeneric('getCommandNames', 
-            signature='obj',
-            function(obj) standardGeneric ('getCommandNames'))
-
 setMethod('getCommandNames',
           'CytoscapeConnectionClass',
           function(obj) { 
@@ -37,7 +38,10 @@ setMethod('getCommandNames',
           })
 
 
-
+setGeneric('getCommandsWithinNamespace', 
+           signature = 'obj',
+           function(obj,
+                    namespace) standardGeneric('getCommandsWithinNamespace'))
 #' Gets commands available from within a namespace in Cytoscape from 
 #' functions within cytoscape and from installed plugins.
 #'
@@ -50,11 +54,6 @@ setMethod('getCommandNames',
 #' @export
 #' 
 #' @importFrom methods setGeneric
-setGeneric('getCommandsWithinNamespace', 
-            signature = 'obj',
-            function(obj,
-                     namespace) standardGeneric('getCommandsWithinNamespace'))
-
 setMethod('getCommandsWithinNamespace',
           'CytoscapeConnectionClass',
           function(obj,
@@ -73,7 +72,13 @@ setMethod('getCommandsWithinNamespace',
             return(available.commands) })
 
 
-## testing out
+setGeneric('setCommandProperties', 
+           signature = 'obj',
+           function(obj,
+                    command.name,
+                    properties.list, 
+                    copy.graph.to.R = FALSE) standardGeneric('setCommandProperties')
+)
 
 #' Runs a Cytoscape command (for example from a plugin) with a list of parameters and creates a connection to the network (if a new one is created) so that it can be further manipulated from R. 
 #'
@@ -92,14 +97,6 @@ setMethod('getCommandsWithinNamespace',
 #' @export
 #' 
 #' @importFrom methods setGeneric
-setGeneric('setCommandProperties', 
-           signature = 'obj',
-           function(obj,
-                    command.name,
-                    properties.list, 
-                    copy.graph.to.R = FALSE) standardGeneric('setCommandProperties')
-)
-
 setMethod('setCommandProperties',
           'CytoscapeConnectionClass', 
           function(obj,
