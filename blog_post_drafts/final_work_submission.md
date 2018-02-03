@@ -1,6 +1,6 @@
 # Final work submission for GSOC project:
 
-This summer I have worked on a project for the Google Summer of Code to create a number of demonstrations of the R package RCy3 that could be used to run common workflows in Cytoscape. RCy3 is a R package that interacts with Cytoscape that was updated from a previous version by a group of developpers. The reason that it was converted to another version is because of an API, cyREST, which was developped to enable the scriptability of network visualisations and analysis in Cytoscape using various different programming languages. 
+This summer I have worked on a project for the Google Summer of Code to create a number of demonstrations of the R package RCy3 that could be used to run common workflows in Cytoscape. RCy3 is a R package that interacts with Cytoscape that was updated from a previous version by a group of developers. The reason that it was converted to another version is because of an API, cyREST, which was developed to enable the scriptability of network visualizations and analysis in Cytoscape using various different programming languages. 
 
 In this page I have included the work that I have done by topic, and also at the bottom of the page is a list of all the commits that I have made to this project's repository and to the RCy3 project repository under "View by commits".
 
@@ -15,7 +15,7 @@ There have been several unanticipated challenges that I have encountered while w
 I will elaborate further in a forthcoming blog post, but I will list a few of the surprising challenges here:
 
 1) Saving images from Cytoscape via cyREST is really dependent on the size of the window that you have open. You can use a parameter "h" which sets the size of the final image, but the width is set automatically.
-2) Plugins in Cytoscape that present an API interface do not have a standard verb-action vocabulary. This is not a huge deal, but requires some guessing of how plugins can be used via cyREST. It can be unclear why certain arguments are available in the app gui and these are not avaible via cyREST. 
+2) Plugins in Cytoscape that present an API interface do not have a standard verb-action vocabulary. This is not a huge deal, but requires some guessing of how plugins can be used via cyREST. It can be unclear why certain arguments are available in the app gui and these are not available via cyREST. 
 
 # Work by topic
 
@@ -30,7 +30,7 @@ There are several plugins that quickly make these figures more easy to interpret
 - autoannotate - could be used to automatically annotate the enrichment maps created. 
 - wordcloud - if a way to export the image automatically were available then the annotations could be made into a word cloud that would be generated each time. 
 
-## Co-occurence network vignette:
+## Co-occurrence network vignette:
 
 Have used data from part of the Tara Oceans [Tara Oceans Expedition](http://oceans.taraexpeditions.org/) expedition to look at the co-occurrence of viruses and bacteria in different oceanic sites.  The network is visualized and then we used some of the taxonomic data associated with the network to ask questions of the network and also to find parts of the network where we would like to examine more of it or to ask more questions or to explore more. See here: https://github.com/jooolia/gsoc_Rcy3_vignettes/blob/master/tara_oceans_co-occurence_net_RCy3_vignette.md
 
@@ -63,7 +63,7 @@ Another activity that is possible in Cytoscape is examing the chemical propertie
 
 # View by commits:
 
-### Commits to single author repository where I have developped these vignettes.
+### Commits to single author repository where I have developed these vignettes.
 
 The coding is in the .Rmd files and in a directory entitled "functions_to_add_to_RCy3" which contains .R files:
 
